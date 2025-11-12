@@ -7,6 +7,10 @@
 - 위젯 구조 확인 시
 - 레이아웃/인터랙션 확인 시
 
+**참조:**
+- [COMPONENT_SPECS.md](COMPONENT_SPECS.md) - **컴포넌트 구현 시 필수** (크기, 색상, 동작 상세)
+- [../miniline/src/lib/components/](../miniline/src/lib/components/) - 웹 버전 컴포넌트 참조
+
 ---
 
 ## 화면 구조

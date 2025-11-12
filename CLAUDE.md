@@ -30,6 +30,7 @@ AI 기반 자동 조합 저널 앱 (Flutter 버전)
 **미니라인 앱 특화**:
 - [docs/DIFFERENCES_FROM_WEB.md](docs/DIFFERENCES_FROM_WEB.md) - **웹과 다른 점** 확인 시 (공유, 알림, UI)
 - [docs/DESIGN_UI.md](docs/DESIGN_UI.md) - **화면 구현** 시
+- [docs/COMPONENT_SPECS.md](docs/COMPONENT_SPECS.md) - **컴포넌트 구현** 시 (필수)
 - [docs/PLAN.md](docs/PLAN.md) - **개발 일정 확인** 시
 
 **북랩 (Flutter 패턴)**:
