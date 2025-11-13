@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
 
 import 'core/database/database_service.dart';
+import 'core/services/sync/lifecycle_service.dart';
 import 'core/utils/logger.dart';
 import 'env/app_env.dart';
 
@@ -34,11 +35,27 @@ void main() async {
   );
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // 초기화 완료 후 동기화 서비스 시작
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // LifecycleService 초기화 (Provider ref와 함께)
+      ref.read(lifecycleServiceProvider).initialize();
+      logger.i('[Main] LifecycleService initialized');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MiniLine',
       theme: ThemeData(
