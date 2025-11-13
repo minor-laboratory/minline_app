@@ -1,5 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' as intl;
 
 import '../../../../core/utils/app_icons.dart';
 import '../../../../models/fragment.dart';
@@ -150,16 +151,16 @@ class FragmentCard extends StatelessWidget {
 
     // 상대 시간 (time variant만, 7일 이내)
     if (includeTime) {
-      if (diff.inMinutes < 1) return '방금 전';
-      if (diff.inMinutes < 60) return '${diff.inMinutes}분 전';
-      if (diff.inHours < 24) return '${diff.inHours}시간 전';
-      if (diff.inDays < 7) return '${diff.inDays}일 전';
+      if (diff.inMinutes < 1) return 'time.just_now'.tr();
+      if (diff.inMinutes < 60) return 'time.minutes_ago'.tr(args: [diff.inMinutes.toString()]);
+      if (diff.inHours < 24) return 'time.hours_ago'.tr(args: [diff.inHours.toString()]);
+      if (diff.inDays < 7) return 'time.days_ago'.tr(args: [diff.inDays.toString()]);
     }
 
     // 절대 시간
     final locale = Localizations.localeOf(context).languageCode;
-    final format = includeTime ? 'yyyy년 M월 d일 a h:mm' : 'yyyy년 M월 d일';
-    return DateFormat(format, locale).format(date);
+    final format = includeTime ? 'time.datetime_format'.tr() : 'time.date_format'.tr();
+    return intl.DateFormat(format, locale).format(date);
   }
 
   /// 작성 시간 포맷 (항상 상대 시간)
@@ -167,13 +168,13 @@ class FragmentCard extends StatelessWidget {
     final now = DateTime.now();
     final diff = now.difference(date);
 
-    if (diff.inMinutes < 1) return '방금 전';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}분 전';
-    if (diff.inHours < 24) return '${diff.inHours}시간 전';
-    if (diff.inDays < 7) return '${diff.inDays}일 전';
+    if (diff.inMinutes < 1) return 'time.just_now'.tr();
+    if (diff.inMinutes < 60) return 'time.minutes_ago'.tr(args: [diff.inMinutes.toString()]);
+    if (diff.inHours < 24) return 'time.hours_ago'.tr(args: [diff.inHours.toString()]);
+    if (diff.inDays < 7) return 'time.days_ago'.tr(args: [diff.inDays.toString()]);
 
     final locale = Localizations.localeOf(context).languageCode;
-    return DateFormat('yyyy년 M월 d일', locale).format(date);
+    return intl.DateFormat('time.date_format'.tr(), locale).format(date);
   }
 
   /// AI 태그 위젯

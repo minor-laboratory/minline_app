@@ -1,0 +1,351 @@
+import 'dart:io';
+
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../../core/database/database_service.dart';
+import '../../../../core/utils/app_icons.dart';
+import '../../../../core/utils/logger.dart';
+import '../../../../models/fragment.dart';
+
+/// Fragment 입력바 위젯
+///
+/// Timeline 화면 하단 고정 입력바 (채팅 앱 스타일)
+class FragmentInputBar extends ConsumerStatefulWidget {
+  const FragmentInputBar({super.key});
+
+  @override
+  ConsumerState<FragmentInputBar> createState() => _FragmentInputBarState();
+}
+
+class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
+  final _contentController = TextEditingController();
+  final _imagePicker = ImagePicker();
+  final List<File> _selectedImages = [];
+  bool _isLoading = false;
+
+  static const int _maxLength = 300;
+  static const int _maxImages = 3;
+
+  @override
+  void dispose() {
+    _contentController.dispose();
+    super.dispose();
+  }
+
+  /// 유효성 검증 (텍스트 또는 이미지 필수)
+  bool get _isValid =>
+      _contentController.text.trim().isNotEmpty || _selectedImages.isNotEmpty;
+
+  /// 갤러리에서 이미지 선택
+  Future<void> _pickImages() async {
+    if (_selectedImages.length >= _maxImages) {
+      _showError('media.max_files_limit'.tr(args: [_maxImages.toString()]));
+      return;
+    }
+
+    try {
+      final List<XFile> images = await _imagePicker.pickMultiImage(
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageQuality: 85,
+      );
+
+      if (images.isEmpty) return;
+
+      final availableSlots = _maxImages - _selectedImages.length;
+      final imagesToAdd = images.take(availableSlots).toList();
+
+      if (images.length > availableSlots) {
+        _showError('media.max_files_limit'.tr(args: [_maxImages.toString()]));
+      }
+
+      setState(() {
+        _selectedImages.addAll(imagesToAdd.map((xfile) => File(xfile.path)));
+      });
+    } catch (e, stack) {
+      logger.e('Failed to pick images', e, stack);
+      _showError('media.select_failed'.tr());
+    }
+  }
+
+  /// 이미지 삭제
+  void _removeImage(int index) {
+    setState(() {
+      _selectedImages.removeAt(index);
+    });
+  }
+
+  /// Fragment 저장
+  Future<void> _save() async {
+    if (!_isValid) {
+      _showError('snap.content_or_media_required'.tr());
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final supabase = Supabase.instance.client;
+      final currentUser = supabase.auth.currentUser;
+
+      if (currentUser == null) {
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+        _showError('auth.not_authenticated'.tr());
+        return;
+      }
+
+      // TODO: Phase 3에서 이미지 업로드 구현
+      // 현재는 로컬 경로만 저장 (임시)
+      final mediaUrls = _selectedImages.map((file) => file.path).toList();
+
+      final fragment = Fragment.fromNew(
+        userId: currentUser.id,
+        content: _contentController.text.trim(),
+        mediaUrls: mediaUrls,
+        synced: false,
+      );
+
+      final isar = DatabaseService.instance.isar;
+      await isar.writeTxn(() async {
+        await isar.fragments.put(fragment);
+      });
+
+      // 입력 초기화
+      if (!mounted) return;
+      setState(() {
+        _contentController.clear();
+        _selectedImages.clear();
+        _isLoading = false;
+      });
+
+      // 키보드 내리기
+      if (mounted) {
+        FocusScope.of(context).unfocus();
+      }
+    } catch (e, stack) {
+      logger.e('Failed to save fragment', e, stack);
+      setState(() => _isLoading = false);
+      _showError('common.save_failed'.tr());
+    }
+  }
+
+  /// 에러 메시지 표시 (SnackBar)
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: colorScheme.outline.withValues(alpha: 0.2),
+          ),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 이미지 프리뷰
+          if (_selectedImages.isNotEmpty) ...[
+            _buildImagePreview(colorScheme),
+            const SizedBox(height: 12),
+          ],
+
+          // 텍스트 입력
+          TextField(
+            controller: _contentController,
+            maxLines: null,
+            minLines: 2,
+            maxLength: _maxLength,
+            enabled: !_isLoading,
+            decoration: InputDecoration(
+              hintText: 'snap.input_placeholder'.tr(),
+              border: InputBorder.none,
+              counterText: '', // 기본 카운터 숨김 (커스텀 사용)
+            ),
+            onChanged: (_) => setState(() {}),
+            onSubmitted: (_) {
+              if (_isValid) _save();
+            },
+          ),
+
+          const SizedBox(height: 12),
+
+          // 액션 영역
+          Row(
+            children: [
+              // 이미지 추가 버튼
+              _buildImageButton(colorScheme),
+              const SizedBox(width: 8),
+
+              // 글자수 표시
+              _buildCharCounter(colorScheme),
+
+              const Spacer(),
+
+              // 저장 버튼
+              _buildSaveButton(colorScheme),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 이미지 프리뷰 위젯
+  Widget _buildImagePreview(ColorScheme colorScheme) {
+    return SizedBox(
+      height: 80,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _selectedImages.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Stack(
+              children: [
+                // 이미지
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.file(
+                    _selectedImages[index],
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                // 삭제 버튼
+                Positioned(
+                  top: -8,
+                  right: -8,
+                  child: IconButton(
+                    icon: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: colorScheme.error,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        AppIcons.close,
+                        size: 12,
+                        color: colorScheme.onError,
+                      ),
+                    ),
+                    onPressed: () => _removeImage(index),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// 이미지 추가 버튼
+  Widget _buildImageButton(ColorScheme colorScheme) {
+    return GestureDetector(
+      onTap: _isLoading ? null : _pickImages,
+      child: Container(
+        height: 32,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          color: _isLoading
+              ? colorScheme.surfaceContainerHighest
+              : colorScheme.secondaryContainer,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              AppIcons.imagePlus,
+              size: 16,
+              color: _isLoading
+                  ? colorScheme.onSurfaceVariant
+                  : colorScheme.onSecondaryContainer,
+            ),
+            if (_selectedImages.isNotEmpty) ...[
+              const SizedBox(width: 6),
+              Text(
+                '${ _selectedImages.length}/$_maxImages',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: _isLoading
+                      ? colorScheme.onSurfaceVariant
+                      : colorScheme.onSecondaryContainer,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 글자수 카운터
+  Widget _buildCharCounter(ColorScheme colorScheme) {
+    final charCount = _contentController.text.length;
+
+    return Container(
+      height: 32,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Center(
+        child: Text(
+          '$charCount / $_maxLength',
+          style: TextStyle(
+            fontSize: 14,
+            color: colorScheme.onSurfaceVariant,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 저장 버튼
+  Widget _buildSaveButton(ColorScheme colorScheme) {
+    return ElevatedButton(
+      onPressed: _isValid && !_isLoading ? _save : null,
+      child: _isLoading
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: colorScheme.onPrimary,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text('common.saving'.tr()),
+              ],
+            )
+          : Text('common.save'.tr()),
+    );
+  }
+}
