@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/utils/app_icons.dart';
 import '../widgets/fragment_input_bar.dart';
@@ -17,21 +18,17 @@ class TimelinePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('timeline.title'.tr()),
         actions: [
-          // Drafts (나중에 구현)
+          // Drafts
           IconButton(
             icon: Icon(AppIcons.drafts),
-            onPressed: () {
-              // TODO: Navigate to Drafts
-            },
+            onPressed: () => context.push('/drafts'),
           ),
-          // Posts (나중에 구현)
+          // Posts
           IconButton(
             icon: Icon(AppIcons.posts),
-            onPressed: () {
-              // TODO: Navigate to Posts
-            },
+            onPressed: () => context.push('/posts'),
           ),
-          // Settings (나중에 구현)
+          // Settings
           PopupMenuButton(
             icon: Icon(AppIcons.moreVert),
             itemBuilder: (context) => [
@@ -41,7 +38,9 @@ class TimelinePage extends StatelessWidget {
               ),
             ],
             onSelected: (value) {
-              // TODO: Navigate to Settings
+              if (value == 'settings') {
+                context.push('/settings');
+              }
             },
           ),
         ],
