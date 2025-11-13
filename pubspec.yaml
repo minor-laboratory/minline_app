@@ -8,6 +8,7 @@ environment:
 
 # Isar Community Edition 버전 정의
 isar_version: &isar_version 3.3.0-dev.1
+envied_version: &envied_version 1.3.1
 riverpod_version: &riverpod_version 3.0.3
 
 dependencies:
@@ -86,6 +87,10 @@ dependencies:
   # 동기화용 Mutex
   synchronized: ^3.3.0+3
 
+  # 환경 변수
+  envied:
+    version: *envied_version
+
   # 구독 및 결제 (RevenueCat)
   purchases_flutter: ^9.8.0
 
@@ -102,6 +107,8 @@ dev_dependencies:
     version: *riverpod_version
   build_runner: ^2.7.1
   json_serializable: ^6.11.1
+  envied_generator:
+    version: *envied_version
 
   # Isar 코드 생성
   isar_community_generator:

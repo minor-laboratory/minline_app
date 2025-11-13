@@ -37,6 +37,11 @@ migrate_working_dir/
 *.g.dart
 *.freezed.dart
 
+# Environment variables
+.env
+.env.*
+!.env.*.example
+
 # Firebase
 google-services.json
 GoogleService-Info.plist

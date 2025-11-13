@@ -26,19 +26,41 @@ flutterfire configure \
 - `ios/Runner/GoogleService-Info.plist` (gitignore)
 - `lib/firebase_options.dart` (git 포함)
 
-### 2. 의존성 설치
+### 2. Supabase 설정 (필수)
+
+**중요**: 환경 변수 파일은 보안상 git에 포함되지 않습니다.
+
+각 개발자는 다음 명령어로 환경 변수 파일을 생성해야 합니다:
+
+```bash
+# .env.dev.example을 복사하여 .env.dev 생성
+cp .env.dev.example .env.dev
+
+# Supabase 설정 정보 입력 (북랩과 동일한 프로젝트 사용)
+# SUPABASE_URL과 SUPABASE_ANON_KEY를 실제 값으로 변경
+```
+
+생성되는 파일:
+- `.env.dev` (gitignore) - 개발 환경 변수
+- `lib/env/env.dev.g.dart` (gitignore) - 코드 생성 파일
+
+### 3. 의존성 설치
 
 ```bash
 flutter pub get
 ```
 
-### 3. 코드 생성
+### 4. 코드 생성
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-### 4. 앱 실행
+이 명령어는 다음 파일들을 생성합니다:
+- `*.g.dart` - Isar 모델 및 Riverpod 프로바이더
+- `lib/env/env.dev.g.dart` - 환경 변수 (envied)
+
+### 5. 앱 실행
 
 ```bash
 flutter run
