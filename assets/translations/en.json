@@ -39,7 +39,18 @@
     "empty_message": "Accept drafts to create posts",
     "make_public": "Make Public",
     "make_public_description": "Allow other users to see this post",
-    "created_at": "Created"
+    "created_at": "Created",
+    "delete_confirm_title": "Delete Post",
+    "delete_confirm_message": "Are you sure you want to delete this post?",
+    "deleted": "Post deleted successfully",
+    "made_public": "Post is now public",
+    "made_private": "Post is now private",
+    "not_found": "Post not found",
+    "template_product_review": "Product Review",
+    "template_timeline": "Timeline Story",
+    "template_essay": "Essay",
+    "template_travel": "Travel Log",
+    "template_project": "Project Log"
   },
   "post": {
     "public": "Public",
