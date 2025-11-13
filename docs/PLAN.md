@@ -262,6 +262,46 @@ lib/router/app_router.dart
 - 화면 간 이동 확인
 - 뒤로가기 동작 확인
 
+### 2.6 캘린더 뷰
+
+**우선순위:** 중간
+
+**작업:**
+- [ ] CalendarView 위젯 작성
+- [ ] 월간 캘린더 그리드 렌더링
+- [ ] 날짜별 Fragment 개수 점 표시 (1-3개: •••, 4개 이상: •••+)
+- [ ] 날짜 선택 시 하단 Fragment 리스트 표시
+- [ ] 년/월 변경 기능
+- [ ] Timeline ↔ Calendar 뷰 전환 버튼
+- [ ] 오늘 버튼
+
+**파일:**
+```
+lib/features/timeline/presentation/widgets/
+└── calendar_view.dart
+lib/features/timeline/presentation/pages/
+└── timeline_page.dart (뷰 토글 추가)
+```
+
+**참조:**
+- [../miniline/docs/features/캘린더_뷰/FEATURE.md](../miniline/docs/features/캘린더_뷰/FEATURE.md) (웹 버전 참조)
+- [../miniline/docs/features/캘린더_뷰/IMPLEMENTATION.md](../miniline/docs/features/캘린더_뷰/IMPLEMENTATION.md)
+- Flutter table_calendar 패키지 사용 고려
+
+**주의사항:**
+- 필터는 Timeline 뷰에만 적용 (Calendar는 항상 전체 Fragment)
+- 이전 월 날짜(회색)는 클릭 불가
+- 오늘 날짜 border 표시
+- 선택된 날짜 배경색 변경
+- 로컬 데이터 우선 (오프라인 동작)
+
+**검증:**
+- Timeline ↔ Calendar 뷰 전환 확인
+- 날짜 선택 → Fragment 리스트 표시
+- Fragment 없는 날짜 → 안내 메시지
+- 월 변경 → 캘린더 렌더링 확인
+- 오늘 버튼 → 현재 월로 이동
+
 ---
 
 ## Phase 3: 앱 특화 기능
@@ -474,11 +514,12 @@ lib/shared/theme/app_theme.dart
 4. 테스트
 
 ### P2 (중간 - 완성도)
-1. 로컬 알림
-2. 푸시 알림
-3. Settings
-4. 다국어
-5. 테마
+1. 캘린더 뷰
+2. 로컬 알림
+3. 푸시 알림
+4. Settings
+5. 다국어
+6. 테마
 
 ### P3 (낮음 - 추가 기능)
 1. 디바이스 관리
