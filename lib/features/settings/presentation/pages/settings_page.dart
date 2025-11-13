@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/utils/app_icons.dart';
+import '../../../../shared/widgets/standard_bottom_sheet.dart';
 import '../widgets/daily_reminder_sheet.dart';
 import '../widgets/draft_notification_sheet.dart';
 import '../widgets/language_settings_sheet.dart';
@@ -36,17 +38,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Future<void> _handleLogout() async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showShadDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => ShadDialog(
         title: Text('settings.logout'.tr()),
-        content: Text('settings.logout_confirm'.tr()),
+        description: Text('settings.logout_confirm'.tr()),
         actions: [
-          TextButton(
+          ShadButton.outline(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text('common.cancel'.tr()),
           ),
-          TextButton(
+          ShadButton.destructive(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text('settings.logout'.tr()),
           ),
@@ -73,34 +75,42 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   void _showThemeSettings() {
-    showModalBottomSheet(
+    StandardBottomSheet.show(
       context: context,
-      isScrollControlled: true,
-      builder: (context) => const ThemeSettingsSheet(),
+      title: 'settings.theme'.tr(),
+      content: const ThemeSettingsSheet(),
+      isDraggable: true,
+      isDismissible: true,
     );
   }
 
   void _showLanguageSettings() {
-    showModalBottomSheet(
+    StandardBottomSheet.show(
       context: context,
-      isScrollControlled: true,
-      builder: (context) => const LanguageSettingsSheet(),
+      title: 'settings.language'.tr(),
+      content: const LanguageSettingsSheet(),
+      isDraggable: true,
+      isDismissible: true,
     );
   }
 
   void _showDailyReminderSettings() {
-    showModalBottomSheet(
+    StandardBottomSheet.show(
       context: context,
-      isScrollControlled: true,
-      builder: (context) => const DailyReminderSheet(),
+      title: 'settings.daily_reminder'.tr(),
+      content: const DailyReminderSheet(),
+      isDraggable: true,
+      isDismissible: true,
     );
   }
 
   void _showDraftNotificationSettings() {
-    showModalBottomSheet(
+    StandardBottomSheet.show(
       context: context,
-      isScrollControlled: true,
-      builder: (context) => const DraftNotificationSheet(),
+      title: 'settings.draft_notifications'.tr(),
+      content: const DraftNotificationSheet(),
+      isDraggable: true,
+      isDismissible: true,
     );
   }
 
@@ -137,7 +147,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             onTap: _showLanguageSettings,
           ),
 
-          const Divider(),
+          ShadSeparator.horizontal(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+          ),
 
           // 알림 설정 섹션
           _buildSectionHeader(context, 'settings.notifications'.tr()),
@@ -158,7 +170,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             onTap: _showDraftNotificationSettings,
           ),
 
-          const Divider(),
+          ShadSeparator.horizontal(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+          ),
 
           // 앱 정보 섹션
           _buildSectionHeader(context, 'settings.app_info'.tr()),
@@ -169,7 +183,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             subtitle: Text(_appVersion),
           ),
 
-          const Divider(),
+          ShadSeparator.horizontal(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+          ),
 
           // 법적 정보 섹션
           _buildSectionHeader(context, 'settings.legal'.tr()),
@@ -190,7 +206,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
           // 로그아웃 (로그인 상태일 때만)
           if (isLoggedIn) ...[
-            const Divider(),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: ShadSeparator.horizontal(),
+            ),
             ListTile(
               leading: Icon(AppIcons.logout, color: colorScheme.error),
               title: Text(

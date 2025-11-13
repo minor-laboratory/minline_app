@@ -42,20 +42,28 @@ class DraftFilter extends _$DraftFilter {
 
 /// Draft 리스트 Stream Provider (필터 적용 전)
 @riverpod
-Stream<List<Draft>> draftsStream(Ref ref) {
+Stream<List<Draft>> draftsStream(Ref ref) async* {
   final isar = DatabaseService.instance.isar;
 
-  return isar.drafts.watchLazy().asyncMap((_) async {
+  // 초기값 먼저 방출
+  final initialDrafts = await isar.drafts
+      .filter()
+      .deletedEqualTo(false)
+      .findAll();
+
+  initialDrafts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  yield initialDrafts;
+
+  // watchLazy로 변경 이벤트만 감지
+  await for (final _ in isar.drafts.watchLazy()) {
     final drafts = await isar.drafts
         .filter()
         .deletedEqualTo(false)
         .findAll();
 
-    // 생성일 역순 정렬
     drafts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
-    return drafts;
-  });
+    yield drafts;
+  }
 }
 
 /// 필터링된 Draft 리스트
@@ -98,14 +106,24 @@ Stream<Map<String, int>> draftCounts(Ref ref) async* {
 
 /// 미확인 Draft 개수
 @riverpod
-Stream<int> unviewedDraftsCount(Ref ref) {
+Stream<int> unviewedDraftsCount(Ref ref) async* {
   final isar = DatabaseService.instance.isar;
 
-  return isar.drafts.watchLazy().asyncMap((_) async {
-    return await isar.drafts
+  // 초기값 먼저 방출
+  final initialCount = await isar.drafts
+      .filter()
+      .deletedEqualTo(false)
+      .viewedEqualTo(false)
+      .count();
+  yield initialCount;
+
+  // watchLazy로 변경 이벤트만 감지
+  await for (final _ in isar.drafts.watchLazy()) {
+    final count = await isar.drafts
         .filter()
         .deletedEqualTo(false)
         .viewedEqualTo(false)
         .count();
-  });
+    yield count;
+  }
 }

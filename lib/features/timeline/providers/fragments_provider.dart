@@ -30,10 +30,22 @@ Future<List<Fragment>> fragments(Ref ref) async {
 ///
 /// Isar watch로 실시간 변경 감지
 @riverpod
-Stream<List<Fragment>> fragmentsStream(Ref ref) {
+Stream<List<Fragment>> fragmentsStream(Ref ref) async* {
   final isar = DatabaseService.instance.isar;
 
-  return isar.fragments.watchLazy().asyncMap((_) async {
+  // 초기값 먼저 방출
+  final initialFragments = await isar.fragments
+      .filter()
+      .deletedEqualTo(false)
+      .findAll();
+
+  initialFragments.sort((a, b) => (b.refreshAt ?? DateTime.now())
+      .compareTo(a.refreshAt ?? DateTime.now()));
+
+  yield initialFragments;
+
+  // watchLazy로 변경 이벤트만 감지
+  await for (final _ in isar.fragments.watchLazy()) {
     final fragments = await isar.fragments
         .filter()
         .deletedEqualTo(false)
@@ -42,8 +54,8 @@ Stream<List<Fragment>> fragmentsStream(Ref ref) {
     fragments.sort((a, b) => (b.refreshAt ?? DateTime.now())
         .compareTo(a.refreshAt ?? DateTime.now()));
 
-    return fragments;
-  });
+    yield fragments;
+  }
 }
 
 /// Fragment 개수 Provider
@@ -128,35 +140,32 @@ class FragmentFilterState {
 
 /// 필터링된 Fragment 스트림 Provider
 @riverpod
-Stream<List<Fragment>> filteredFragments(Ref ref) {
+Stream<List<Fragment>> filteredFragments(Ref ref) async* {
   final isar = DatabaseService.instance.isar;
   final filter = ref.watch(fragmentFilterProvider);
 
-  return isar.fragments.watchLazy().asyncMap((_) async {
-    // 기본 필터 (deleted = false)
-    var fragments = await isar.fragments
-        .filter()
-        .deletedEqualTo(false)
-        .findAll();
+  // 필터링 및 정렬 로직을 함수로 추출
+  List<Fragment> filterAndSort(List<Fragment> fragments) {
+    var result = fragments;
 
     // 검색어 필터링
     if (filter.query.isNotEmpty) {
       final searchQuery = filter.query.toLowerCase();
-      fragments = fragments.where((f) =>
+      result = result.where((f) =>
         f.content.toLowerCase().contains(searchQuery)
       ).toList();
     }
 
     // 태그 필터링
     if (filter.selectedTags.isNotEmpty) {
-      fragments = fragments.where((f) {
+      result = result.where((f) {
         final allTags = [...f.tags, ...f.userTags];
         return filter.selectedTags.any((tag) => allTags.contains(tag));
       }).toList();
     }
 
     // 정렬
-    fragments.sort((a, b) {
+    result.sort((a, b) {
       DateTime aTime, bTime;
 
       if (filter.sortBy == 'created') {
@@ -175,6 +184,24 @@ Stream<List<Fragment>> filteredFragments(Ref ref) {
       return filter.sortOrder == 'desc' ? -diff : diff;
     });
 
-    return fragments;
-  });
+    return result;
+  }
+
+  // 초기값 먼저 방출
+  final initialFragments = await isar.fragments
+      .filter()
+      .deletedEqualTo(false)
+      .findAll();
+
+  yield filterAndSort(initialFragments);
+
+  // watchLazy로 변경 이벤트만 감지
+  await for (final _ in isar.fragments.watchLazy()) {
+    final fragments = await isar.fragments
+        .filter()
+        .deletedEqualTo(false)
+        .findAll();
+
+    yield filterAndSort(fragments);
+  }
 }

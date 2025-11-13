@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/database/database_service.dart';
 import '../../../../core/utils/app_icons.dart';
@@ -100,17 +101,17 @@ class _DraftCardState extends ConsumerState<DraftCard> {
   }
 
   Future<void> _showDeleteDialog() async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showShadDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => ShadDialog(
         title: Text('draft.delete_title'.tr()),
-        content: Text('draft.delete_confirm'.tr()),
+        description: Text('draft.delete_confirm'.tr()),
         actions: [
-          TextButton(
+          ShadButton.outline(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text('common.cancel'.tr()),
           ),
-          FilledButton(
+          ShadButton.destructive(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text('common.delete'.tr()),
           ),

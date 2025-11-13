@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../../core/utils/app_icons.dart';
-
 /// Draft 완성 알림 설정 바텀 시트
 class DraftNotificationSheet extends ConsumerStatefulWidget {
   const DraftNotificationSheet({super.key});
@@ -45,40 +43,11 @@ class _DraftNotificationSheetState
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
-    return Container(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 헤더
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Icon(AppIcons.notification, size: 24),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'settings.draft_notifications'.tr(),
-                    style: textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(AppIcons.close),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-          ),
-
-          const Divider(height: 1),
-
-          // 설명
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 설명
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
@@ -104,11 +73,10 @@ class _DraftNotificationSheetState
               });
               await _saveSettings();
             },
-          ),
+        ),
 
-          const SizedBox(height: 16),
-        ],
-      ),
+        const SizedBox(height: 16),
+      ],
     );
   }
 }

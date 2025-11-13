@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
 import '../../providers/fragments_provider.dart';
@@ -26,29 +27,26 @@ class FilterBar extends ConsumerWidget {
             children: [
               // 검색 입력
               Expanded(
-                child: TextField(
+                child: ShadInput(
                   onChanged: (value) {
                     ref.read(fragmentFilterProvider.notifier).setQuery(value);
                   },
-                  decoration: InputDecoration(
-                    hintText: 'filter.search_placeholder'.tr(),
-                    prefixIcon: Icon(AppIcons.search),
-                    suffixIcon: filter.query.isNotEmpty
-                        ? IconButton(
-                            icon: Icon(AppIcons.close),
-                            onPressed: () {
-                              ref.read(fragmentFilterProvider.notifier).setQuery('');
-                            },
-                          )
-                        : null,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
+                  placeholder: Text('filter.search_placeholder'.tr()),
+                  leading: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Icon(AppIcons.search, size: 16),
                   ),
+                  trailing: filter.query.isNotEmpty
+                      ? ShadIconButton.ghost(
+                          width: 24,
+                          height: 24,
+                          padding: EdgeInsets.zero,
+                          icon: Icon(AppIcons.close, size: 16),
+                          onPressed: () {
+                            ref.read(fragmentFilterProvider.notifier).setQuery('');
+                          },
+                        )
+                      : null,
                 ),
               ),
               const SizedBox(width: 8),
@@ -83,15 +81,14 @@ class FilterBar extends ConsumerWidget {
               ),
 
               // 정렬 방향 토글
-              IconButton(
+              ShadIconButton.ghost(
+                padding: const EdgeInsets.all(8),
                 icon: Icon(
                   filter.sortOrder == 'desc'
                       ? AppIcons.arrowDown
                       : AppIcons.arrowUp,
+                  size: 20,
                 ),
-                tooltip: filter.sortOrder == 'desc'
-                    ? 'filter.sort_desc'.tr()
-                    : 'filter.sort_asc'.tr(),
                 onPressed: () {
                   ref.read(fragmentFilterProvider.notifier).toggleSortOrder();
                 },

@@ -85,7 +85,12 @@
     "template_timeline": "Timeline Story",
     "template_essay": "Essay",
     "template_travel": "Travel Log",
-    "template_project": "Project Log"
+    "template_project": "Project Log",
+    "version": "Version",
+    "version_info": "Version {0}",
+    "exported_to": "Exported to",
+    "fragments_used": "Snaps used",
+    "fragments_count": "{0} snaps"
   },
   "post": {
     "public": "Public",
@@ -105,6 +110,10 @@
     "dark_mode": "Dark",
     "language": "Language",
     "language_description": "Korean / English",
+    "use_system_language": "Use System Language",
+    "use_system_language_description": "Follow device language settings",
+    "available_languages": "Available Languages",
+    "language_changed": "Language changed",
     "notifications": "Notifications",
     "daily_reminder": "Daily Reminder",
     "daily_reminder_description": "Notify at a set time every day",
@@ -121,6 +130,7 @@
     "logout_confirm": "Are you sure you want to logout?"
   },
   "theme": {
+    "mode": "Theme Mode",
     "color_scheme": "Color Theme",
     "color_blue": "Blue",
     "color_slate": "Slate",
@@ -133,14 +143,31 @@
     "color_yellow": "Yellow",
     "color_green": "Green",
     "color_violet": "Violet",
-    "color_rose": "Rose"
+    "color_rose": "Rose",
+    "background_color": "Background Color",
+    "background_color_desc": "Choose a comfortable background color",
+    "bg_default": "Default",
+    "bg_default_desc": "Pure white/black",
+    "bg_warm": "Warm",
+    "bg_warm_desc": "Sepia/charcoal tone",
+    "bg_neutral": "Neutral",
+    "bg_neutral_desc": "Light gray tone"
   },
   "auth": {
-    "login_required": "Login required"
+    "login_required": "Login required",
+    "not_authenticated": "Please sign in"
+  },
+  "snap": {
+    "input_placeholder": "Write a snap...",
+    "content_or_media_required": "Please add content or images",
+    "save_failed": "Save failed",
+    "empty": "No snaps yet.",
+    "empty_hint": "Write your first snap below!"
   },
   "common": {
     "input_placeholder": "What's on your mind?",
     "save": "Save",
+    "saving": "Saving...",
     "character_count": "{current}/{max}",
     "saved": "Saved",
     "loading": "Loading...",
@@ -149,7 +176,22 @@
     "error": "An error occurred",
     "enable": "Enable",
     "notifications_on": "Notifications on",
-    "notifications_off": "Notifications off"
+    "notifications_off": "Notifications off",
+    "terms_of_service": "Terms of Service",
+    "privacy_policy": "Privacy Policy",
+    "marketing_consent": "Marketing Consent",
+    "youth_protection_policy": "Youth Protection Policy",
+    "policy": "Policy",
+    "loading_policy": "Loading policy...",
+    "version_format": "Version: {}",
+    "effective_date": "Effective Date",
+    "last_modified": "Last Modified",
+    "required_agreement": "Required",
+    "policy_not_found": "Policy Not Found",
+    "policy_not_found_description": "The policy does not exist",
+    "refresh": "Refresh",
+    "connection_error": "Connection Error",
+    "retry": "Retry"
   },
   "time": {
     "just_now": "Just now",
@@ -163,6 +205,7 @@
     "max_files_exceeded": "Maximum {count} files allowed",
     "unsupported_file_type": "Unsupported file type: {type}",
     "upload_failed": "Upload failed: {message}",
-    "delete_failed": "Delete failed: {message}"
+    "delete_failed": "Delete failed: {message}",
+    "select_failed": "File selection failed"
   }
 }

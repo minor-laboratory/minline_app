@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
@@ -187,7 +188,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
       logger.e('Failed to save fragment', e, stack);
       if (!mounted) return;
       setState(() => _isLoading = false);
-      _showError('common.save_failed'.tr());
+      _showError('snap.save_failed'.tr());
     }
   }
 
@@ -206,9 +207,15 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 16,
+        bottom: 16 + bottomPadding,
+      ),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         border: Border(
@@ -227,21 +234,26 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
           ],
 
           // 텍스트 입력
-          TextField(
-            controller: _contentController,
-            maxLines: null,
-            minLines: 2,
-            maxLength: _maxLength,
-            enabled: !_isLoading,
-            decoration: InputDecoration(
-              hintText: 'snap.input_placeholder'.tr(),
-              border: InputBorder.none,
-              counterText: '', // 기본 카운터 숨김 (커스텀 사용)
+          ConstrainedBox(
+            constraints: const BoxConstraints(
+              minHeight: 80,
+              maxHeight: 200,
             ),
-            onChanged: (_) => setState(() {}),
-            onSubmitted: (_) {
-              if (_isValid) _save();
-            },
+            child: ShadTextarea(
+              controller: _contentController,
+              enabled: !_isLoading,
+              placeholder: Text('snap.input_placeholder'.tr()),
+              onChanged: (value) {
+                // 300자 제한
+                if (value.length > _maxLength) {
+                  _contentController.text = value.substring(0, _maxLength);
+                  _contentController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: _maxLength),
+                  );
+                }
+                setState(() {});
+              },
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -293,8 +305,12 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
                 Positioned(
                   top: -8,
                   right: -8,
-                  child: IconButton(
-                    icon: Container(
+                  child: ShadButton.ghost(
+                    width: 24,
+                    height: 24,
+                    padding: EdgeInsets.zero,
+                    onPressed: () => _removeImage(index),
+                    child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         color: colorScheme.error,
@@ -306,7 +322,6 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
                         color: colorScheme.onError,
                       ),
                     ),
-                    onPressed: () => _removeImage(index),
                   ),
                 ),
               ],
@@ -384,7 +399,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
 
   /// 저장 버튼
   Widget _buildSaveButton(ColorScheme colorScheme) {
-    return ElevatedButton(
+    return ShadButton(
       onPressed: _isValid && !_isLoading ? _save : null,
       child: _isLoading
           ? Row(

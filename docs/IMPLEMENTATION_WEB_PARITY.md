@@ -109,6 +109,11 @@ ThemeSettingsSheet (Column)
 │  ├─ Light
 │  └─ Dark
 ├─ Divider
+├─ 배경색 (Column - 3개 RadioListTile)
+│  ├─ 기본 (defaultColor): 순수한 흰색/검정
+│  ├─ 따뜻함 (warm): 세피아/차콜 톤
+│  └─ 중립 (neutral): 연한 회색 톤
+├─ Divider
 └─ 컬러 스킴 (GridView 3x4)
    ├─ Blue, Slate, Gray, Zinc
    ├─ Neutral, Stone, Red, Orange
@@ -170,13 +175,59 @@ return colorTheme.when(
 );
 ```
 
-#### 4. 다국어 키 추가
+#### 4. 배경색 Provider 추가
 
-**파일**: `assets/translations/ko-KR.json`, `en-US.json`
+**파일**: `lib/features/settings/providers/settings_provider.dart`
+
+```dart
+/// 배경색 Provider (defaultColor/warm/neutral)
+@riverpod
+class BackgroundColorNotifier extends _$BackgroundColorNotifier {
+  static const String _key = 'background_color';
+
+  @override
+  Future<String> build() async {
+    final prefs = await ref.watch(sharedPreferencesProvider.future);
+    return prefs.getString(_key) ?? 'defaultColor';
+  }
+
+  Future<void> setBackgroundColor(String bgColor) async {
+    state = AsyncValue.data(bgColor);
+    final prefs = await ref.read(sharedPreferencesProvider.future);
+    await prefs.setString(_key, bgColor);
+  }
+}
+```
+
+**테마 적용**:
+```dart
+// main.dart에서 minorlab_common의 BackgroundColorOption 사용
+final bgColor = ref.watch(backgroundColorProvider);
+
+theme: AppTheme.light(
+  colorId: colorId,
+  bgColor: bgColor == 'warm' ? BackgroundColorOption.warm
+         : bgColor == 'neutral' ? BackgroundColorOption.neutral
+         : BackgroundColorOption.defaultColor,
+),
+```
+
+#### 5. 다국어 키 추가
+
+**파일**: `assets/translations/ko.json`, `en.json`
 
 ```json
 {
+  "theme.mode": "테마 모드",
   "theme.color_scheme": "컬러 테마",
+  "theme.background_color": "배경색",
+  "theme.background_color_desc": "읽기 편한 배경색을 선택하세요",
+  "theme.bg_default": "기본",
+  "theme.bg_default_desc": "순수한 흰색/검정",
+  "theme.bg_warm": "따뜻함",
+  "theme.bg_warm_desc": "세피아/차콜 톤",
+  "theme.bg_neutral": "중립",
+  "theme.bg_neutral_desc": "연한 회색 톤",
   "theme.color_blue": "블루",
   "theme.color_slate": "슬레이트",
   "theme.color_gray": "그레이",

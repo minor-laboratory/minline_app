@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/database/database_service.dart';
 import '../../../../core/utils/app_icons.dart';
@@ -27,17 +28,17 @@ class _PostCardState extends ConsumerState<PostCard> {
   bool _isLoading = false;
 
   Future<void> _showDeleteDialog() async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showShadDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => ShadDialog(
         title: Text('post.delete_title'.tr()),
-        content: Text('post.delete_confirm'.tr()),
+        description: Text('post.delete_confirm'.tr()),
         actions: [
-          TextButton(
+          ShadButton.outline(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text('common.cancel'.tr()),
           ),
-          FilledButton(
+          ShadButton.destructive(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text('common.delete'.tr()),
           ),
@@ -94,13 +95,12 @@ class _PostCardState extends ConsumerState<PostCard> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: widget.onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+      child: ShadCard(
+        child: InkWell(
+          onTap: widget.onTap,
+          borderRadius: BorderRadius.circular(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -118,54 +118,24 @@ class _PostCardState extends ConsumerState<PostCard> {
                   ),
                   const SizedBox(width: 8),
                   if (widget.post.isPublic)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
+                    ShadBadge(
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            AppIcons.language,
-                            size: 12,
-                            color: colorScheme.onPrimaryContainer,
-                          ),
+                          Icon(AppIcons.language, size: 12),
                           const SizedBox(width: 4),
-                          Text(
-                            'post.public'.tr(),
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: colorScheme.onPrimaryContainer,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
+                          Text('post.public'.tr()),
                         ],
                       ),
                     )
                   else
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
+                    ShadBadge.outline(
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            AppIcons.password,
-                            size: 12,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
+                          Icon(AppIcons.password, size: 12),
                           const SizedBox(width: 4),
-                          Text(
-                            'post.private'.tr(),
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
+                          Text('post.private'.tr()),
                         ],
                       ),
                     ),
@@ -238,15 +208,16 @@ class _PostCardState extends ConsumerState<PostCard> {
                 ],
               ),
 
-              const Divider(height: 24),
+              const ShadSeparator.horizontal(),
+              const SizedBox(height: 12),
 
               // 액션 버튼
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  IconButton(
-                    onPressed: _isLoading ? null : _showDeleteDialog,
+                  ShadIconButton.ghost(
                     icon: Icon(AppIcons.delete, size: 16),
+                    onPressed: _isLoading ? null : _showDeleteDialog,
                   ),
                 ],
               ),

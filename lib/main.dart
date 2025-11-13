@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
+import 'package:shadcn_ui/shadcn_ui.dart';
 
-import 'core/constants/app_colors.dart';
 import 'core/database/database_service.dart';
 import 'core/services/share_handler_service.dart';
 import 'core/services/sync/lifecycle_service.dart';
@@ -79,28 +79,84 @@ class _MyAppState extends ConsumerState<MyApp> {
   Widget build(BuildContext context) {
     final themeModeAsync = ref.watch(themeModeProvider);
     final colorThemeAsync = ref.watch(colorThemeProvider);
+    final backgroundColorAsync = ref.watch(backgroundColorProvider);
     final localeAsync = ref.watch(localeProvider);
 
     return themeModeAsync.when(
       data: (themeMode) => colorThemeAsync.when(
-        data: (colorTheme) {
-          final seedColor = AppColors.getColorByTheme(colorTheme);
+        data: (colorTheme) => backgroundColorAsync.when(
+          data: (backgroundOption) {
+            // Shadcn UI 테마 생성 (배경색 옵션 적용)
+            final shadLightTheme = common.MinorLabShadTheme.lightTheme(
+              paletteId: colorTheme,
+              backgroundOption: backgroundOption,
+            );
+            final shadDarkTheme = common.MinorLabShadTheme.darkTheme(
+              paletteId: colorTheme,
+              backgroundOption: backgroundOption,
+            );
 
-          return MaterialApp.router(
-            title: 'MiniLine',
-            theme: common.AppTheme.lightTheme(
-              seedColor: seedColor,
+            return ShadApp.custom(
+              themeMode: themeMode,
+              theme: shadLightTheme,
+              darkTheme: shadDarkTheme,
+              appBuilder: (context) {
+                // ShadApp이 자동으로 생성한 Material Theme 사용
+                final materialTheme = Theme.of(context);
+
+                return MaterialApp.router(
+                  title: 'MiniLine',
+                  theme: materialTheme,
+                  darkTheme: materialTheme,
+                  themeMode: themeMode,
+                  routerConfig: router.appRouter,
+                  localizationsDelegates: context.localizationDelegates,
+                  supportedLocales: context.supportedLocales,
+                  locale: localeAsync.value ?? context.locale,
+                  builder: (context, child) {
+                    return ShadAppBuilder(child: child!);
+                  },
+                );
+              },
+            );
+          },
+          loading: () => MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
             ),
-            darkTheme: common.AppTheme.darkTheme(
-              seedColor: seedColor,
-            ),
-            themeMode: themeMode,
-            routerConfig: router.appRouter,
-            localizationsDelegates: context.localizationDelegates,
-            supportedLocales: context.supportedLocales,
-            locale: localeAsync.value ?? context.locale,
-          );
-        },
+          ),
+          error: (error, stack) {
+            final shadLightTheme = common.MinorLabShadTheme.lightTheme(
+              paletteId: colorTheme,
+              backgroundOption: common.BackgroundColorOption.defaultColor,
+            );
+            final shadDarkTheme = common.MinorLabShadTheme.darkTheme(
+              paletteId: colorTheme,
+              backgroundOption: common.BackgroundColorOption.defaultColor,
+            );
+
+            return ShadApp.custom(
+              themeMode: themeMode,
+              theme: shadLightTheme,
+              darkTheme: shadDarkTheme,
+              appBuilder: (appContext) {
+                final materialTheme = Theme.of(appContext);
+                return MaterialApp.router(
+                  title: 'MiniLine',
+                  theme: materialTheme,
+                  darkTheme: materialTheme,
+                  themeMode: themeMode,
+                  routerConfig: router.appRouter,
+                  localizationsDelegates: context.localizationDelegates,
+                  supportedLocales: context.supportedLocales,
+                  locale: localeAsync.value ?? context.locale,
+                );
+              },
+            );
+          },
+        ),
         loading: () => MaterialApp(
           home: Scaffold(
             body: Center(
@@ -108,20 +164,35 @@ class _MyAppState extends ConsumerState<MyApp> {
             ),
           ),
         ),
-        error: (error, stack) => MaterialApp.router(
-          title: 'MiniLine',
-          theme: common.AppTheme.lightTheme(
-            seedColor: AppColors.seedColor,
-          ),
-          darkTheme: common.AppTheme.darkTheme(
-            seedColor: AppColors.seedColor,
-          ),
-          themeMode: themeMode,
-          routerConfig: router.appRouter,
-          localizationsDelegates: context.localizationDelegates,
-          supportedLocales: context.supportedLocales,
-          locale: localeAsync.value ?? context.locale,
-        ),
+        error: (error, stack) {
+          final shadLightTheme = common.MinorLabShadTheme.lightTheme(
+            paletteId: 'zinc',
+            backgroundOption: common.BackgroundColorOption.defaultColor,
+          );
+          final shadDarkTheme = common.MinorLabShadTheme.darkTheme(
+            paletteId: 'zinc',
+            backgroundOption: common.BackgroundColorOption.defaultColor,
+          );
+
+          return ShadApp.custom(
+            themeMode: themeMode,
+            theme: shadLightTheme,
+            darkTheme: shadDarkTheme,
+            appBuilder: (appContext) {
+              final materialTheme = Theme.of(appContext);
+              return MaterialApp.router(
+                title: 'MiniLine',
+                theme: materialTheme,
+                darkTheme: materialTheme,
+                themeMode: themeMode,
+                routerConfig: router.appRouter,
+                localizationsDelegates: context.localizationDelegates,
+                supportedLocales: context.supportedLocales,
+                locale: localeAsync.value ?? context.locale,
+              );
+            },
+          );
+        },
       ),
       loading: () => MaterialApp(
         home: Scaffold(
@@ -130,20 +201,35 @@ class _MyAppState extends ConsumerState<MyApp> {
           ),
         ),
       ),
-      error: (error, stack) => MaterialApp.router(
-        title: 'MiniLine',
-        theme: common.AppTheme.lightTheme(
-          seedColor: AppColors.seedColor,
-        ),
-        darkTheme: common.AppTheme.darkTheme(
-          seedColor: AppColors.seedColor,
-        ),
-        themeMode: ThemeMode.system,
-        routerConfig: router.appRouter,
-        localizationsDelegates: context.localizationDelegates,
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
-      ),
+      error: (error, stack) {
+        final shadLightTheme = common.MinorLabShadTheme.lightTheme(
+          paletteId: 'zinc',
+          backgroundOption: common.BackgroundColorOption.defaultColor,
+        );
+        final shadDarkTheme = common.MinorLabShadTheme.darkTheme(
+          paletteId: 'zinc',
+          backgroundOption: common.BackgroundColorOption.defaultColor,
+        );
+
+        return ShadApp.custom(
+          themeMode: ThemeMode.system,
+          theme: shadLightTheme,
+          darkTheme: shadDarkTheme,
+          appBuilder: (appContext) {
+            final materialTheme = Theme.of(appContext);
+            return MaterialApp.router(
+              title: 'MiniLine',
+              theme: materialTheme,
+              darkTheme: materialTheme,
+              themeMode: ThemeMode.system,
+              routerConfig: router.appRouter,
+              localizationsDelegates: context.localizationDelegates,
+              supportedLocales: context.supportedLocales,
+              locale: context.locale,
+            );
+          },
+        );
+      },
     );
   }
 }

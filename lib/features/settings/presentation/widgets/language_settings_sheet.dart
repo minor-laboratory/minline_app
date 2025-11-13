@@ -1,11 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 
 import '../../../../core/utils/app_icons.dart';
 import '../../providers/settings_provider.dart';
 
-/// 언어 설정 Bottom Sheet
+/// 언어 설정 시트
 class LanguageSettingsSheet extends ConsumerWidget {
   const LanguageSettingsSheet({super.key});
 
@@ -13,152 +15,156 @@ class LanguageSettingsSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final localeAsync = ref.watch(localeProvider);
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.4,
-      minChildSize: 0.3,
-      maxChildSize: 0.7,
-      expand: false,
-      builder: (context, scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-          ),
-          child: localeAsync.when(
-            data: (currentLocale) {
-              final systemLocale = currentLocale == null;
-              final selectedCode = currentLocale?.languageCode ?? context.locale.languageCode;
+    return localeAsync.when(
+      data: (currentLocale) {
+        final useSystemLocale = currentLocale == null;
+        final selectedCode = currentLocale?.languageCode ?? context.locale.languageCode;
 
-              return ListView(
-                controller: scrollController,
-                padding: const EdgeInsets.all(16),
-                children: [
-                  // 핸들바
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 시스템 언어 사용 스위치
+            ShadCard(
+              child: SwitchListTile(
+                title: Text('settings.use_system_language'.tr()),
+                subtitle: Text('settings.use_system_language_description'.tr()),
+                value: useSystemLocale,
+                onChanged: (value) async {
+                  if (value) {
+                    // 시스템 언어 사용
+                    await ref.read(localeProvider.notifier).setLocale(null);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('settings.language_changed'.tr()),
+                          duration: const Duration(seconds: 1),
+                        ),
+                      );
+                    }
+                  } else {
+                    // 현재 시스템 언어를 명시적으로 설정
+                    final systemLocale = context.locale;
+                    if (!context.mounted) return;
+                    await context.setLocale(systemLocale);
+                    await ref.read(localeProvider.notifier).setLocale(systemLocale);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('settings.language_changed'.tr()),
+                          duration: const Duration(seconds: 1),
+                        ),
+                      );
+                    }
+                  }
+                },
+              ),
+            ),
+            const SizedBox(height: common.Spacing.md),
+
+            // 언어 목록 헤더
+            Text(
+              'settings.available_languages'.tr(),
+              style: ShadTheme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: common.Spacing.sm),
+
+            // 한국어
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: common.Spacing.xs),
+              child: ShadCard(
+                child: ListTile(
+                  leading: const Text(
+                    '🇰🇷',
+                    style: TextStyle(fontSize: 32),
                   ),
-
-                  // 타이틀
-                  Text(
-                    'settings.language'.tr(),
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
+                  title: Text(
+                    '한국어',
+                    style: ShadTheme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: (!useSystemLocale && selectedCode == 'ko') ||
+                                  (useSystemLocale && selectedCode == 'ko')
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                         ),
                   ),
-                  const SizedBox(height: 16),
-
-                  // 시스템 언어 (null)
-                  _LanguageCard(
-                    label: 'settings.system_mode'.tr(),
-                    isSelected: systemLocale,
-                    onTap: () async {
-                      await ref.read(localeProvider.notifier).setLocale(null);
-                      if (context.mounted) {
-                        await context.setLocale(context.deviceLocale);
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // 한국어
-                  _LanguageCard(
-                    label: '한국어',
-                    isSelected: !systemLocale && selectedCode == 'ko',
-                    onTap: () async {
-                      await ref.read(localeProvider.notifier).setLocale(const Locale('ko'));
-                      if (context.mounted) {
-                        await context.setLocale(const Locale('ko'));
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // English
-                  _LanguageCard(
-                    label: 'English',
-                    isSelected: !systemLocale && selectedCode == 'en',
-                    onTap: () async {
-                      await ref.read(localeProvider.notifier).setLocale(const Locale('en'));
-                      if (context.mounted) {
-                        await context.setLocale(const Locale('en'));
-                      }
-                    },
-                  ),
-                ],
-              );
-            },
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => Center(
-              child: Text('common.error'.tr()),
+                  subtitle: const Text('Korean'),
+                  trailing: ((!useSystemLocale && selectedCode == 'ko') ||
+                          (useSystemLocale && selectedCode == 'ko'))
+                      ? Icon(
+                          AppIcons.checkCircle,
+                          color: ShadTheme.of(context).colorScheme.primary,
+                        )
+                      : null,
+                  selected: (!useSystemLocale && selectedCode == 'ko') ||
+                      (useSystemLocale && selectedCode == 'ko'),
+                  onTap: useSystemLocale
+                      ? null
+                      : () async {
+                          if (!context.mounted) return;
+                          final messenger = ScaffoldMessenger.of(context);
+                          await context.setLocale(const Locale('ko'));
+                          await ref.read(localeProvider.notifier).setLocale(const Locale('ko'));
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text('settings.language_changed'.tr()),
+                              duration: const Duration(seconds: 1),
+                            ),
+                          );
+                        },
+                ),
+              ),
             ),
-          ),
+
+            // 영어
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: common.Spacing.xs),
+              child: ShadCard(
+                child: ListTile(
+                  leading: const Text(
+                    '🇺🇸',
+                    style: TextStyle(fontSize: 32),
+                  ),
+                  title: Text(
+                    'English',
+                    style: ShadTheme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: (!useSystemLocale && selectedCode == 'en') ||
+                                  (useSystemLocale && selectedCode == 'en')
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                  ),
+                  subtitle: const Text('English'),
+                  trailing: ((!useSystemLocale && selectedCode == 'en') ||
+                          (useSystemLocale && selectedCode == 'en'))
+                      ? Icon(
+                          AppIcons.checkCircle,
+                          color: ShadTheme.of(context).colorScheme.primary,
+                        )
+                      : null,
+                  selected: (!useSystemLocale && selectedCode == 'en') ||
+                      (useSystemLocale && selectedCode == 'en'),
+                  onTap: useSystemLocale
+                      ? null
+                      : () async {
+                          if (!context.mounted) return;
+                          final messenger = ScaffoldMessenger.of(context);
+                          await context.setLocale(const Locale('en'));
+                          await ref.read(localeProvider.notifier).setLocale(const Locale('en'));
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text('settings.language_changed'.tr()),
+                              duration: const Duration(seconds: 1),
+                            ),
+                          );
+                        },
+                ),
+              ),
+            ),
+          ],
         );
       },
-    );
-  }
-}
-
-/// 언어 선택 카드
-class _LanguageCard extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _LanguageCard({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? colorScheme.primaryContainer
-              : colorScheme.surfaceContainerHighest,
-          border: Border.all(
-            color: isSelected
-                ? colorScheme.primary
-                : Colors.transparent,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                label,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: isSelected ? FontWeight.w600 : null,
-                      color: isSelected
-                          ? colorScheme.onPrimaryContainer
-                          : null,
-                    ),
-              ),
-            ),
-            if (isSelected)
-              Icon(
-                AppIcons.checkCircle,
-                color: colorScheme.primary,
-              ),
-          ],
-        ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Text('common.error'.tr()),
       ),
     );
   }

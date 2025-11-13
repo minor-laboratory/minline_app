@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
 import '../../providers/fragments_provider.dart';
@@ -42,22 +43,19 @@ class _TimelinePageState extends ConsumerState<TimelinePage> {
             : 'calendar.title'.tr()),
         actions: [
           // 뷰 토글 버튼
-          IconButton(
+          ShadIconButton.ghost(
             icon: Icon(_viewMode == 'timeline'
                 ? AppIcons.calendar
                 : AppIcons.sparkles),
-            tooltip: _viewMode == 'timeline'
-                ? 'calendar.switch_to_calendar'.tr()
-                : 'calendar.switch_to_timeline'.tr(),
             onPressed: _toggleViewMode,
           ),
           // Drafts
-          IconButton(
+          ShadIconButton.ghost(
             icon: Icon(AppIcons.drafts),
             onPressed: () => context.push('/drafts'),
           ),
           // Posts
-          IconButton(
+          ShadIconButton.ghost(
             icon: Icon(AppIcons.posts),
             onPressed: () => context.push('/posts'),
           ),

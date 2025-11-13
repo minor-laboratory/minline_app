@@ -76,40 +76,11 @@ class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
-    return Container(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 헤더
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Icon(AppIcons.notification, size: 24),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'settings.daily_reminder'.tr(),
-                    style: textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(AppIcons.close),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-          ),
-
-          const Divider(height: 1),
-
-          // 설명
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 설명
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
@@ -152,11 +123,10 @@ class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
               ),
               onTap: _selectTime,
             ),
-          ],
-
-          const SizedBox(height: 16),
         ],
-      ),
+
+        const SizedBox(height: 16),
+      ],
     );
   }
 }

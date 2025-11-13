@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
 import '../../../../models/fragment.dart';
@@ -163,8 +164,9 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                icon: Icon(AppIcons.chevronLeft),
+              ShadIconButton.ghost(
+                padding: const EdgeInsets.all(8),
+                icon: Icon(AppIcons.chevronLeft, size: 20),
                 onPressed: _previousMonth,
               ),
               Text(
@@ -176,12 +178,13 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextButton(
+                  ShadButton.ghost(
                     onPressed: _goToToday,
                     child: Text('calendar.today'.tr()),
                   ),
-                  IconButton(
-                    icon: Icon(AppIcons.chevronRight),
+                  ShadIconButton.ghost(
+                    padding: const EdgeInsets.all(8),
+                    icon: Icon(AppIcons.chevronRight, size: 20),
                     onPressed: _nextMonth,
                   ),
                 ],
@@ -286,7 +289,10 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
           ),
         ),
 
-        const Divider(height: 32),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: const ShadSeparator.horizontal(),
+        ),
 
         // 선택된 날짜의 Fragment 리스트
         Expanded(

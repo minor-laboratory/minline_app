@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 
 part 'settings_provider.g.dart';
 
@@ -83,5 +84,33 @@ class LocaleNotifier extends _$LocaleNotifier {
     } else {
       await prefs.remove(_key);
     }
+  }
+}
+
+/// 배경색 옵션 Provider
+@riverpod
+class BackgroundColorNotifier extends _$BackgroundColorNotifier {
+  static const String _key = 'background_color_option';
+
+  @override
+  Future<common.BackgroundColorOption> build() async {
+    final prefs = await ref.watch(sharedPreferencesProvider.future);
+    final String? optionString = prefs.getString(_key);
+
+    if (optionString != null) {
+      return common.BackgroundColorOption.values.firstWhere(
+        (option) => option.toString() == optionString,
+        orElse: () => common.BackgroundColorOption.defaultColor,
+      );
+    }
+
+    return common.BackgroundColorOption.defaultColor;
+  }
+
+  Future<void> setBackgroundOption(common.BackgroundColorOption option) async {
+    state = AsyncValue.data(option);
+
+    final prefs = await ref.read(sharedPreferencesProvider.future);
+    await prefs.setString(_key, option.toString());
   }
 }

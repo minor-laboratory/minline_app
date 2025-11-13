@@ -8,6 +8,25 @@
 
 ## 📐 공통 규칙
 
+### UI 라이브러리
+
+**shadcn_ui 사용 (기본 원칙)**
+
+```dart
+import 'package:shadcn_ui/shadcn_ui.dart';
+
+// ✅ shadcn_ui 컴포넌트 사용 (기본)
+ShadButton(onPressed: _save, child: Text('common.save'.tr()))
+ShadButton.outline(onPressed: _cancel, child: Text('common.cancel'.tr()))
+ShadInput(placeholder: Text('snap.input_placeholder'.tr()))
+ShadCard(title: Text('Title'), child: ...)
+showShadDialog(context: context, builder: (context) => ShadDialog(...))
+
+// ⚠️ Material 기본 위젯은 계속 사용 (Scaffold, AppBar, Column 등)
+```
+
+**상세 가이드:** [docs/MIGRATION_SHADCN.md](MIGRATION_SHADCN.md) 참조
+
 ### 색상 시스템
 
 **테마 사용 필수** (하드코딩 금지):
@@ -16,7 +35,7 @@
 Color(0xFF2563EB)
 Colors.blue
 
-// ✅ 테마 사용
+// ✅ 테마 사용 (shadcn_ui가 자동 감지)
 theme.colorScheme.primary
 theme.colorScheme.surface
 theme.colorScheme.onSurface
@@ -93,15 +112,13 @@ Container(
 
 **텍스트 입력**:
 ```dart
-TextField(
-  maxLines: null,  // 자동 확장
+// 다줄 입력 (Textarea)
+ShadTextarea(
+  controller: _contentController,
+  placeholder: Text('snap.input_placeholder'.tr()),
   minLines: 2,
+  maxLines: null,  // 자동 확장
   maxLength: 300,  // MAX_LENGTH
-  decoration: InputDecoration(
-    hintText: 'snap.input_placeholder'.tr(),
-    border: InputBorder.none,
-    counterText: '',  // 기본 카운터 숨김 (커스텀 사용)
-  ),
 )
 ```
 
@@ -198,6 +215,66 @@ if (content.trim().isEmpty && images.isEmpty) {
   return;
 }
 ```
+
+### SafeArea 처리 (필수)
+
+**문제:** bottomNavigationBar에서 하단 시스템 바 (홈 인디케이터) 영역 침범
+
+**❌ 잘못된 패딩 (고정값):**
+```dart
+Container(
+  padding: EdgeInsets.all(16),  // 시스템 바 영역 침범
+  child: FragmentInput(),
+)
+```
+
+**✅ 올바른 패딩 (MediaQuery 사용):**
+```dart
+final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+Container(
+  padding: EdgeInsets.only(
+    left: 16,
+    right: 16,
+    top: 16,
+    bottom: 16 + bottomPadding,  // 시스템 바 높이만큼 추가
+  ),
+  child: FragmentInput(),
+)
+```
+
+**SafeArea vs MediaQuery.padding:**
+```dart
+// ❌ SafeArea: 전체 컨테이너에 적용 (불필요한 공간)
+SafeArea(
+  child: Container(
+    padding: EdgeInsets.all(16),
+    child: FragmentInput(),
+  ),
+)
+
+// ✅ MediaQuery.padding: 필요한 곳에만 적용 (정확한 패딩)
+Container(
+  padding: EdgeInsets.only(
+    left: 16,
+    right: 16,
+    top: 16,
+    bottom: 16 + MediaQuery.of(context).padding.bottom,
+  ),
+  child: FragmentInput(),
+)
+```
+
+**iOS vs Android:**
+- iOS: 홈 인디케이터 영역 약 34dp
+- Android (제스처 네비게이션): 약 16-20dp
+- Android (버튼 네비게이션): 0dp (시스템이 자동 처리)
+
+**적용 위치:**
+- bottomNavigationBar
+- 하단 고정 버튼
+- 바텀시트 하단
+- 스크롤 가능 리스트의 마지막 항목 (padding: EdgeInsets.only(bottom: bottomPadding))
 
 ### 엣지 케이스
 
@@ -1041,7 +1118,214 @@ Card(
 
 ---
 
-## 7. 알림 설정 (Notification Settings)
+## 7. StandardBottomSheet (공통 바텀시트 패턴)
+
+> 북랩 앱과 동일한 바텀시트 패턴 (Wolt Modal Sheet 기반)
+
+**언제 읽어야 하는가:**
+- Settings 시트 구현 시
+- 바텀시트 UI 구현 시
+- 북랩 앱과 동일한 패턴 적용 시
+
+### 기본 정보
+
+**파일:**
+- `lib/shared/widgets/standard_bottom_sheet.dart`
+- `lib/shared/widgets/responsive_modal_sheet.dart`
+
+**패키지:** `wolt_modal_sheet: ^0.11.0`
+
+**참조:**
+- 북랩: `minorlab_book/lib/shared/widgets/standard_bottom_sheet.dart`
+- 북랩: `minorlab_book/lib/shared/widgets/responsive_modal_sheet.dart`
+
+### 구조
+
+**ResponsiveModalSheet**: WoltModalSheet 래퍼
+- 모바일: 바텀시트
+- 태블릿 (600dp 이상): 다이얼로그
+- 드래그/탭으로 닫기 제어
+
+**StandardBottomSheet**: 표준화된 바텀시트
+- Material widget context 제공 (InkWell 등 Material 위젯 사용 가능)
+- 타이틀 헤더 자동 제공
+- 일관된 패딩 및 스타일
+
+### 사용 방법
+
+**❌ ShadSheet 사용 (이전 방식):**
+```dart
+void _showSettings() {
+  showShadSheet(
+    context: context,
+    side: ShadSheetSide.bottom,
+    builder: (context) => ThemeSettingsSheet(),
+  );
+}
+```
+
+**✅ StandardBottomSheet 사용 (북랩 패턴):**
+```dart
+void _showThemeSettings() {
+  StandardBottomSheet.show(
+    context: context,
+    title: 'settings.theme'.tr(),
+    content: const ThemeSettingsSheet(),
+    isDraggable: true,
+    isDismissible: true,
+  );
+}
+```
+
+### 시트 내부 구조
+
+**❌ 자체 헤더 포함 (중복):**
+```dart
+class ThemeSettingsSheet extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(
+      children: [
+        // ❌ StandardBottomSheet가 이미 제공하는 헤더
+        Row(
+          children: [
+            Text('settings.theme'.tr()),
+            IconButton(icon: Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+          ],
+        ),
+        // 실제 컨텐츠
+        ...
+      ],
+    );
+  }
+}
+```
+
+**✅ 컨텐츠만 포함:**
+```dart
+class ThemeSettingsSheet extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // StandardBottomSheet.show()의 title로 헤더 제공됨
+        // 바로 컨텐츠 시작
+        ...
+      ],
+    );
+  }
+}
+```
+
+### Material Widget 문제 해결
+
+**문제:** InkWell, InkResponse 등 Material 위젯이 Material ancestor를 요구
+
+**❌ GestureDetector로만 대체 (터치 피드백 없음):**
+```dart
+GestureDetector(
+  onTap: onTap,
+  child: Container(...),
+)
+```
+
+**✅ StandardBottomSheet 사용 (Material 제공):**
+```dart
+// StandardBottomSheet가 Material widget을 제공하므로
+// InkWell 사용 가능
+InkWell(
+  onTap: onTap,
+  child: Container(...),
+)
+
+// 또는 GestureDetector 사용 (더 간단)
+GestureDetector(
+  onTap: onTap,
+  child: Container(...),
+)
+```
+
+### 적용 예시
+
+**ThemeSettingsSheet:**
+```dart
+// settings_page.dart
+void _showThemeSettings() {
+  StandardBottomSheet.show(
+    context: context,
+    title: 'settings.theme'.tr(),
+    content: const ThemeSettingsSheet(),
+  );
+}
+
+// theme_settings_sheet.dart
+class ThemeSettingsSheet extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(common.Spacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 테마 모드 선택 (시스템/라이트/다크)
+          Row(
+            children: [
+              _ThemeModeCard(...),
+              _ThemeModeCard(...),
+              _ThemeModeCard(...),
+            ],
+          ),
+          // 배경색 선택
+          // 컬러 스킴 선택
+        ],
+      ),
+    );
+  }
+}
+```
+
+**LanguageSettingsSheet:**
+```dart
+// settings_page.dart
+void _showLanguageSettings() {
+  StandardBottomSheet.show(
+    context: context,
+    title: 'settings.language'.tr(),
+    content: const LanguageSettingsSheet(),
+  );
+}
+
+// language_settings_sheet.dart
+class LanguageSettingsSheet extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // 시스템 언어 사용 스위치
+        ShadCard(
+          child: SwitchListTile(...),
+        ),
+        // 언어 목록 (한국어, English)
+        ShadCard(child: ListTile(...)),
+        ShadCard(child: ListTile(...)),
+      ],
+    );
+  }
+}
+```
+
+### 주의사항
+
+1. **헤더 중복 방지**: StandardBottomSheet.show()의 title로 제공되므로 시트 내부에 헤더 불필요
+2. **Material 제공**: StandardBottomSheet가 Material widget을 제공하므로 InkWell 등 사용 가능
+3. **mainAxisSize**: Column의 mainAxisSize는 MainAxisSize.min 사용 (자동 높이)
+4. **SingleChildScrollView**: 컨텐츠가 길 경우 스크롤 가능하도록 감싸기
+
+---
+
+## 8. 알림 설정 (Notification Settings)
 
 > 앱 전용 기능 (웹 버전 없음)
 
@@ -1137,6 +1421,207 @@ common.enable: "사용"
 common.notifications_on: "알림 켜짐"
 common.notifications_off: "알림 꺼짐"
 ```
+
+---
+
+## 8. Isar Stream Provider 패턴 (watchLazy)
+
+> Riverpod Stream Provider에서 Isar watchLazy() 사용 패턴
+
+**언제 읽어야 하는가:**
+- Provider에서 Isar 데이터 스트림 구현 시
+- 빈 DB에서 무한 로딩 문제 해결 시
+- 실시간 UI 갱신 구현 시
+
+### 문제: watchLazy()는 초기값을 emit하지 않음
+
+**❌ 잘못된 패턴 (무한 로딩):**
+```dart
+@riverpod
+Stream<List<Fragment>> fragmentsStream(Ref ref) async* {
+  final isar = DatabaseService.instance.isar;
+
+  // watchLazy()는 변경 이벤트만 emit (초기값 없음)
+  await for (final _ in isar.fragments.watchLazy()) {
+    final fragments = await isar.fragments
+        .filter()
+        .deletedEqualTo(false)
+        .findAll();
+
+    yield fragments;
+  }
+}
+// 문제: DB가 비어있으면 watchLazy()가 emit하지 않음 → 무한 로딩
+```
+
+**✅ 올바른 패턴 (초기값 먼저 emit):**
+```dart
+@riverpod
+Stream<List<Fragment>> fragmentsStream(Ref ref) async* {
+  final isar = DatabaseService.instance.isar;
+
+  // 1. 초기값 먼저 방출
+  final initialFragments = await isar.fragments
+      .filter()
+      .deletedEqualTo(false)
+      .findAll();
+
+  initialFragments.sort((a, b) => (b.refreshAt ?? DateTime.now())
+      .compareTo(a.refreshAt ?? DateTime.now()));
+
+  yield initialFragments;
+
+  // 2. watchLazy로 변경 이벤트만 감지
+  await for (final _ in isar.fragments.watchLazy()) {
+    final fragments = await isar.fragments
+        .filter()
+        .deletedEqualTo(false)
+        .findAll();
+
+    fragments.sort((a, b) => (b.refreshAt ?? DateTime.now())
+        .compareTo(a.refreshAt ?? DateTime.now()));
+
+    yield fragments;
+  }
+}
+// 해결: 초기값을 먼저 emit하므로 빈 DB에서도 정상 동작
+```
+
+### 패턴 상세 설명
+
+**1단계: 초기값 로드 및 emit**
+```dart
+// await으로 초기 데이터 로드
+final initialFragments = await isar.fragments.filter().deletedEqualTo(false).findAll();
+
+// yield로 초기값 즉시 방출 (UI가 데이터를 받음)
+yield initialFragments;
+```
+
+**2단계: watchLazy()로 변경 감지**
+```dart
+// await for로 변경 이벤트를 계속 감지
+await for (final _ in isar.fragments.watchLazy()) {
+  // 변경 발생 시에만 데이터 다시 로드
+  final fragments = await isar.fragments.filter().deletedEqualTo(false).findAll();
+  yield fragments;
+}
+```
+
+### 왜 watchLazy()를 사용하는가?
+
+**watch() vs watchLazy():**
+
+```dart
+// ❌ watch(): 전체 데이터를 매번 emit (메모리 비효율적)
+await for (final fragments in isar.fragments.watch()) {
+  yield fragments;  // 변경 시마다 전체 리스트 emit
+}
+
+// ✅ watchLazy(): 변경 이벤트만 emit (메모리 효율적)
+await for (final _ in isar.fragments.watchLazy()) {
+  final fragments = await isar.fragments.findAll();  // 명시적으로 로드
+  yield fragments;
+}
+```
+
+**장점:**
+- 메모리 효율적 (데이터를 중복 전송하지 않음)
+- 필요한 시점에만 데이터 로드
+- 대용량 데이터에서도 성능 유지
+
+### 실제 예제
+
+**fragmentsProvider (타임라인):**
+```dart
+@riverpod
+Stream<List<Fragment>> fragmentsStream(Ref ref) async* {
+  final isar = DatabaseService.instance.isar;
+
+  // 초기값 먼저 방출
+  final initialFragments = await isar.fragments
+      .filter()
+      .deletedEqualTo(false)
+      .findAll();
+
+  initialFragments.sort((a, b) => (b.refreshAt ?? DateTime.now())
+      .compareTo(a.refreshAt ?? DateTime.now()));
+
+  yield initialFragments;
+
+  // watchLazy로 변경 이벤트만 감지
+  await for (final _ in isar.fragments.watchLazy()) {
+    final fragments = await isar.fragments
+        .filter()
+        .deletedEqualTo(false)
+        .findAll();
+
+    fragments.sort((a, b) => (b.refreshAt ?? DateTime.now())
+        .compareTo(a.refreshAt ?? DateTime.now()));
+
+    yield fragments;
+  }
+}
+```
+
+**filteredFragments (검색/정렬 적용):**
+```dart
+@riverpod
+Stream<List<Fragment>> filteredFragments(Ref ref) async* {
+  final fragmentsAsync = ref.watch(fragmentsStreamProvider);
+  final filterState = ref.watch(fragmentFilterProvider);
+
+  // 초기값 먼저 방출
+  await for (final fragments in fragmentsAsync) {
+    final filtered = filterAndSort(fragments, filterState);
+    yield filtered;
+    break;  // 초기값만 방출하고 중단
+  }
+
+  // watchLazy로 변경 감지
+  await for (final fragmentsValue in fragmentsAsync) {
+    final filtered = filterAndSort(fragmentsValue, filterState);
+    yield filtered;
+  }
+}
+
+List<Fragment> filterAndSort(List<Fragment> fragments, FragmentFilterState filterState) {
+  var result = fragments;
+
+  // 검색어 필터링
+  if (filterState.query.trim().isNotEmpty) {
+    result = result.where((f) =>
+      f.content.toLowerCase().contains(filterState.query.toLowerCase())
+    ).toList();
+  }
+
+  // 정렬
+  result.sort((a, b) {
+    final aTime = filterState.sortBy == 'created' ? a.createdAt : a.refreshAt ?? DateTime.now();
+    final bTime = filterState.sortBy == 'created' ? b.createdAt : b.refreshAt ?? DateTime.now();
+    return filterState.sortOrder == 'desc'
+      ? bTime.compareTo(aTime)
+      : aTime.compareTo(bTime);
+  });
+
+  return result;
+}
+```
+
+### 주의사항
+
+1. **반드시 초기값 먼저 emit**: 빈 DB에서 무한 로딩 방지
+2. **정렬은 emit 전에**: yield 전에 sort 완료
+3. **필터 로직은 별도 함수로**: 재사용성 향상
+4. **Stream Provider 사용**: FutureProvider가 아닌 StreamProvider 사용
+
+### 참조
+
+- 구현 파일:
+  - `lib/features/timeline/providers/fragments_provider.dart`
+  - `lib/features/drafts/providers/drafts_provider.dart`
+  - `lib/features/posts/providers/posts_provider.dart`
+- 패턴 출처: [북랩 Stream Provider 패턴](../../minorlab_book/lib/features/library/providers/)
 
 ---
 

@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/utils/app_icons.dart';
@@ -95,18 +96,25 @@ class _DraftsPageState extends ConsumerState<DraftsPage> {
           // AI 분석 버튼
           Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: TextButton.icon(
+            child: ShadButton.ghost(
               onPressed: _isAnalyzing ? null : _handleAnalyzeNow,
-              icon: _isAnalyzing
-                  ? const SizedBox(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_isAnalyzing)
+                    const SizedBox(
                       width: 16,
                       height: 16,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Icon(AppIcons.sparkles),
-              label: Text(_isAnalyzing
-                  ? 'draft.analyzing'.tr()
-                  : 'draft.analyze_now'.tr()),
+                  else
+                    Icon(AppIcons.sparkles, size: 16),
+                  const SizedBox(width: 8),
+                  Text(_isAnalyzing
+                      ? 'draft.analyzing'.tr()
+                      : 'draft.analyze_now'.tr()),
+                ],
+              ),
             ),
           ),
         ],

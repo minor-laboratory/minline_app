@@ -85,7 +85,12 @@
     "template_timeline": "시간순 스토리",
     "template_essay": "생각 정리",
     "template_travel": "여행기",
-    "template_project": "프로젝트 기록"
+    "template_project": "프로젝트 기록",
+    "version": "버전",
+    "version_info": "버전 {0}",
+    "exported_to": "내보내기",
+    "fragments_used": "사용된 스냅",
+    "fragments_count": "{0}개의 스냅"
   },
   "post": {
     "public": "공개",
@@ -105,6 +110,10 @@
     "dark_mode": "다크",
     "language": "언어",
     "language_description": "한국어 / English",
+    "use_system_language": "시스템 언어 사용",
+    "use_system_language_description": "기기의 언어 설정을 따릅니다",
+    "available_languages": "사용 가능한 언어",
+    "language_changed": "언어가 변경되었습니다",
     "notifications": "알림",
     "daily_reminder": "일일 리마인더",
     "daily_reminder_description": "매일 정해진 시간에 알림",
@@ -121,6 +130,7 @@
     "logout_confirm": "정말 로그아웃 하시겠습니까?"
   },
   "theme": {
+    "mode": "테마 모드",
     "color_scheme": "컬러 테마",
     "color_blue": "블루",
     "color_slate": "슬레이트",
@@ -133,14 +143,31 @@
     "color_yellow": "옐로우",
     "color_green": "그린",
     "color_violet": "바이올렛",
-    "color_rose": "로즈"
+    "color_rose": "로즈",
+    "background_color": "배경색",
+    "background_color_desc": "읽기 편한 배경색을 선택하세요",
+    "bg_default": "기본",
+    "bg_default_desc": "순수한 흰색/검정",
+    "bg_warm": "따뜻함",
+    "bg_warm_desc": "세피아/차콜 톤",
+    "bg_neutral": "중립",
+    "bg_neutral_desc": "연한 회색 톤"
   },
   "auth": {
-    "login_required": "로그인이 필요합니다"
+    "login_required": "로그인이 필요합니다",
+    "not_authenticated": "로그인이 필요합니다"
+  },
+  "snap": {
+    "input_placeholder": "스냅을 입력하세요...",
+    "content_or_media_required": "내용 또는 이미지를 추가해주세요",
+    "save_failed": "저장 실패",
+    "empty": "아직 스냅이 없습니다.",
+    "empty_hint": "아래에서 첫 스냅을 작성해보세요!"
   },
   "common": {
     "input_placeholder": "무슨 생각을 하고 계신가요?",
     "save": "저장",
+    "saving": "저장 중...",
     "character_count": "{current}/{max}",
     "saved": "저장되었습니다",
     "loading": "로딩 중...",
@@ -149,7 +176,22 @@
     "error": "오류가 발생했습니다",
     "enable": "사용",
     "notifications_on": "알림 켜짐",
-    "notifications_off": "알림 꺼짐"
+    "notifications_off": "알림 꺼짐",
+    "terms_of_service": "이용약관",
+    "privacy_policy": "개인정보처리방침",
+    "marketing_consent": "마케팅 정보 수신 동의",
+    "youth_protection_policy": "청소년 보호 정책",
+    "policy": "정책",
+    "loading_policy": "정책을 불러오는 중...",
+    "version_format": "버전: {}",
+    "effective_date": "시행일",
+    "last_modified": "최종 수정일",
+    "required_agreement": "필수 동의",
+    "policy_not_found": "정책을 찾을 수 없습니다",
+    "policy_not_found_description": "해당 정책이 존재하지 않습니다",
+    "refresh": "새로고침",
+    "connection_error": "연결 오류",
+    "retry": "다시 시도"
   },
   "time": {
     "just_now": "방금 전",
@@ -163,6 +205,7 @@
     "max_files_exceeded": "최대 {count}개까지 첨부 가능합니다",
     "unsupported_file_type": "지원하지 않는 파일 형식: {type}",
     "upload_failed": "업로드 실패: {message}",
-    "delete_failed": "삭제 실패: {message}"
+    "delete_failed": "삭제 실패: {message}",
+    "select_failed": "파일 선택 실패"
   }
 }
