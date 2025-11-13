@@ -37,6 +37,12 @@ migrate_working_dir/
 *.g.dart
 *.freezed.dart
 
+# Firebase
+google-services.json
+GoogleService-Info.plist
+firebase-debug.log
+.firebase/
+
 # Symbolication related
 app.*.symbols
 
