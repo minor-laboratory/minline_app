@@ -1,4 +1,4 @@
-package com.minorlab.miniline_app
+package com.minorlab.miniline
 
 import io.flutter.embedding.android.FlutterActivity
 
