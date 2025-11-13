@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../../core/database/database_service.dart';
+import '../../../../core/services/media/media_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../models/fragment.dart';
@@ -99,16 +101,40 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
         return;
       }
 
-      // TODO: Phase 3에서 이미지 업로드 구현
-      // 현재는 로컬 경로만 저장 (임시)
-      final mediaUrls = _selectedImages.map((file) => file.path).toList();
+      // Fragment ID 생성 (이미지 업로드 경로용)
+      final fragmentId = const Uuid().v4();
+
+      // 이미지 업로드 (있을 경우)
+      List<String> mediaUrls = [];
+      if (_selectedImages.isNotEmpty) {
+        final mediaService = MediaService(supabase);
+        try {
+          mediaUrls = await mediaService.uploadImages(
+            _selectedImages,
+            currentUser.id,
+            fragmentId,
+          );
+        } on MediaException catch (e) {
+          if (!mounted) return;
+          setState(() => _isLoading = false);
+
+          // MediaException code를 다국어 키로 매핑
+          String errorKey = 'media.${e.code}';
+          if (e.details != null) {
+            _showError(errorKey.tr(namedArgs: e.details!));
+          } else {
+            _showError(errorKey.tr());
+          }
+          return;
+        }
+      }
 
       final fragment = Fragment.fromNew(
         userId: currentUser.id,
         content: _contentController.text.trim(),
         mediaUrls: mediaUrls,
         synced: false,
-      );
+      )..remoteID = fragmentId; // remoteID 설정
 
       final isar = DatabaseService.instance.isar;
       await isar.writeTxn(() async {
@@ -129,6 +155,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
       }
     } catch (e, stack) {
       logger.e('Failed to save fragment', e, stack);
+      if (!mounted) return;
       setState(() => _isLoading = false);
       _showError('common.save_failed'.tr());
     }
