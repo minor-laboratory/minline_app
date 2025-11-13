@@ -12,6 +12,7 @@ class AppIcons {
   static const IconData drafts = LucideIcons.file_text;
   static const IconData posts = LucideIcons.book_text;
   static const IconData settings = LucideIcons.settings;
+  static const IconData sparkles = LucideIcons.sparkles;
 
   // Auth Icons
   static const IconData login = LucideIcons.log_in;
