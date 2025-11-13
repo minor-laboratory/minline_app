@@ -59,15 +59,45 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
       if (images.isEmpty) return;
 
       final availableSlots = _maxImages - _selectedImages.length;
-      final imagesToAdd = images.take(availableSlots).toList();
+      final imagesToSelect = images.take(availableSlots).toList();
 
       if (images.length > availableSlots) {
         _showError('media.max_files_limit'.tr(args: [_maxImages.toString()]));
       }
 
-      setState(() {
-        _selectedImages.addAll(imagesToAdd.map((xfile) => File(xfile.path)));
-      });
+      // 선택된 이미지들의 크기 검증
+      final validImages = <File>[];
+      final oversizedFiles = <String>[];
+
+      for (final xfile in imagesToSelect) {
+        final file = File(xfile.path);
+        final sizeMB = file.lengthSync() / (1024 * 1024);
+
+        if (sizeMB > MediaService.maxFileSizeMB) {
+          oversizedFiles.add('${xfile.name} (${sizeMB.toStringAsFixed(1)}MB)');
+        } else {
+          validImages.add(file);
+        }
+      }
+
+      // 크기 초과 파일이 있으면 경고
+      if (oversizedFiles.isNotEmpty) {
+        _showError(
+          'media.file_size_exceeded'.tr(
+            namedArgs: {
+              'files': oversizedFiles.join(', '),
+              'maxMB': MediaService.maxFileSizeMB.toString(),
+            },
+          ),
+        );
+      }
+
+      // 유효한 이미지만 추가
+      if (validImages.isNotEmpty) {
+        setState(() {
+          _selectedImages.addAll(validImages);
+        });
+      }
     } catch (e, stack) {
       logger.e('Failed to pick images', e, stack);
       _showError('media.select_failed'.tr());
