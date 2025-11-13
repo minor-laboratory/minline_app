@@ -44,19 +44,26 @@ class _TimelinePageState extends ConsumerState<TimelinePage> {
         actions: [
           // 뷰 토글 버튼
           ShadIconButton.ghost(
-            icon: Icon(_viewMode == 'timeline'
-                ? AppIcons.calendar
-                : AppIcons.sparkles),
+            icon: Icon(
+              _viewMode == 'timeline' ? AppIcons.calendar : AppIcons.sparkles,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             onPressed: _toggleViewMode,
           ),
           // Drafts
           ShadIconButton.ghost(
-            icon: Icon(AppIcons.drafts),
+            icon: Icon(
+              AppIcons.drafts,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             onPressed: () => context.push('/drafts'),
           ),
           // Posts
           ShadIconButton.ghost(
-            icon: Icon(AppIcons.posts),
+            icon: Icon(
+              AppIcons.posts,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             onPressed: () => context.push('/posts'),
           ),
           // Settings

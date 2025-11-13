@@ -53,7 +53,7 @@ class FilterBar extends ConsumerWidget {
 
               // 정렬 버튼
               PopupMenuButton<String>(
-                icon: Icon(AppIcons.sort),
+                icon: Icon(AppIcons.sort, color: colorScheme.onSurfaceVariant),
                 tooltip: 'filter.sort'.tr(),
                 onSelected: (value) {
                   ref.read(fragmentFilterProvider.notifier).setSortBy(value);
@@ -88,6 +88,7 @@ class FilterBar extends ConsumerWidget {
                       ? AppIcons.arrowDown
                       : AppIcons.arrowUp,
                   size: 20,
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 onPressed: () {
                   ref.read(fragmentFilterProvider.notifier).toggleSortOrder();

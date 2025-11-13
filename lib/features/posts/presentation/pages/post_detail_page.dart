@@ -4,6 +4,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:isar_community/isar.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/database/database_service.dart';
 import '../../../../core/utils/app_icons.dart';
@@ -60,17 +61,17 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
   }
 
   Future<void> _deletePost() async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showShadDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => ShadDialog(
         title: Text('posts.delete_confirm_title'.tr()),
-        content: Text('posts.delete_confirm_message'.tr()),
+        description: Text('posts.delete_confirm_message'.tr()),
         actions: [
-          TextButton(
+          ShadButton.outline(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text('common.cancel'.tr()),
           ),
-          TextButton(
+          ShadButton.destructive(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text('common.delete'.tr()),
           ),
@@ -172,7 +173,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
       appBar: AppBar(
         title: Text('posts.title'.tr()),
         actions: [
-          IconButton(
+          ShadIconButton.ghost(
             icon: Icon(AppIcons.moreVert),
             onPressed: () {
               showModalBottomSheet(

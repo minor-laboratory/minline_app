@@ -274,21 +274,23 @@ class _DraftCardState extends ConsumerState<DraftCard> {
             const SizedBox(height: 12),
 
             // Fragment 목록 토글
-            TextButton.icon(
+            ShadButton.ghost(
               onPressed: () => setState(() => _showFragments = !_showFragments),
-              icon: Icon(
-                _showFragments ? AppIcons.chevronDown : AppIcons.chevronRight,
-                size: 16,
-              ),
-              label: Text(
-                _showFragments
-                    ? 'draft.toggle_snaps_hide'.tr()
-                    : 'draft.toggle_snaps_show'.tr(),
-              ),
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              padding: EdgeInsets.zero,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    _showFragments ? AppIcons.chevronDown : AppIcons.chevronRight,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    _showFragments
+                        ? 'draft.toggle_snaps_hide'.tr()
+                        : 'draft.toggle_snaps_show'.tr(),
+                  ),
+                ],
               ),
             ),
 
@@ -344,21 +346,40 @@ class _DraftCardState extends ConsumerState<DraftCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  FilledButton.icon(
-                    onPressed: _isLoading ? null : () => _updateStatus('accepted'),
-                    icon: Icon(AppIcons.checkCircle, size: 16),
-                    label: Text(
-                      _isLoading ? 'common.loading'.tr() : 'draft.accept_action'.tr(),
+                  ShadButton.outline(
+                    onPressed: _isLoading ? null : () => _updateStatus('rejected'),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(AppIcons.error, size: 16),
+                        const SizedBox(width: 6),
+                        Text('draft.reject_action'.tr()),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 8),
-                  OutlinedButton.icon(
-                    onPressed: _isLoading ? null : () => _updateStatus('rejected'),
-                    icon: Icon(AppIcons.error, size: 16),
-                    label: Text('draft.reject_action'.tr()),
+                  ShadButton(
+                    onPressed: _isLoading ? null : () => _updateStatus('accepted'),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_isLoading)
+                          const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        else
+                          Icon(AppIcons.checkCircle, size: 16),
+                        const SizedBox(width: 6),
+                        Text(
+                          _isLoading ? 'common.loading'.tr() : 'draft.accept_action'.tr(),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(width: 8),
-                  IconButton(
+                  ShadIconButton.ghost(
                     onPressed: _showDeleteDialog,
                     icon: Icon(AppIcons.delete, size: 16),
                   ),
@@ -368,19 +389,31 @@ class _DraftCardState extends ConsumerState<DraftCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  FilledButton.icon(
-                    onPressed: _isLoading ? null : () => _updateStatus('accepted'),
-                    icon: Icon(AppIcons.fileText, size: 16),
-                    label: Text('draft.create_post'.tr()),
-                  ),
-                  const SizedBox(width: 8),
-                  OutlinedButton.icon(
+                  ShadButton.outline(
                     onPressed: _isLoading ? null : () => _updateStatus('rejected'),
-                    icon: Icon(AppIcons.error, size: 16),
-                    label: Text('draft.reject_action'.tr()),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(AppIcons.error, size: 16),
+                        const SizedBox(width: 6),
+                        Text('draft.reject_action'.tr()),
+                      ],
+                    ),
                   ),
                   const SizedBox(width: 8),
-                  IconButton(
+                  ShadButton(
+                    onPressed: _isLoading ? null : () => _updateStatus('accepted'),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(AppIcons.fileText, size: 16),
+                        const SizedBox(width: 6),
+                        Text('draft.create_post'.tr()),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ShadIconButton.ghost(
                     onPressed: _showDeleteDialog,
                     icon: Icon(AppIcons.delete, size: 16),
                   ),
@@ -390,13 +423,19 @@ class _DraftCardState extends ConsumerState<DraftCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  FilledButton.icon(
+                  ShadButton(
                     onPressed: _isLoading ? null : () => _updateStatus('accepted'),
-                    icon: Icon(AppIcons.checkCircle, size: 16),
-                    label: Text('draft.reaccept_action'.tr()),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(AppIcons.checkCircle, size: 16),
+                        const SizedBox(width: 6),
+                        Text('draft.reaccept_action'.tr()),
+                      ],
+                    ),
                   ),
                   const SizedBox(width: 8),
-                  IconButton(
+                  ShadIconButton.ghost(
                     onPressed: _showDeleteDialog,
                     icon: Icon(AppIcons.delete, size: 16),
                   ),

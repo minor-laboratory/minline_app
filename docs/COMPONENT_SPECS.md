@@ -1625,6 +1625,166 @@ List<Fragment> filterAndSort(List<Fragment> fragments, FragmentFilterState filte
 
 ---
 
+## 9. Empty State (빈 상태 화면)
+
+> Fragment 목록이 비어있을 때 표시되는 화면
+
+**언제 읽어야 하는가:**
+- Empty State UI 구현 시
+- 빈 목록 화면 디자인 시
+
+### 기본 정보
+
+**파일**: `lib/features/timeline/presentation/widgets/fragment_list.dart`
+**웹 참조**: 웹 버전도 유사한 Empty State 사용
+
+### 레이아웃
+
+```
+┌─────────────────────────────────────────┐
+│                                         │
+│          [원형 아이콘 배경]              │  ← 64x64, sparkles
+│                                         │
+│          빈 상태 제목                    │
+│          설명 텍스트                     │
+│                                         │
+│        [입력 힌트 칩]                    │  ← 화살표 + 플레이스홀더
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+### 상세 스펙
+
+**컨테이너**:
+```dart
+Container(
+  margin: const EdgeInsets.all(16),
+  padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        colorScheme.surfaceContainerHighest,
+      ],
+    ),
+    borderRadius: BorderRadius.circular(12),
+  ),
+)
+```
+
+**원형 아이콘 배경**:
+```dart
+Container(
+  width: 64,
+  height: 64,
+  decoration: BoxDecoration(
+    color: colorScheme.surfaceContainerHighest,
+    shape: BoxShape.circle,
+  ),
+  child: Icon(
+    AppIcons.sparkles,
+    size: 32,
+    color: colorScheme.onSurface,
+  ),
+)
+```
+
+**텍스트**:
+```dart
+// 제목
+Text(
+  'snap.empty'.tr(),
+  style: theme.textTheme.titleLarge?.copyWith(
+    fontWeight: FontWeight.w600,
+    color: colorScheme.onSurface,
+  ),
+)
+
+// 설명
+Text(
+  'snap.empty_hint'.tr(),
+  style: theme.textTheme.bodyMedium?.copyWith(
+    color: colorScheme.onSurfaceVariant,
+  ),
+)
+```
+
+**입력 힌트 칩**:
+```dart
+Container(
+  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+  decoration: BoxDecoration(
+    color: colorScheme.surface.withValues(alpha: 0.5),
+    borderRadius: BorderRadius.circular(20),
+  ),
+  child: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(
+        AppIcons.arrowUp,
+        size: 12,
+        color: colorScheme.onSurfaceVariant,
+      ),
+      const SizedBox(width: 8),
+      Text(
+        'snap.input_placeholder'.tr(),
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+      ),
+    ],
+  ),
+)
+```
+
+### 색상 사용 원칙
+
+**❌ 메인 컬러 남용:**
+```dart
+// 모든 요소에 primary 사용 (과도한 강조)
+Container(
+  decoration: BoxDecoration(
+    color: colorScheme.primary.withValues(alpha: 0.1),
+  ),
+  child: Icon(AppIcons.sparkles, color: colorScheme.primary),
+)
+```
+
+**✅ 중립 색상 + 최소 강조:**
+```dart
+// 배경은 중립, 아이콘만 강조
+Container(
+  decoration: BoxDecoration(
+    color: colorScheme.surfaceContainerHighest,  // 중립
+  ),
+  child: Icon(
+    AppIcons.sparkles,
+    color: colorScheme.onSurface,  // 중립
+  ),
+)
+```
+
+**색상 선택 가이드:**
+- **배경**: `surfaceContainerHighest` (중립)
+- **아이콘 배경**: `surfaceContainerHighest` (중립)
+- **아이콘**: `onSurface` (중립)
+- **텍스트 제목**: `onSurface` (중립)
+- **텍스트 설명**: `onSurfaceVariant` (중립)
+- **입력 힌트**: `surface` + `onSurfaceVariant` (중립)
+
+**이유**: Empty State는 정보 제공이 목적이므로 중립적인 색상 사용. 메인 컬러는 CTA 버튼에만 사용.
+
+### 주의사항
+
+1. **메인 컬러 사용 금지**: Empty State에서 primary 색상 사용 최소화
+2. **그라데이션 사용**: 배경에 subtle한 그라데이션으로 깊이감 추가
+3. **원형 배경**: 아이콘을 원형 배경에 배치하여 시각적 안정감 제공
+4. **입력 힌트**: 사용자에게 다음 액션을 명확히 안내
+
+---
+
 ## 📋 체크리스트
 
 **컴포넌트 구현 시 필수 확인:**

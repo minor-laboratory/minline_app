@@ -89,13 +89,13 @@ class FragmentList extends ConsumerWidget {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.1),
+                color: colorScheme.surfaceContainerHighest,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 AppIcons.sparkles,
                 size: 32,
-                color: colorScheme.primary,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 16),
