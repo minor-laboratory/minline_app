@@ -53,3 +53,128 @@ Future<int> fragmentCount(Ref ref) async {
 
   return await isar.fragments.filter().deletedEqualTo(false).count();
 }
+
+/// Fragment 필터 상태 Provider
+@riverpod
+class FragmentFilter extends _$FragmentFilter {
+  @override
+  FragmentFilterState build() {
+    return const FragmentFilterState();
+  }
+
+  void setQuery(String value) {
+    state = state.copyWith(query: value);
+  }
+
+  void setSortBy(String value) {
+    state = state.copyWith(sortBy: value);
+  }
+
+  void toggleSortOrder() {
+    state = state.copyWith(
+      sortOrder: state.sortOrder == 'desc' ? 'asc' : 'desc',
+    );
+  }
+
+  void toggleTag(String tag) {
+    final newTags = List<String>.from(state.selectedTags);
+    if (newTags.contains(tag)) {
+      newTags.remove(tag);
+    } else {
+      newTags.add(tag);
+    }
+    state = state.copyWith(selectedTags: newTags);
+  }
+
+  void removeTag(String tag) {
+    final newTags = List<String>.from(state.selectedTags);
+    newTags.remove(tag);
+    state = state.copyWith(selectedTags: newTags);
+  }
+
+  void reset() {
+    state = const FragmentFilterState();
+  }
+}
+
+/// Fragment 필터 상태
+class FragmentFilterState {
+  final String query;
+  final String sortBy; // created, updated, event
+  final String sortOrder; // desc, asc
+  final List<String> selectedTags;
+
+  const FragmentFilterState({
+    this.query = '',
+    this.sortBy = 'event',
+    this.sortOrder = 'desc',
+    this.selectedTags = const [],
+  });
+
+  FragmentFilterState copyWith({
+    String? query,
+    String? sortBy,
+    String? sortOrder,
+    List<String>? selectedTags,
+  }) {
+    return FragmentFilterState(
+      query: query ?? this.query,
+      sortBy: sortBy ?? this.sortBy,
+      sortOrder: sortOrder ?? this.sortOrder,
+      selectedTags: selectedTags ?? this.selectedTags,
+    );
+  }
+}
+
+/// 필터링된 Fragment 스트림 Provider
+@riverpod
+Stream<List<Fragment>> filteredFragments(Ref ref) {
+  final isar = DatabaseService.instance.isar;
+  final filter = ref.watch(fragmentFilterProvider);
+
+  return isar.fragments.watchLazy().asyncMap((_) async {
+    // 기본 필터 (deleted = false)
+    var fragments = await isar.fragments
+        .filter()
+        .deletedEqualTo(false)
+        .findAll();
+
+    // 검색어 필터링
+    if (filter.query.isNotEmpty) {
+      final searchQuery = filter.query.toLowerCase();
+      fragments = fragments.where((f) =>
+        f.content.toLowerCase().contains(searchQuery)
+      ).toList();
+    }
+
+    // 태그 필터링
+    if (filter.selectedTags.isNotEmpty) {
+      fragments = fragments.where((f) {
+        final allTags = [...f.tags, ...f.userTags];
+        return filter.selectedTags.any((tag) => allTags.contains(tag));
+      }).toList();
+    }
+
+    // 정렬
+    fragments.sort((a, b) {
+      DateTime aTime, bTime;
+
+      if (filter.sortBy == 'created') {
+        aTime = a.createdAt;
+        bTime = b.createdAt;
+      } else if (filter.sortBy == 'updated') {
+        aTime = a.updatedAt;
+        bTime = b.updatedAt;
+      } else {
+        // event (기본값)
+        aTime = a.eventTime;
+        bTime = b.eventTime;
+      }
+
+      final diff = aTime.compareTo(bTime);
+      return filter.sortOrder == 'desc' ? -diff : diff;
+    });
+
+    return fragments;
+  });
+}

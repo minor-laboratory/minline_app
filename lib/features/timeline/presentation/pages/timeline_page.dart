@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../providers/fragments_provider.dart';
 import '../widgets/calendar_view.dart';
+import '../widgets/filter_bar.dart';
 import '../widgets/fragment_input_bar.dart';
 import '../widgets/fragment_list.dart';
 
@@ -78,7 +79,12 @@ class _TimelinePageState extends ConsumerState<TimelinePage> {
         ],
       ),
       body: _viewMode == 'timeline'
-          ? const FragmentList()
+          ? Column(
+              children: [
+                const FilterBar(),
+                const Expanded(child: FragmentList()),
+              ],
+            )
           : fragmentsAsync.when(
               data: (fragments) => CalendarView(allFragments: fragments),
               loading: () => const Center(child: CircularProgressIndicator()),

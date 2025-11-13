@@ -78,11 +78,37 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     final themeModeAsync = ref.watch(themeModeProvider);
+    final colorThemeAsync = ref.watch(colorThemeProvider);
     final localeAsync = ref.watch(localeProvider);
 
     return themeModeAsync.when(
-      data: (themeMode) {
-        return MaterialApp.router(
+      data: (themeMode) => colorThemeAsync.when(
+        data: (colorTheme) {
+          final seedColor = AppColors.getColorByTheme(colorTheme);
+
+          return MaterialApp.router(
+            title: 'MiniLine',
+            theme: common.AppTheme.lightTheme(
+              seedColor: seedColor,
+            ),
+            darkTheme: common.AppTheme.darkTheme(
+              seedColor: seedColor,
+            ),
+            themeMode: themeMode,
+            routerConfig: router.appRouter,
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: localeAsync.value ?? context.locale,
+          );
+        },
+        loading: () => MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        ),
+        error: (error, stack) => MaterialApp.router(
           title: 'MiniLine',
           theme: common.AppTheme.lightTheme(
             seedColor: AppColors.seedColor,
@@ -95,8 +121,8 @@ class _MyAppState extends ConsumerState<MyApp> {
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: localeAsync.value ?? context.locale,
-        );
-      },
+        ),
+      ),
       loading: () => MaterialApp(
         home: Scaffold(
           body: Center(

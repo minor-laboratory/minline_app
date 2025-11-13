@@ -38,6 +38,25 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
   }
 }
 
+/// 컬러 테마 Provider (12가지 Shadcn UI 컬러)
+@riverpod
+class ColorThemeNotifier extends _$ColorThemeNotifier {
+  static const String _key = 'color_theme';
+
+  @override
+  Future<String> build() async {
+    final prefs = await ref.watch(sharedPreferencesProvider.future);
+    return prefs.getString(_key) ?? 'zinc';
+  }
+
+  Future<void> setColorTheme(String colorId) async {
+    state = AsyncValue.data(colorId);
+
+    final prefs = await ref.read(sharedPreferencesProvider.future);
+    await prefs.setString(_key, colorId);
+  }
+}
+
 /// 언어 설정 Provider
 @riverpod
 class LocaleNotifier extends _$LocaleNotifier {

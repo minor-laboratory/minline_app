@@ -14,7 +14,7 @@ class FragmentList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final fragmentsAsync = ref.watch(fragmentsStreamProvider);
+    final fragmentsAsync = ref.watch(filteredFragmentsProvider);
 
     return fragmentsAsync.when(
       data: (fragments) {

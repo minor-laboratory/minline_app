@@ -3,8 +3,19 @@
     "title": "Timeline",
     "empty_title": "No Fragments Yet",
     "empty_message": "Start by writing a short thought below",
+    "empty_subtitle": "AI will automatically connect your thoughts",
     "error_title": "Loading Failed",
-    "error_message": "Please try again"
+    "error_message": "Please try again",
+    "error_loading": "An error occurred while loading"
+  },
+  "filter": {
+    "search_placeholder": "Search...",
+    "sort": "Sort",
+    "sort_event": "Event time",
+    "sort_created": "Created time",
+    "sort_updated": "Updated time",
+    "sort_desc": "Newest first",
+    "sort_asc": "Oldest first"
   },
   "calendar": {
     "title": "Calendar",
@@ -26,19 +37,36 @@
     "empty_message": "AI will suggest drafts when you have enough fragments"
   },
   "draft": {
+    "title": "Drafts",
+    "ai_suggestions": "AI Suggestions",
+    "subtitle": "Group related snaps into posts",
     "status_pending": "Pending",
     "status_accepted": "Accepted",
     "status_rejected": "Rejected",
     "snap_count": "{count} snaps",
     "similarity": "Similarity",
-    "toggle_snaps_show": "Show Snaps",
-    "toggle_snaps_hide": "Hide Snaps",
-    "accept_action": "Accept",
+    "toggle_snaps_show": "Show snaps",
+    "toggle_snaps_hide": "Hide snaps",
+    "accept_action": "Create post",
     "reject_action": "Reject",
     "reaccept_action": "Re-accept",
-    "create_post": "Create Post",
+    "create_post": "Create post",
     "delete_title": "Delete Draft",
-    "delete_confirm": "Are you sure you want to delete this draft?"
+    "delete_confirm": "Are you sure you want to delete this draft?",
+    "linked_to": "Draft: {title}",
+    "filter_all": "All",
+    "filter_pending": "Pending",
+    "filter_accepted": "Accepted",
+    "filter_rejected": "Rejected",
+    "analyze_now": "Analyze Now",
+    "analyzing": "Analyzing...",
+    "analyze_success": "{count} draft(s) created",
+    "analyze_no_results": "No new drafts found",
+    "analyze_failed": "Analysis failed",
+    "load_failed": "Failed to load drafts",
+    "empty_message": "No AI suggestions yet",
+    "empty_hint": "AI will automatically group related snaps as you write",
+    "empty_filter": "No drafts with this status"
   },
   "posts": {
     "title": "Posts",
@@ -91,6 +119,21 @@
     "privacy_policy": "Privacy Policy",
     "logout": "Logout",
     "logout_confirm": "Are you sure you want to logout?"
+  },
+  "theme": {
+    "color_scheme": "Color Theme",
+    "color_blue": "Blue",
+    "color_slate": "Slate",
+    "color_gray": "Gray",
+    "color_zinc": "Zinc",
+    "color_neutral": "Neutral",
+    "color_stone": "Stone",
+    "color_red": "Red",
+    "color_orange": "Orange",
+    "color_yellow": "Yellow",
+    "color_green": "Green",
+    "color_violet": "Violet",
+    "color_rose": "Rose"
   },
   "auth": {
     "login_required": "Login required"

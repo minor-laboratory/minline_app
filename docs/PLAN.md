@@ -12,6 +12,9 @@
 ## 전체 단계
 
 ```
+웹 동등성 구현: Phase 1-3 완료 ✅
+  └─ Settings 컬러 테마, Timeline 검색/정렬, Drafts 필터/AI 분석
+
 Phase 1: 기반 구축 (1-2주)
   └─ 데이터 모델, DB, 동기화
 
@@ -24,6 +27,106 @@ Phase 3: 앱 특화 (1-2주)
 Phase 4: 완성도 (1주)
   └─ Settings, 테스트, 배포
 ```
+
+---
+
+## 웹 버전 동등성 구현 ✅
+
+> **목적**: 웹 버전과 동일한 기능 제공
+> **상세**: [IMPLEMENTATION_WEB_PARITY.md](IMPLEMENTATION_WEB_PARITY.md)
+
+### Phase 1-1: Settings 컬러 테마 선택 ✅
+
+**우선순위:** 최상 (사용자 경험)
+**완료일:** 2025-11-13
+
+**작업:**
+- [x] ColorThemeNotifier Provider 추가
+- [x] ThemeSettingsSheet UI 수정 (12색 GridView)
+- [x] main.dart 테마 적용 로직
+- [x] 다국어 키 추가 (theme.color_*)
+
+**파일:**
+```
+lib/features/settings/
+├── providers/settings_provider.dart ✅
+├── presentation/widgets/theme_settings_sheet.dart ✅
+lib/main.dart ✅
+lib/core/constants/app_colors.dart ✅
+assets/translations/ko.json, en.json ✅
+```
+
+**참조:**
+- 구현 계획: [IMPLEMENTATION_WEB_PARITY.md](IMPLEMENTATION_WEB_PARITY.md) Phase 1-1
+- 북랩 패턴: `minorlab_book/lib/features/profile/presentation/widgets/theme_settings_sheet.dart`
+
+**검증:** ✅
+- 12가지 컬러 선택 가능
+- SharedPreferences 저장 확인
+- 앱 재시작 시 테마 유지
+
+### Phase 1-2: Timeline 검색/정렬/필터 ✅
+
+**우선순위:** 최상 (핵심 기능)
+**완료일:** 2025-11-13
+
+**작업:**
+- [x] FragmentFilterState 및 Provider 추가
+- [x] filteredFragmentsProvider (필터링/정렬 로직)
+- [x] FilterBar 위젯 생성
+- [x] TimelinePage에 FilterBar 추가
+- [x] 다국어 키 추가 (filter.*)
+
+**파일:**
+```
+lib/features/timeline/
+├── providers/fragments_provider.dart ✅
+├── presentation/widgets/filter_bar.dart ✅
+├── presentation/widgets/fragment_list.dart ✅
+├── presentation/pages/timeline_page.dart ✅
+lib/core/utils/app_icons.dart ✅
+assets/translations/ko.json, en.json ✅
+```
+
+**참조:**
+- 구현 계획: [IMPLEMENTATION_WEB_PARITY.md](IMPLEMENTATION_WEB_PARITY.md) Phase 1-2
+- 웹 버전: `miniline/src/lib/components/Timeline.svelte`, `FilterBar.svelte`
+
+**검증:** ✅
+- 검색 입력 시 실시간 필터링
+- 정렬 변경 (created/updated/event, desc/asc)
+- Stream 기반 자동 갱신
+
+### Phase 1-3: Drafts 상태 필터 + AI 분석 ✅
+
+**우선순위:** 최상 (핵심 기능)
+**완료일:** 2025-11-13
+
+**작업:**
+- [x] DraftFilterState 및 Provider 추가
+- [x] filteredDraftsProvider (필터링 로직)
+- [x] draftCountsProvider (상태별 카운트)
+- [x] DraftsPage UI (필터 칩, AI 분석 버튼)
+- [x] _handleAnalyzeNow 함수 (Edge Function 호출)
+- [x] 다국어 키 추가 (웹과 100% 일치)
+
+**파일:**
+```
+lib/features/drafts/
+├── providers/drafts_provider.dart ✅
+├── presentation/pages/drafts_page.dart ✅
+assets/translations/ko.json, en.json ✅
+```
+
+**참조:**
+- 구현 계획: [IMPLEMENTATION_WEB_PARITY.md](IMPLEMENTATION_WEB_PARITY.md) Phase 1-3
+- 웹 버전: `miniline/src/lib/components/DraftList.svelte`
+
+**검증:** ✅
+- 상태별 필터 (all/pending/accepted/rejected)
+- 각 상태별 개수 표시
+- AI 분석 버튼 동작 확인
+- 웹과 동일한 UX
 
 ---
 

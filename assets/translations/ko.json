@@ -3,8 +3,19 @@
     "title": "타임라인",
     "empty_title": "아직 Fragment가 없습니다",
     "empty_message": "아래에서 짧은 생각을 입력해보세요",
+    "empty_subtitle": "짧은 생각을 입력하면 AI가 자동으로 연결합니다",
     "error_title": "로딩 실패",
-    "error_message": "다시 시도해주세요"
+    "error_message": "다시 시도해주세요",
+    "error_loading": "로딩 중 오류가 발생했습니다"
+  },
+  "filter": {
+    "search_placeholder": "검색...",
+    "sort": "정렬",
+    "sort_event": "이벤트 시간순",
+    "sort_created": "작성 시간순",
+    "sort_updated": "수정 시간순",
+    "sort_desc": "최신순",
+    "sort_asc": "오래된순"
   },
   "calendar": {
     "title": "캘린더",
@@ -26,19 +37,36 @@
     "empty_message": "충분한 스냅이 모이면 AI가 초안을 제안합니다"
   },
   "draft": {
-    "status_pending": "대기 중",
+    "title": "제안",
+    "ai_suggestions": "AI 제안",
+    "subtitle": "관련된 스냅을 묶어 글로 만들어보세요",
+    "status_pending": "확인 대기",
     "status_accepted": "수락됨",
     "status_rejected": "거부됨",
-    "snap_count": "{count}개 스냅",
+    "snap_count": "{count}개의 스냅",
     "similarity": "유사도",
-    "toggle_snaps_show": "스냅 보기",
-    "toggle_snaps_hide": "스냅 숨기기",
-    "accept_action": "수락",
+    "toggle_snaps_show": "스냅 목록 보기",
+    "toggle_snaps_hide": "스냅 목록 숨기기",
+    "accept_action": "글로 만들기",
     "reject_action": "거부",
     "reaccept_action": "다시 수락",
     "create_post": "글 만들기",
-    "delete_title": "초안 삭제",
-    "delete_confirm": "이 초안을 삭제하시겠습니까?"
+    "delete_title": "Draft 삭제",
+    "delete_confirm": "정말 이 Draft를 삭제하시겠습니까?",
+    "linked_to": "제안: {title}",
+    "filter_all": "전체",
+    "filter_pending": "확인 대기",
+    "filter_accepted": "수락됨",
+    "filter_rejected": "거부됨",
+    "analyze_now": "지금 분석",
+    "analyzing": "분석 중...",
+    "analyze_success": "{count}개의 제안이 생성되었습니다",
+    "analyze_no_results": "새로운 제안이 없습니다",
+    "analyze_failed": "분석 실패",
+    "load_failed": "Draft 로딩 실패",
+    "empty_message": "아직 AI 제안이 없습니다",
+    "empty_hint": "스냅을 작성하면 AI가 자동으로 관련된 내용을 묶어 제안합니다",
+    "empty_filter": "해당 상태의 Draft가 없습니다"
   },
   "posts": {
     "title": "게시글",
@@ -91,6 +119,21 @@
     "privacy_policy": "개인정보처리방침",
     "logout": "로그아웃",
     "logout_confirm": "정말 로그아웃 하시겠습니까?"
+  },
+  "theme": {
+    "color_scheme": "컬러 테마",
+    "color_blue": "블루",
+    "color_slate": "슬레이트",
+    "color_gray": "그레이",
+    "color_zinc": "징크",
+    "color_neutral": "뉴트럴",
+    "color_stone": "스톤",
+    "color_red": "레드",
+    "color_orange": "오렌지",
+    "color_yellow": "옐로우",
+    "color_green": "그린",
+    "color_violet": "바이올렛",
+    "color_rose": "로즈"
   },
   "auth": {
     "login_required": "로그인이 필요합니다"

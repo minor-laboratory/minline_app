@@ -39,6 +39,8 @@ class AppIcons {
   // UI Elements Icons
   static const IconData arrowBack = LucideIcons.arrow_left;
   static const IconData arrowForward = LucideIcons.arrow_right;
+  static const IconData arrowDown = LucideIcons.arrow_down;
+  static const IconData arrowUp = LucideIcons.arrow_up;
   static const IconData chevronRight = LucideIcons.chevron_right;
   static const IconData chevronLeft = LucideIcons.chevron_left;
   static const IconData chevronDown = LucideIcons.chevron_down;
@@ -47,6 +49,7 @@ class AppIcons {
   static const IconData moreHoriz = LucideIcons.ellipsis;
   static const IconData filter = LucideIcons.funnel;
   static const IconData sort = LucideIcons.arrow_up_down;
+  static const IconData search = LucideIcons.search;
   static const IconData refresh = LucideIcons.refresh_cw;
   static const IconData loader = LucideIcons.loader;
 
