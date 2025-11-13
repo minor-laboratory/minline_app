@@ -1,0 +1,41 @@
+{
+  "timeline": {
+    "title": "타임라인",
+    "empty_title": "아직 Fragment가 없습니다",
+    "empty_message": "아래에서 짧은 생각을 입력해보세요",
+    "error_title": "로딩 실패",
+    "error_message": "다시 시도해주세요"
+  },
+  "drafts": {
+    "title": "초안",
+    "coming_soon": "곧 만나보실 수 있습니다"
+  },
+  "posts": {
+    "title": "게시글",
+    "coming_soon": "곧 만나보실 수 있습니다"
+  },
+  "settings": {
+    "title": "설정",
+    "coming_soon": "곧 만나보실 수 있습니다"
+  },
+  "common": {
+    "input_placeholder": "무슨 생각을 하고 계신가요?",
+    "save": "저장",
+    "character_count": "{current}/{max}",
+    "saved": "저장되었습니다"
+  },
+  "time": {
+    "just_now": "방금 전",
+    "minutes_ago": "{minutes}분 전",
+    "hours_ago": "{hours}시간 전",
+    "date_format": "M월 d일",
+    "datetime_format": "M월 d일 HH:mm"
+  },
+  "media": {
+    "file_size_exceeded": "파일 크기 초과: {files} (최대 {maxMB}MB)",
+    "max_files_exceeded": "최대 {count}개까지 첨부 가능합니다",
+    "unsupported_file_type": "지원하지 않는 파일 형식: {type}",
+    "upload_failed": "업로드 실패: {message}",
+    "delete_failed": "삭제 실패: {message}"
+  }
+}

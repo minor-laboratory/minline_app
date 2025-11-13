@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -7,10 +8,14 @@ import 'core/database/database_service.dart';
 import 'core/services/sync/lifecycle_service.dart';
 import 'core/utils/logger.dart';
 import 'env/app_env.dart';
+import 'router/app_router.dart';
 
 void main() async {
   // 위젯 바인딩 초기화
   WidgetsFlutterBinding.ensureInitialized();
+
+  // easy_localization 초기화
+  await EasyLocalization.ensureInitialized();
 
   // Isar Database 초기화 (로컬 데이터베이스)
   await DatabaseService.instance.init();
@@ -29,8 +34,13 @@ void main() async {
   await Supabase.instance.client.auth.onAuthStateChange.first;
 
   runApp(
-    const ProviderScope(
-      child: MyApp(),
+    EasyLocalization(
+      supportedLocales: const [Locale('ko'), Locale('en')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('ko'),
+      child: const ProviderScope(
+        child: MyApp(),
+      ),
     ),
   );
 }
@@ -56,59 +66,19 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'MiniLine',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+      theme: common.AppTheme.lightTheme(
+        seedColor: const Color(0xFF5B6CF6),
       ),
-      home: const MyHomePage(title: 'MiniLine Home'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+      darkTheme: common.AppTheme.darkTheme(
+        seedColor: const Color(0xFF5B6CF6),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+      themeMode: ThemeMode.system,
+      routerConfig: appRouter,
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
     );
   }
 }

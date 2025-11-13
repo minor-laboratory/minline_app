@@ -1,0 +1,41 @@
+{
+  "timeline": {
+    "title": "Timeline",
+    "empty_title": "No Fragments Yet",
+    "empty_message": "Start by writing a short thought below",
+    "error_title": "Loading Failed",
+    "error_message": "Please try again"
+  },
+  "drafts": {
+    "title": "Drafts",
+    "coming_soon": "Coming Soon"
+  },
+  "posts": {
+    "title": "Posts",
+    "coming_soon": "Coming Soon"
+  },
+  "settings": {
+    "title": "Settings",
+    "coming_soon": "Coming Soon"
+  },
+  "common": {
+    "input_placeholder": "What's on your mind?",
+    "save": "Save",
+    "character_count": "{current}/{max}",
+    "saved": "Saved"
+  },
+  "time": {
+    "just_now": "Just now",
+    "minutes_ago": "{minutes}m ago",
+    "hours_ago": "{hours}h ago",
+    "date_format": "MMM d",
+    "datetime_format": "MMM d, HH:mm"
+  },
+  "media": {
+    "file_size_exceeded": "File size exceeded: {files} (max {maxMB}MB)",
+    "max_files_exceeded": "Maximum {count} files allowed",
+    "unsupported_file_type": "Unsupported file type: {type}",
+    "upload_failed": "Upload failed: {message}",
+    "delete_failed": "Delete failed: {message}"
+  }
+}
