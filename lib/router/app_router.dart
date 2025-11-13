@@ -3,9 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
 
+import '../features/auth/presentation/pages/login_page.dart';
 import '../features/drafts/presentation/pages/drafts_page.dart';
 import '../features/posts/presentation/pages/post_detail_page.dart';
 import '../features/posts/presentation/pages/posts_page.dart';
+import '../features/profile/presentation/pages/account_withdrawal_page.dart';
+import '../features/profile/presentation/pages/password_change_page.dart';
+import '../features/profile/presentation/pages/profile_detail_page.dart';
 import '../features/settings/presentation/pages/settings_page.dart';
 import '../features/timeline/presentation/pages/timeline_page.dart';
 
@@ -32,6 +36,20 @@ final appRouter = GoRouter(
       builder: (context, state) => const TimelinePage(),
     ),
 
+    // Auth
+    GoRoute(
+      path: '/auth',
+      name: 'auth',
+      builder: (context, state) => const LoginPage(),
+      routes: [
+        // 비밀번호 재설정
+        GoRoute(
+          path: 'reset-password',
+          builder: (context, state) => const common.PasswordResetPage(),
+        ),
+      ],
+    ),
+
     // Drafts
     GoRoute(
       path: '/drafts',
@@ -56,12 +74,29 @@ final appRouter = GoRouter(
       ],
     ),
 
+    // Profile
+    GoRoute(
+      path: '/profile',
+      name: 'profile',
+      builder: (context, state) => const ProfileDetailPage(),
+    ),
+
     // Settings
     GoRoute(
       path: '/settings',
       name: 'settings',
       builder: (context, state) => const SettingsPage(),
       routes: [
+        // 프로필 비밀번호 변경
+        GoRoute(
+          path: 'profile/password',
+          builder: (context, state) => const PasswordChangePage(),
+        ),
+        // 회원 탈퇴
+        GoRoute(
+          path: 'account/withdrawal',
+          builder: (context, state) => const AccountWithdrawalPage(),
+        ),
         // 이용약관
         GoRoute(
           path: 'terms',

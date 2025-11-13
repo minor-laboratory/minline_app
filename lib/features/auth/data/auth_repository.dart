@@ -282,6 +282,35 @@ class AuthRepository {
     }
   }
 
+  // 비밀번호 재설정 이메일 전송
+  Future<void> resetPassword(String email) async {
+    logger.i('Password reset email requested for: $email');
+
+    try {
+      await _supabase.auth.resetPasswordForEmail(
+        email,
+        redirectTo: 'com.minorlab.miniline://reset-password',
+      );
+      logger.i('Password reset email sent successfully to: $email');
+    } catch (e, stackTrace) {
+      logger.e('Password reset email failed', e, stackTrace);
+      NetworkErrorHandler.logError(e, 'Password reset', stackTrace);
+
+      if (e is AuthException) {
+        switch (e.code) {
+          case 'invalid_email':
+            throw Exception('Invalid email address');
+          case 'user_not_found':
+            throw Exception('No account found with this email');
+          default:
+            throw Exception(e.message);
+        }
+      }
+
+      throw Exception(NetworkErrorHandler.getErrorMessage(e));
+    }
+  }
+
   // 사용자 로그인 방법 확인
   bool get isEmailUser {
     final user = currentUser;

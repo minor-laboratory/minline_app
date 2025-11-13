@@ -13,6 +13,7 @@ import '../../../../core/services/media/media_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../models/fragment.dart';
+import '../../../auth/widgets/login_required_bottom_sheet.dart';
 
 /// Fragment 입력바 위젯
 ///
@@ -119,18 +120,19 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
       return;
     }
 
+    // 로그인 체크
+    final supabase = Supabase.instance.client;
+    final currentUser = supabase.auth.currentUser;
+
+    if (currentUser == null) {
+      // 로그인 유도 bottom sheet 표시
+      await showLoginRequiredBottomSheet(context);
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
-      final supabase = Supabase.instance.client;
-      final currentUser = supabase.auth.currentUser;
-
-      if (currentUser == null) {
-        if (!mounted) return;
-        setState(() => _isLoading = false);
-        _showError('auth.not_authenticated'.tr());
-        return;
-      }
 
       // Fragment ID 생성 (이미지 업로드 경로용)
       final fragmentId = const Uuid().v4();

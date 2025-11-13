@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/utils/app_icons.dart';
 import '../../../../shared/widgets/standard_bottom_sheet.dart';
+import '../../../profile/widgets/user_profile_section.dart';
 import '../widgets/daily_reminder_sheet.dart';
 import '../widgets/draft_notification_sheet.dart';
 import '../widgets/language_settings_sheet.dart';
@@ -128,6 +129,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       ),
       body: ListView(
         children: [
+          // 프로필 섹션
+          const UserProfileSection(),
+          const SizedBox(height: 16),
+
+          const ShadSeparator.horizontal(
+            margin: EdgeInsets.symmetric(horizontal: 16),
+          ),
+
           // UX 설정 섹션
           _buildSectionHeader(context, 'settings.ux'.tr()),
 

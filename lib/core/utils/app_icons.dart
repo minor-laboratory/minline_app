@@ -19,9 +19,12 @@ class AppIcons {
   static const IconData logout = LucideIcons.log_out;
   static const IconData email = LucideIcons.mail;
   static const IconData password = LucideIcons.lock;
+  static const IconData passwordOutline = LucideIcons.lock_keyhole;
   static const IconData user = LucideIcons.user;
   static const IconData userCircle = LucideIcons.circle_user;
   static const IconData shield = LucideIcons.shield;
+  static const IconData eye = LucideIcons.eye;
+  static const IconData eyeOff = LucideIcons.eye_off;
 
   // Actions Icons
   static const IconData add = LucideIcons.plus;

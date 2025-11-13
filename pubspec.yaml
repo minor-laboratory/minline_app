@@ -23,6 +23,7 @@ dependencies:
 
   # 아이콘
   flutter_lucide: ^1.7.0
+  font_awesome_flutter: ^10.8.0
 
   # 상태 관리
   flutter_riverpod:
