@@ -11,7 +11,14 @@
     "switch_to_calendar": "캘린더 뷰로 전환",
     "switch_to_timeline": "타임라인 뷰로 전환",
     "today": "오늘",
-    "no_fragments": "이 날짜에는 스냅이 없습니다"
+    "no_fragments": "이 날짜에는 스냅이 없습니다",
+    "weekday_sun": "일",
+    "weekday_mon": "월",
+    "weekday_tue": "화",
+    "weekday_wed": "수",
+    "weekday_thu": "목",
+    "weekday_fri": "금",
+    "weekday_sat": "토"
   },
   "drafts": {
     "title": "초안",

@@ -194,11 +194,19 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
-            children: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-                .map((day) => Expanded(
+            children: [
+              'calendar.weekday_sun',
+              'calendar.weekday_mon',
+              'calendar.weekday_tue',
+              'calendar.weekday_wed',
+              'calendar.weekday_thu',
+              'calendar.weekday_fri',
+              'calendar.weekday_sat',
+            ]
+                .map((key) => Expanded(
                       child: Center(
                         child: Text(
-                          day,
+                          key.tr(),
                           style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                                 fontWeight: FontWeight.w600,

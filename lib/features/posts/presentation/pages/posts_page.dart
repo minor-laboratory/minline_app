@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/utils/app_icons.dart';
 import '../../providers/posts_provider.dart';
 import '../widgets/post_card.dart';
 
@@ -30,7 +31,7 @@ class PostsPage extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.article_outlined,
+                      AppIcons.posts,
                       size: 64,
                       color: Theme.of(context).colorScheme.outline,
                     ),
@@ -87,7 +88,7 @@ class PostsPage extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.error_outline,
+                  AppIcons.error,
                   size: 64,
                   color: Theme.of(context).colorScheme.error,
                 ),

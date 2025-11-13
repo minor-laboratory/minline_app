@@ -11,7 +11,14 @@
     "switch_to_calendar": "Switch to Calendar View",
     "switch_to_timeline": "Switch to Timeline View",
     "today": "Today",
-    "no_fragments": "No snaps on this date"
+    "no_fragments": "No snaps on this date",
+    "weekday_sun": "Sun",
+    "weekday_mon": "Mon",
+    "weekday_tue": "Tue",
+    "weekday_wed": "Wed",
+    "weekday_thu": "Thu",
+    "weekday_fri": "Fri",
+    "weekday_sat": "Sat"
   },
   "drafts": {
     "title": "Drafts",

@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/app_icons.dart';
 import '../../providers/settings_provider.dart';
 
 /// 언어 설정 Bottom Sheet
@@ -153,7 +154,7 @@ class _LanguageCard extends StatelessWidget {
             ),
             if (isSelected)
               Icon(
-                Icons.check_circle,
+                AppIcons.checkCircle,
                 color: colorScheme.primary,
               ),
           ],

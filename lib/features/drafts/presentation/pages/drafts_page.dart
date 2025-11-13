@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/app_icons.dart';
 import '../../providers/drafts_provider.dart';
 import '../widgets/draft_card.dart';
 
@@ -29,7 +30,7 @@ class DraftsPage extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.auto_awesome_outlined,
+                      AppIcons.sparkles,
                       size: 64,
                       color: Theme.of(context).colorScheme.outline,
                     ),
@@ -83,7 +84,7 @@ class DraftsPage extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.error_outline,
+                  AppIcons.error,
                   size: 64,
                   color: Theme.of(context).colorScheme.error,
                 ),

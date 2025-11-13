@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
 
+import 'core/constants/app_colors.dart';
 import 'core/database/database_service.dart';
 import 'core/services/share_handler_service.dart';
 import 'core/services/sync/lifecycle_service.dart';
@@ -84,10 +85,10 @@ class _MyAppState extends ConsumerState<MyApp> {
         return MaterialApp.router(
           title: 'MiniLine',
           theme: common.AppTheme.lightTheme(
-            seedColor: const Color(0xFF5B6CF6),
+            seedColor: AppColors.seedColor,
           ),
           darkTheme: common.AppTheme.darkTheme(
-            seedColor: const Color(0xFF5B6CF6),
+            seedColor: AppColors.seedColor,
           ),
           themeMode: themeMode,
           routerConfig: router.appRouter,
@@ -106,10 +107,10 @@ class _MyAppState extends ConsumerState<MyApp> {
       error: (error, stack) => MaterialApp.router(
         title: 'MiniLine',
         theme: common.AppTheme.lightTheme(
-          seedColor: const Color(0xFF5B6CF6),
+          seedColor: AppColors.seedColor,
         ),
         darkTheme: common.AppTheme.darkTheme(
-          seedColor: const Color(0xFF5B6CF6),
+          seedColor: AppColors.seedColor,
         ),
         themeMode: ThemeMode.system,
         routerConfig: router.appRouter,

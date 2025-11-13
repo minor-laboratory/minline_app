@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/app_icons.dart';
 import '../../providers/settings_provider.dart';
 
 /// 테마 설정 Bottom Sheet
@@ -52,7 +53,7 @@ class ThemeSettingsSheet extends ConsumerWidget {
 
                 // 시스템 모드
                 _ThemeModeCard(
-                  icon: Icons.brightness_auto,
+                  icon: AppIcons.monitor,
                   label: 'settings.system_mode'.tr(),
                   isSelected: themeMode == ThemeMode.system,
                   onTap: () {
@@ -63,7 +64,7 @@ class ThemeSettingsSheet extends ConsumerWidget {
 
                 // 라이트 모드
                 _ThemeModeCard(
-                  icon: Icons.light_mode,
+                  icon: AppIcons.sun,
                   label: 'settings.light_mode'.tr(),
                   isSelected: themeMode == ThemeMode.light,
                   onTap: () {
@@ -74,7 +75,7 @@ class ThemeSettingsSheet extends ConsumerWidget {
 
                 // 다크 모드
                 _ThemeModeCard(
-                  icon: Icons.dark_mode,
+                  icon: AppIcons.moon,
                   label: 'settings.dark_mode'.tr(),
                   isSelected: themeMode == ThemeMode.dark,
                   onTap: () {
@@ -151,7 +152,7 @@ class _ThemeModeCard extends StatelessWidget {
             ),
             if (isSelected)
               Icon(
-                Icons.check_circle,
+                AppIcons.checkCircle,
                 color: colorScheme.primary,
               ),
           ],
