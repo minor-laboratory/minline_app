@@ -242,7 +242,8 @@ class IsarWatchSyncService {
       return;
     }
 
-    // Supabase에 upsert (embedding은 서버에서 자동 생성)
+    // Supabase에 upsert
+    // created_at, updated_at은 서버에서 자동 관리 (클라이언트에서 보내지 않음)
     final response = await _supabase.from('fragments').upsert({
       'id': fragment.remoteID,
       'user_id': user.id,
@@ -253,8 +254,6 @@ class IsarWatchSyncService {
       'event_time_source': fragment.eventTimeSource,
       'tags': fragment.tags,
       'user_tags': fragment.userTags,
-      'created_at': fragment.createdAt.toIso8601String(),
-      'updated_at': fragment.updatedAt.toIso8601String(),
       'deleted': fragment.deleted,
     });
 
@@ -282,6 +281,7 @@ class IsarWatchSyncService {
       return;
     }
 
+    // created_at, updated_at은 서버에서 자동 관리
     final response = await _supabase.from('drafts').upsert({
       'id': draft.remoteID,
       'user_id': user.id,
@@ -289,8 +289,6 @@ class IsarWatchSyncService {
       'fragment_ids': draft.fragmentIds,
       'status': draft.status,
       'viewed': draft.viewed,
-      'created_at': draft.createdAt.toIso8601String(),
-      'updated_at': draft.updatedAt.toIso8601String(),
       'deleted': draft.deleted,
     });
 
@@ -318,6 +316,7 @@ class IsarWatchSyncService {
       return;
     }
 
+    // created_at, updated_at은 서버에서 자동 관리
     final response = await _supabase.from('posts').upsert({
       'id': post.remoteID,
       'user_id': user.id,
@@ -329,8 +328,6 @@ class IsarWatchSyncService {
       'version': post.version,
       'previous_version_id': post.previousVersionId,
       'viewed': post.viewed,
-      'created_at': post.createdAt.toIso8601String(),
-      'updated_at': post.updatedAt.toIso8601String(),
       'deleted': post.deleted,
     });
 
