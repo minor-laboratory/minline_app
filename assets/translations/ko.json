@@ -6,23 +6,89 @@
     "error_title": "로딩 실패",
     "error_message": "다시 시도해주세요"
   },
+  "calendar": {
+    "title": "캘린더",
+    "switch_to_calendar": "캘린더 뷰로 전환",
+    "switch_to_timeline": "타임라인 뷰로 전환",
+    "today": "오늘",
+    "no_fragments": "이 날짜에는 스냅이 없습니다"
+  },
   "drafts": {
     "title": "초안",
-    "coming_soon": "곧 만나보실 수 있습니다"
+    "empty_title": "아직 초안이 없습니다",
+    "empty_message": "충분한 스냅이 모이면 AI가 초안을 제안합니다"
+  },
+  "draft": {
+    "status_pending": "대기 중",
+    "status_accepted": "수락됨",
+    "status_rejected": "거부됨",
+    "snap_count": "{count}개 스냅",
+    "similarity": "유사도",
+    "toggle_snaps_show": "스냅 보기",
+    "toggle_snaps_hide": "스냅 숨기기",
+    "accept_action": "수락",
+    "reject_action": "거부",
+    "reaccept_action": "다시 수락",
+    "create_post": "글 만들기",
+    "delete_title": "초안 삭제",
+    "delete_confirm": "이 초안을 삭제하시겠습니까?"
   },
   "posts": {
     "title": "게시글",
-    "coming_soon": "곧 만나보실 수 있습니다"
+    "empty_title": "아직 게시글이 없습니다",
+    "empty_message": "초안을 수락하면 게시글이 생성됩니다",
+    "make_public": "공개 게시",
+    "make_public_description": "다른 사용자가 볼 수 있도록 공개",
+    "created_at": "작성일"
+  },
+  "post": {
+    "public": "공개",
+    "private": "비공개",
+    "snap_count": "{count}개 스냅",
+    "exported": "공유됨",
+    "delete_title": "게시글 삭제",
+    "delete_confirm": "이 게시글을 삭제하시겠습니까?"
   },
   "settings": {
     "title": "설정",
-    "coming_soon": "곧 만나보실 수 있습니다"
+    "ux": "사용자 경험",
+    "theme": "테마",
+    "theme_description": "라이트/다크 모드 선택",
+    "system_mode": "시스템",
+    "light_mode": "라이트",
+    "dark_mode": "다크",
+    "language": "언어",
+    "language_description": "한국어 / English",
+    "notifications": "알림",
+    "daily_reminder": "일일 리마인더",
+    "daily_reminder_description": "매일 정해진 시간에 알림",
+    "draft_notifications": "초안 완성 알림",
+    "draft_notifications_description": "AI가 초안을 생성하면 알림",
+    "select_time": "시간 선택",
+    "notification_time": "알림 시간",
+    "app_info": "앱 정보",
+    "app_version": "앱 버전",
+    "legal": "법적 정보",
+    "terms_of_service": "이용약관",
+    "privacy_policy": "개인정보처리방침",
+    "logout": "로그아웃",
+    "logout_confirm": "정말 로그아웃 하시겠습니까?"
+  },
+  "auth": {
+    "login_required": "로그인이 필요합니다"
   },
   "common": {
     "input_placeholder": "무슨 생각을 하고 계신가요?",
     "save": "저장",
     "character_count": "{current}/{max}",
-    "saved": "저장되었습니다"
+    "saved": "저장되었습니다",
+    "loading": "로딩 중...",
+    "delete": "삭제",
+    "cancel": "취소",
+    "error": "오류가 발생했습니다",
+    "enable": "사용",
+    "notifications_on": "알림 켜짐",
+    "notifications_off": "알림 꺼짐"
   },
   "time": {
     "just_now": "방금 전",

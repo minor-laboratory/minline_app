@@ -5,10 +5,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
 
 import 'core/database/database_service.dart';
+import 'core/services/share_handler_service.dart';
 import 'core/services/sync/lifecycle_service.dart';
 import 'core/utils/logger.dart';
 import 'env/app_env.dart';
-import 'router/app_router.dart';
+import 'features/settings/providers/settings_provider.dart';
+import 'router/app_router.dart' as router;
 
 void main() async {
   // 위젯 바인딩 초기화
@@ -56,29 +58,65 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   void initState() {
     super.initState();
-    // 초기화 완료 후 동기화 서비스 시작
+
+    // ShareHandlerService에 Navigator Key 설정 (app_router에서)
+    ShareHandlerService.navigatorKey = router.navigatorKey;
+
+    // 초기화 완료 후 서비스 시작
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // LifecycleService 초기화 (Provider ref와 함께)
       ref.read(lifecycleServiceProvider).initialize();
       logger.i('[Main] LifecycleService initialized');
+
+      // ShareHandlerService 초기화
+      ShareHandlerService().initialize();
+      logger.i('[Main] ShareHandlerService initialized');
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'MiniLine',
-      theme: common.AppTheme.lightTheme(
-        seedColor: const Color(0xFF5B6CF6),
+    final themeModeAsync = ref.watch(themeModeProvider);
+    final localeAsync = ref.watch(localeProvider);
+
+    return themeModeAsync.when(
+      data: (themeMode) {
+        return MaterialApp.router(
+          title: 'MiniLine',
+          theme: common.AppTheme.lightTheme(
+            seedColor: const Color(0xFF5B6CF6),
+          ),
+          darkTheme: common.AppTheme.darkTheme(
+            seedColor: const Color(0xFF5B6CF6),
+          ),
+          themeMode: themeMode,
+          routerConfig: router.appRouter,
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: localeAsync.value ?? context.locale,
+        );
+      },
+      loading: () => MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
       ),
-      darkTheme: common.AppTheme.darkTheme(
-        seedColor: const Color(0xFF5B6CF6),
+      error: (error, stack) => MaterialApp.router(
+        title: 'MiniLine',
+        theme: common.AppTheme.lightTheme(
+          seedColor: const Color(0xFF5B6CF6),
+        ),
+        darkTheme: common.AppTheme.darkTheme(
+          seedColor: const Color(0xFF5B6CF6),
+        ),
+        themeMode: ThemeMode.system,
+        routerConfig: router.appRouter,
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
       ),
-      themeMode: ThemeMode.system,
-      routerConfig: appRouter,
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
     );
   }
 }

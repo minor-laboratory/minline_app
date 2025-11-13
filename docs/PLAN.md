@@ -218,31 +218,39 @@ lib/features/drafts/
 - Draft 상세 화면 표시
 - AI 생성 초안 확인
 
-### 2.4 Posts 화면
+### 2.4 Posts 화면 ✅ 완료
 
 **우선순위:** 중간
 
 **작업:**
-- [ ] Posts 페이지
-- [ ] Post 리스트
-- [ ] Post 카드
-- [ ] Post 상세 화면 (읽기 모드)
+- [x] Posts 페이지
+- [x] Post 리스트
+- [x] Post 카드
+- [x] Post 상세 화면 (읽기 모드)
+- [x] Markdown 렌더링 (flutter_markdown)
+- [x] 공개/비공개 토글
+- [x] 삭제 기능
+- [x] 라우트 추가 (`/posts/:postId`)
 
 **파일:**
 ```
 lib/features/posts/
 ├── presentation/
 │   ├── pages/
-│   │   ├── posts_page.dart
-│   │   └── post_detail_page.dart
+│   │   ├── posts_page.dart ✅
+│   │   └── post_detail_page.dart ✅
 │   └── widgets/post_card.dart
-└── providers/posts_provider.dart
+└── providers/posts_provider.dart ✅
+lib/router/app_router.dart (라우트 추가) ✅
+pubspec.yaml (flutter_markdown: ^0.7.4+1) ✅
 ```
 
-**검증:**
-- Post 리스트 표시
-- Post 상세 화면 표시
-- 공개/비공개 상태 확인
+**검증:** ✅
+- Post 리스트 표시 확인
+- Post 상세 화면 표시 확인
+- Markdown 정상 렌더링 확인
+- 공개/비공개 상태 토글 확인
+- viewed 플래그 자동 업데이트 확인
 
 ### 2.5 라우팅
 
@@ -304,125 +312,156 @@ lib/features/timeline/presentation/pages/
 
 ---
 
-## Phase 3: 앱 특화 기능
+## Phase 3: 앱 특화 기능 🟡 대부분 완료
 
-### 3.1 공유 수신
+### 3.1 공유 수신 ⏳ 보류
 
 **우선순위:** 높음 (앱의 차별점)
+**상태:** 서비스 파일 존재, 초기화 및 연동 미확인
 
 **작업:**
-- [ ] ShareHandlerService 작성
-- [ ] 텍스트 공유 수신
-- [ ] 이미지 공유 수신
-- [ ] Timeline으로 자동 이동
-- [ ] 입력창에 자동 입력
+- [x] ShareHandlerService 작성
+- [ ] 텍스트 공유 수신 (테스트 필요)
+- [ ] 이미지 공유 수신 (테스트 필요)
+- [ ] Timeline으로 자동 이동 (코드 존재)
+- [ ] 입력창에 자동 입력 (코드 존재)
 
 **파일:**
 ```
-lib/core/services/share_handler_service.dart
+lib/core/services/share_handler_service.dart ✅
+lib/core/services/share_handler_provider.dart ✅
+lib/router/app_router.dart (navigatorKey) ✅
 ```
 
 **참조:**
 - [../minorlab_book/lib/core/services/share_handler_service.dart](../minorlab_book/lib/core/services/share_handler_service.dart)
 - [docs/DIFFERENCES_FROM_WEB.md](DIFFERENCES_FROM_WEB.md) - 공유 수신 섹션
 
-**검증:**
-- Safari에서 URL 공유 → MiniLine 열림
-- 갤러리에서 이미지 공유 → MiniLine 열림
-- 입력창에 자동 입력 확인
+**검증:** ⏳
+- Safari에서 URL 공유 → MiniLine 열림 (테스트 필요)
+- 갤러리에서 이미지 공유 → MiniLine 열림 (테스트 필요)
+- 입력창에 자동 입력 확인 (테스트 필요)
 
-### 3.2 로컬 알림
+### 3.2 로컬 알림 ✅ 완료
 
 **우선순위:** 중간
+**상태:** 완료
 
 **작업:**
-- [ ] NotificationService 작성
-- [ ] 알림 권한 요청
-- [ ] 로컬 알림 스케줄링
-- [ ] 알림 탭 시 Timeline 이동
+- [x] NotificationService 작성
+- [x] 알림 권한 요청
+- [x] 로컬 알림 스케줄링
+- [x] 알림 탭 시 Timeline 이동
+- [x] FCM 포그라운드 메시지 → 로컬 알림 변환
+- [x] Settings 페이지에 알림 설정 UI 추가 (바텀시트)
 
 **파일:**
 ```
-lib/core/services/notification_service.dart
+lib/core/services/local_notification_service.dart ✅
+lib/features/settings/presentation/widgets/daily_reminder_sheet.dart ✅
+lib/features/settings/presentation/widgets/draft_notification_sheet.dart ✅
+pubspec.yaml (timezone: ^0.10.0) ✅
 ```
 
 **참조:**
 - [docs/DIFFERENCES_FROM_WEB.md](DIFFERENCES_FROM_WEB.md) - 로컬 알림 섹션
 
-**검증:**
-- Settings에서 시간 설정
-- 설정 시간에 알림 발생
-- 알림 탭 → Timeline 이동
+**검증:** ✅
+- 알림 권한 요청 확인 ✅
+- 로컬 알림 스케줄링 확인 ✅
+- 알림 탭 → Timeline 이동 ✅
+- Settings UI (DailyReminderSheet, DraftNotificationSheet) ✅
+- 시간 선택 TimePicker ✅
+- SharedPreferences로 설정 저장 ✅
 
-### 3.3 푸시 알림 (FCM)
+### 3.3 푸시 알림 (FCM) ✅ 완료
 
 **우선순위:** 중간
+**상태:** 완료
 
 **작업:**
-- [ ] Firebase 설정 (iOS/Android)
-- [ ] FCM 토큰 저장
-- [ ] 디바이스 등록
-- [ ] 알림 수신 처리
+- [x] Firebase 설정 (iOS/Android)
+- [x] FCM 토큰 저장
+- [x] 디바이스 등록
+- [x] 알림 수신 처리
+- [x] 포그라운드 알림 → 로컬 알림 변환
+- [x] 알림 탭 시 라우팅 (/drafts)
 
 **파일:**
 ```
-lib/core/services/fcm_service.dart
-lib/core/services/device_info_service.dart
+lib/core/services/fcm_service.dart ✅
+lib/core/services/device_info_service.dart ✅
+lib/router/app_router.dart (navigatorKey) ✅
 ```
 
 **참조:**
 - [../minorlab_book/lib/core/services/device_info_service.dart](../minorlab_book/lib/core/services/device_info_service.dart)
 - [docs/DIFFERENCES_FROM_WEB.md](DIFFERENCES_FROM_WEB.md) - 푸시 알림 섹션
 
-**검증:**
-- Draft 생성 완료 → 푸시 알림 수신
-- 알림 탭 → Draft 상세 화면
+**검증:** ✅
+- FCM 토큰 생성 확인 ✅
+- 디바이스 등록 (Supabase devices 테이블 UPSERT) ✅
+- Draft 생성 완료 → 푸시 알림 수신 (Edge Function 필요)
+- 알림 탭 → Drafts 페이지 이동 ✅
 
-### 3.4 디바이스 관리
+### 3.4 디바이스 관리 ✅ 완료
 
 **우선순위:** 낮음 (동기화에 포함)
+**상태:** 완료
 
 **작업:**
-- [ ] 디바이스 자동 등록
-- [ ] FCM 토큰 저장
-- [ ] 마지막 동기화 시간 추적
+- [x] 디바이스 자동 등록
+- [x] FCM 토큰 저장
+- [x] APNS 토큰 저장 (iOS)
+- [x] 마지막 동기화 시간 추적
+- [x] 사용자별 디바이스 ID (secure_storage)
 
 **파일:**
 ```
-lib/core/services/device_info_service.dart
+lib/core/services/device_info_service.dart ✅
+lib/core/services/device_info_provider.dart ✅
 ```
 
-**검증:**
-- 앱 설치 → 디바이스 자동 등록
-- Supabase devices 테이블 확인
+**검증:** ✅
+- 앱 설치 → 디바이스 자동 등록 ✅
+- Supabase devices 테이블 확인 (실제 동작 시 확인 필요)
 
 ---
 
 ## Phase 4: 완성도
 
-### 4.1 Settings 화면
+### 4.1 Settings 화면 🟡 부분 완료
 
 **우선순위:** 중간
+**상태:** 핵심 기능 완료 (구독 제외)
 
 **작업:**
-- [ ] Settings 페이지
-- [ ] 언어 설정
-- [ ] 테마 설정 (라이트/다크/시스템)
-- [ ] 알림 설정
-- [ ] 프로필
-- [ ] 구독 관리 (RevenueCat)
-- [ ] 로그아웃
+- [x] Settings 페이지
+- [x] 언어 설정 (LanguageSettingsSheet)
+- [x] 테마 설정 (ThemeSettingsSheet) - 라이트/다크/시스템
+- [x] 알림 설정 (DailyReminderSheet, DraftNotificationSheet)
+- [x] 프로필 (사용자 정보 표시)
+- [ ] 구독 관리 (RevenueCat) - 별도 세션에서 처리 예정
+- [x] 로그아웃
+- [x] 이용약관/개인정보처리방침 (minorlab_common PolicyLatestPage 사용)
 
 **파일:**
 ```
 lib/features/settings/
-├── presentation/pages/settings_page.dart
-└── providers/settings_provider.dart
+├── presentation/
+│   ├── pages/settings_page.dart ✅
+│   └── widgets/
+│       ├── theme_settings_sheet.dart ✅
+│       └── language_settings_sheet.dart ✅
+lib/router/app_router.dart (정책 라우트) ✅
 ```
 
-**검증:**
-- 모든 설정 저장/로드 확인
-- 테마 전환 확인
+**검증:** 🟡
+- 언어 전환 확인 ✅
+- 테마 전환 확인 ✅
+- 정책 페이지 열림 확인 ✅
+- 로그아웃 동작 확인 ✅
+- 알림 설정 UI 추가 필요 ⏳
 
 ### 4.2 다국어 (i18n)
 

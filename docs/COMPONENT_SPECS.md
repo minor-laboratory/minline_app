@@ -838,6 +838,308 @@ Row(
 
 ---
 
+## 6. PostDetailPage (공개글 상세)
+
+### 기본 정보
+
+- **파일**: `lib/features/posts/presentation/pages/post_detail_page.dart`
+- **패키지**: `flutter_markdown: ^0.7.4+1`
+- **웹 참조**: 웹 버전과 유사하나 Markdown 렌더링 라이브러리 차이
+
+### 레이아웃
+
+```
+┌─────────────────────────────────────────┐
+│ ← Posts                        [⋮]      │ ← AppBar
+├─────────────────────────────────────────┤
+│ 제목 (headlineSmall, bold)              │
+│ [템플릿 타입] 2025-01-13   [공개/비공개]│ ← 메타 정보
+├─────────────────────────────────────────┤
+│                                         │
+│ Markdown 본문 렌더링                    │
+│ # 제목 (headlineMedium, bold)          │
+│ ## 부제목 (titleLarge, bold)           │
+│ 본문 내용... (bodyLarge)                │
+│                                         │
+├─────────────────────────────────────────┤
+│ 공개글로 전환           [toggle]         │ ← SwitchListTile (Card)
+│ 공개 시 다른 사용자도 볼 수 있습니다      │
+├─────────────────────────────────────────┤
+│ ⭐ 버전                                 │ (version > 1일 때만)
+│ 버전 2                                  │
+├─────────────────────────────────────────┤
+│ 🔗 내보낸 플랫폼                         │ (exportedTo가 있을 때만)
+│ Medium, Notion                          │
+├─────────────────────────────────────────┤
+│ 📄 사용된 Fragment                      │
+│ 5개의 Fragment로 작성되었습니다          │
+└─────────────────────────────────────────┘
+```
+
+### 상세 스펙
+
+#### Markdown 렌더링
+
+**패키지:** flutter_markdown ^0.7.4+1
+
+**❌ 웹 버전처럼 HTML 사용:**
+```dart
+// 웹: marked 라이브러리 사용
+const htmlContent = marked(post.content);
+```
+
+**✅ Flutter에서 Markdown 직접 렌더링:**
+```dart
+MarkdownBody(
+  data: post.content,
+  styleSheet: MarkdownStyleSheet(
+    p: textTheme.bodyLarge,
+    h1: textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+    h2: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+    h3: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+  ),
+)
+```
+
+**이유:**
+- Flutter는 HTML 렌더링보다 Markdown 직접 렌더링이 효율적
+- flutter_markdown이 Material Design과 잘 통합됨
+- 웹 버전 (marked)보다 가볍고 빠름
+
+#### 공개 여부 토글
+
+**크기:** Card 내부 SwitchListTile
+**상태:** post.isPublic (true/false)
+
+**❌ 단순 Switch만 사용:**
+```dart
+Switch(
+  value: post.isPublic,
+  onChanged: (_) => _togglePublic(),
+)
+```
+
+**✅ Card + SwitchListTile로 명확한 설명:**
+```dart
+Card(
+  child: SwitchListTile(
+    title: Text('posts.make_public'.tr()),
+    subtitle: Text('posts.make_public_description'.tr()),
+    value: post.isPublic,
+    onChanged: (_) => _togglePublic(),
+  ),
+)
+```
+
+**동작:**
+1. 토글 시 Isar 로컬 업데이트
+2. synced = false 설정 (동기화 큐 추가)
+3. setState()로 UI 즉시 갱신
+4. SnackBar로 변경 알림
+
+#### viewed 플래그 자동 업데이트
+
+**시점:** 화면 진입 시 (initState)
+
+**로직:**
+```dart
+// viewed = false → true 업데이트
+if (post != null && !post.viewed) {
+  post.viewed = true;
+  await isar.writeTxn(() => isar.posts.put(post));
+}
+```
+
+**이유:**
+- 사용자가 Post를 확인했음을 표시
+- 헤더 뱃지 업데이트에 사용 (미확인 Post 개수)
+- 웹과 동기화되어 한 기기에서 확인하면 모든 기기에서 뱃지 제거
+
+#### 메타 정보 표시
+
+**템플릿 타입:** primaryContainer 배경
+- product_review: 제품 사용기
+- timeline: 시간순 스토리
+- essay: 생각 정리
+- travel: 여행기
+- project: 프로젝트 기록
+
+**작성일:** yyyy-MM-dd 형식
+
+**공개 여부 아이콘:**
+- 공개: `AppIcons.language` (지구본)
+- 비공개: `AppIcons.password` (자물쇠)
+
+#### 선택사항 카드들
+
+**1. 버전 정보 (version > 1):**
+```dart
+if (_post!.version > 1) ...[
+  Card(
+    child: ListTile(
+      leading: Icon(AppIcons.star),
+      title: Text('posts.version'.tr()),
+      subtitle: Text('posts.version_info'.tr(args: [version.toString()])),
+    ),
+  ),
+]
+```
+
+**2. 내보내기 정보 (exportedTo.isNotEmpty):**
+```dart
+if (_post!.exportedTo.isNotEmpty) ...[
+  Card(
+    child: ListTile(
+      leading: Icon(AppIcons.share),
+      title: Text('posts.exported_to'.tr()),
+      subtitle: Text(_post!.exportedTo.join(', ')),
+    ),
+  ),
+]
+```
+
+**3. Fragment 개수 (항상 표시):**
+```dart
+Card(
+  child: ListTile(
+    leading: Icon(AppIcons.fileText),
+    title: Text('posts.fragments_used'.tr()),
+    subtitle: Text('posts.fragments_count'.tr(
+      args: [_post!.fragmentIds.length.toString()],
+    )),
+  ),
+)
+```
+
+#### 삭제 기능
+
+**진입:** AppBar 우측 더보기 메뉴 (`AppIcons.moreVert`)
+
+**플로우:**
+1. 더보기 메뉴 표시 (ModalBottomSheet)
+2. 삭제 항목 선택
+3. 확인 다이얼로그 (`AlertDialog`)
+4. 확인 시 `post.deleted = true` 설정
+5. Isar에 저장 (동기화 큐 추가)
+6. SnackBar 표시 후 pop()
+
+### 웹 버전과의 차이점
+
+| 항목 | 웹 (miniline) | 앱 (miniline_app) |
+|------|--------------|------------------|
+| Markdown 렌더링 | marked (HTML 변환) | flutter_markdown (직접 렌더링) |
+| 공개 토글 | 버튼 클릭 | SwitchListTile |
+| 삭제 | 인라인 버튼 | 더보기 메뉴 |
+| 메타 정보 | 상단 고정 | 스크롤 가능 |
+
+### 언제 읽어야 하는가
+
+- Posts 상세 화면 구현 시
+- Markdown 렌더링 방법 확인 시
+- Post 메타 정보 표시 방법 확인 시
+- 웹 버전과 차이점 확인 시
+
+---
+
+## 7. 알림 설정 (Notification Settings)
+
+> 앱 전용 기능 (웹 버전 없음)
+
+**언제 읽어야 하는가:**
+- Settings 알림 UI 구현 시
+- 알림 설정 저장/로드 구현 시
+
+### 7.1 DailyReminderSheet (일일 리마인더 설정)
+
+**파일:** `lib/features/settings/presentation/widgets/daily_reminder_sheet.dart`
+
+**구조:**
+- 바텀시트 (showModalBottomSheet)
+- 헤더 (아이콘 + 제목 + 닫기 버튼)
+- 설명 텍스트
+- ON/OFF 스위치
+- 시간 선택 (TimePicker)
+
+**데이터 저장:**
+```dart
+// SharedPreferences 사용
+final prefs = await SharedPreferences.getInstance();
+await prefs.setBool('daily_reminder_enabled', enabled);
+await prefs.setInt('daily_reminder_hour', hour);
+await prefs.setInt('daily_reminder_minute', minute);
+```
+
+**LocalNotificationService 연동:**
+```dart
+if (enabled) {
+  await LocalNotificationService().scheduleDailyReminder(
+    hour: hour,
+    minute: minute,
+    title: 'timeline.title'.tr(),
+    body: 'common.input_placeholder'.tr(),
+  );
+} else {
+  await LocalNotificationService().cancelDailyReminder();
+}
+```
+
+**UI 요소:**
+- 헤더 높이: 56dp
+- 아이콘 크기: 24dp
+- Padding: 16dp
+- SwitchListTile (Material Design)
+- TimeOfDay 선택 → TimePicker
+
+### 7.2 DraftNotificationSheet (Draft 완성 알림 설정)
+
+**파일:** `lib/features/settings/presentation/widgets/draft_notification_sheet.dart`
+
+**구조:**
+- 바텀시트 (showModalBottomSheet)
+- 헤더 (아이콘 + 제목 + 닫기 버튼)
+- 설명 텍스트
+- ON/OFF 스위치
+
+**데이터 저장:**
+```dart
+// SharedPreferences 사용
+final prefs = await SharedPreferences.getInstance();
+await prefs.setBool('draft_notification_enabled', enabled);
+```
+
+**기본값:**
+- 기본: true (켜짐)
+- Draft 생성 시 FCM 푸시 수신 여부 제어
+
+**UI 요소:**
+- 헤더 높이: 56dp
+- 아이콘 크기: 24dp
+- Padding: 16dp
+- SwitchListTile (Material Design)
+- subtitle: "알림 켜짐" / "알림 꺼짐"
+
+### 번역 키
+
+**settings:**
+```
+settings.notifications: "알림"
+settings.daily_reminder: "일일 리마인더"
+settings.daily_reminder_description: "매일 정해진 시간에 알림"
+settings.draft_notifications: "초안 완성 알림"
+settings.draft_notifications_description: "AI가 초안을 생성하면 알림"
+settings.select_time: "시간 선택"
+settings.notification_time: "알림 시간"
+```
+
+**common:**
+```
+common.enable: "사용"
+common.notifications_on: "알림 켜짐"
+common.notifications_off: "알림 꺼짐"
+```
+
+---
+
 ## 📋 체크리스트
 
 **컴포넌트 구현 시 필수 확인:**

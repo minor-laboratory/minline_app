@@ -6,23 +6,89 @@
     "error_title": "Loading Failed",
     "error_message": "Please try again"
   },
+  "calendar": {
+    "title": "Calendar",
+    "switch_to_calendar": "Switch to Calendar View",
+    "switch_to_timeline": "Switch to Timeline View",
+    "today": "Today",
+    "no_fragments": "No snaps on this date"
+  },
   "drafts": {
     "title": "Drafts",
-    "coming_soon": "Coming Soon"
+    "empty_title": "No Drafts Yet",
+    "empty_message": "AI will suggest drafts when you have enough fragments"
+  },
+  "draft": {
+    "status_pending": "Pending",
+    "status_accepted": "Accepted",
+    "status_rejected": "Rejected",
+    "snap_count": "{count} snaps",
+    "similarity": "Similarity",
+    "toggle_snaps_show": "Show Snaps",
+    "toggle_snaps_hide": "Hide Snaps",
+    "accept_action": "Accept",
+    "reject_action": "Reject",
+    "reaccept_action": "Re-accept",
+    "create_post": "Create Post",
+    "delete_title": "Delete Draft",
+    "delete_confirm": "Are you sure you want to delete this draft?"
   },
   "posts": {
     "title": "Posts",
-    "coming_soon": "Coming Soon"
+    "empty_title": "No Posts Yet",
+    "empty_message": "Accept drafts to create posts",
+    "make_public": "Make Public",
+    "make_public_description": "Allow other users to see this post",
+    "created_at": "Created"
+  },
+  "post": {
+    "public": "Public",
+    "private": "Private",
+    "snap_count": "{count} snaps",
+    "exported": "Exported",
+    "delete_title": "Delete Post",
+    "delete_confirm": "Are you sure you want to delete this post?"
   },
   "settings": {
     "title": "Settings",
-    "coming_soon": "Coming Soon"
+    "ux": "User Experience",
+    "theme": "Theme",
+    "theme_description": "Choose light/dark mode",
+    "system_mode": "System",
+    "light_mode": "Light",
+    "dark_mode": "Dark",
+    "language": "Language",
+    "language_description": "Korean / English",
+    "notifications": "Notifications",
+    "daily_reminder": "Daily Reminder",
+    "daily_reminder_description": "Notify at a set time every day",
+    "draft_notifications": "Draft Completion",
+    "draft_notifications_description": "Notify when AI creates a draft",
+    "select_time": "Select Time",
+    "notification_time": "Notification Time",
+    "app_info": "App Information",
+    "app_version": "App Version",
+    "legal": "Legal",
+    "terms_of_service": "Terms of Service",
+    "privacy_policy": "Privacy Policy",
+    "logout": "Logout",
+    "logout_confirm": "Are you sure you want to logout?"
+  },
+  "auth": {
+    "login_required": "Login required"
   },
   "common": {
     "input_placeholder": "What's on your mind?",
     "save": "Save",
     "character_count": "{current}/{max}",
-    "saved": "Saved"
+    "saved": "Saved",
+    "loading": "Loading...",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "error": "An error occurred",
+    "enable": "Enable",
+    "notifications_on": "Notifications on",
+    "notifications_off": "Notifications off"
   },
   "time": {
     "just_now": "Just now",
