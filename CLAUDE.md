@@ -124,6 +124,7 @@ Icon(AppIcons.settings)
 - **Markdown**: flutter_markdown ^0.7.4+1
 - **알림**: firebase_messaging ^16.0.4, flutter_local_notifications ^19.4.2
 - **공유**: share_handler ^0.0.25 (수신), share_plus ^10.1.4 (전송)
+- **이미지**: cached_network_image ^3.4.1, image_picker ^1.1.2, easy_image_viewer ^1.5.1
 - **다국어**: easy_localization ^3.0.7
 - **공통**: minorlab_common (로컬 경로)
 

@@ -1,10 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/database/database_service.dart';
 import 'core/services/share_handler_service.dart';
@@ -42,11 +43,7 @@ void main() async {
       supportedLocales: const [Locale('ko'), Locale('en')],
       path: 'assets/translations',
       fallbackLocale: const Locale('ko'),
-      child: const KeyboardDismissOnTap(
-        child: ProviderScope(
-          child: MyApp(),
-        ),
-      ),
+      child: const KeyboardDismissOnTap(child: ProviderScope(child: MyApp())),
     ),
   );
 }
@@ -99,36 +96,50 @@ class _MyAppState extends ConsumerState<MyApp> {
               backgroundOption: backgroundOption,
             );
 
-            return ShadApp.custom(
-              themeMode: themeMode,
-              theme: shadLightTheme,
-              darkTheme: shadDarkTheme,
-              appBuilder: (context) {
-                // ShadApp이 자동으로 생성한 Material Theme 사용
-                final materialTheme = Theme.of(context);
+            return AnnotatedRegion<SystemUiOverlayStyle>(
+              value: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: themeMode == ThemeMode.dark
+                    ? Brightness.light
+                    : Brightness.dark,
+                statusBarBrightness: themeMode == ThemeMode.dark
+                    ? Brightness.dark
+                    : Brightness.light,
+                systemNavigationBarContrastEnforced: false,
+                systemNavigationBarColor: Colors.transparent,
+                systemNavigationBarDividerColor: Colors.transparent,
+                systemNavigationBarIconBrightness: themeMode == ThemeMode.dark
+                    ? Brightness.light
+                    : Brightness.dark,
+                systemStatusBarContrastEnforced: false,
+              ),
+              child: ShadApp.custom(
+                themeMode: themeMode,
+                theme: shadLightTheme,
+                darkTheme: shadDarkTheme,
+                appBuilder: (context) {
+                  // ShadApp이 자동으로 생성한 Material Theme 사용
+                  final materialTheme = Theme.of(context);
 
-                return MaterialApp.router(
-                  title: 'MiniLine',
-                  theme: materialTheme,
-                  darkTheme: materialTheme,
-                  themeMode: themeMode,
-                  routerConfig: router.appRouter,
-                  localizationsDelegates: context.localizationDelegates,
-                  supportedLocales: context.supportedLocales,
-                  locale: localeAsync.value ?? context.locale,
-                  builder: (context, child) {
-                    return ShadAppBuilder(child: child!);
-                  },
-                );
-              },
+                  return MaterialApp.router(
+                    title: 'MiniLine',
+                    theme: materialTheme,
+                    darkTheme: materialTheme,
+                    themeMode: themeMode,
+                    routerConfig: router.appRouter,
+                    localizationsDelegates: context.localizationDelegates,
+                    supportedLocales: context.supportedLocales,
+                    locale: localeAsync.value ?? context.locale,
+                    builder: (context, child) {
+                      return ShadAppBuilder(child: child!);
+                    },
+                  );
+                },
+              ),
             );
           },
           loading: () => MaterialApp(
-            home: Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
+            home: Scaffold(body: Center(child: CircularProgressIndicator())),
           ),
           error: (error, stack) {
             final shadLightTheme = common.MinorLabShadTheme.lightTheme(
@@ -140,7 +151,78 @@ class _MyAppState extends ConsumerState<MyApp> {
               backgroundOption: common.BackgroundColorOption.defaultColor,
             );
 
-            return ShadApp.custom(
+            return AnnotatedRegion<SystemUiOverlayStyle>(
+              value: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: themeMode == ThemeMode.dark
+                    ? Brightness.light
+                    : Brightness.dark,
+                statusBarBrightness: themeMode == ThemeMode.dark
+                    ? Brightness.dark
+                    : Brightness.light,
+                systemNavigationBarContrastEnforced: false,
+                systemNavigationBarColor: Colors.transparent,
+                systemNavigationBarDividerColor: Colors.transparent,
+                systemNavigationBarIconBrightness: themeMode == ThemeMode.dark
+                    ? Brightness.light
+                    : Brightness.dark,
+                systemStatusBarContrastEnforced: false,
+              ),
+              child: ShadApp.custom(
+                themeMode: themeMode,
+                theme: shadLightTheme,
+                darkTheme: shadDarkTheme,
+                appBuilder: (appContext) {
+                  final materialTheme = Theme.of(appContext);
+                  return MaterialApp.router(
+                    title: 'MiniLine',
+                    theme: materialTheme,
+                    darkTheme: materialTheme,
+                    themeMode: themeMode,
+                    routerConfig: router.appRouter,
+                    localizationsDelegates: context.localizationDelegates,
+                    supportedLocales: context.supportedLocales,
+                    locale: localeAsync.value ?? context.locale,
+                    builder: (context, child) {
+                      return ShadAppBuilder(child: child!);
+                    },
+                  );
+                },
+              ),
+            );
+          },
+        ),
+        loading: () => MaterialApp(
+          home: Scaffold(body: Center(child: CircularProgressIndicator())),
+        ),
+        error: (error, stack) {
+          final shadLightTheme = common.MinorLabShadTheme.lightTheme(
+            paletteId: 'zinc',
+            backgroundOption: common.BackgroundColorOption.defaultColor,
+          );
+          final shadDarkTheme = common.MinorLabShadTheme.darkTheme(
+            paletteId: 'zinc',
+            backgroundOption: common.BackgroundColorOption.defaultColor,
+          );
+
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: themeMode == ThemeMode.dark
+                  ? Brightness.light
+                  : Brightness.dark,
+              statusBarBrightness: themeMode == ThemeMode.dark
+                  ? Brightness.dark
+                  : Brightness.light,
+              systemNavigationBarContrastEnforced: false,
+              systemNavigationBarColor: Colors.transparent,
+              systemNavigationBarDividerColor: Colors.transparent,
+              systemNavigationBarIconBrightness: themeMode == ThemeMode.dark
+                  ? Brightness.light
+                  : Brightness.dark,
+              systemStatusBarContrastEnforced: false,
+            ),
+            child: ShadApp.custom(
               themeMode: themeMode,
               theme: shadLightTheme,
               darkTheme: shadDarkTheme,
@@ -160,55 +242,12 @@ class _MyAppState extends ConsumerState<MyApp> {
                   },
                 );
               },
-            );
-          },
-        ),
-        loading: () => MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
             ),
-          ),
-        ),
-        error: (error, stack) {
-          final shadLightTheme = common.MinorLabShadTheme.lightTheme(
-            paletteId: 'zinc',
-            backgroundOption: common.BackgroundColorOption.defaultColor,
-          );
-          final shadDarkTheme = common.MinorLabShadTheme.darkTheme(
-            paletteId: 'zinc',
-            backgroundOption: common.BackgroundColorOption.defaultColor,
-          );
-
-          return ShadApp.custom(
-            themeMode: themeMode,
-            theme: shadLightTheme,
-            darkTheme: shadDarkTheme,
-            appBuilder: (appContext) {
-              final materialTheme = Theme.of(appContext);
-              return MaterialApp.router(
-                title: 'MiniLine',
-                theme: materialTheme,
-                darkTheme: materialTheme,
-                themeMode: themeMode,
-                routerConfig: router.appRouter,
-                localizationsDelegates: context.localizationDelegates,
-                supportedLocales: context.supportedLocales,
-                locale: localeAsync.value ?? context.locale,
-                builder: (context, child) {
-                  return ShadAppBuilder(child: child!);
-                },
-              );
-            },
           );
         },
       ),
       loading: () => MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
+        home: Scaffold(body: Center(child: CircularProgressIndicator())),
       ),
       error: (error, stack) {
         final shadLightTheme = common.MinorLabShadTheme.lightTheme(
@@ -220,26 +259,38 @@ class _MyAppState extends ConsumerState<MyApp> {
           backgroundOption: common.BackgroundColorOption.defaultColor,
         );
 
-        return ShadApp.custom(
-          themeMode: ThemeMode.system,
-          theme: shadLightTheme,
-          darkTheme: shadDarkTheme,
-          appBuilder: (appContext) {
-            final materialTheme = Theme.of(appContext);
-            return MaterialApp.router(
-              title: 'MiniLine',
-              theme: materialTheme,
-              darkTheme: materialTheme,
-              themeMode: ThemeMode.system,
-              routerConfig: router.appRouter,
-              localizationsDelegates: context.localizationDelegates,
-              supportedLocales: context.supportedLocales,
-              locale: context.locale,
-              builder: (context, child) {
-                return ShadAppBuilder(child: child!);
-              },
-            );
-          },
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light,
+            systemNavigationBarContrastEnforced: false,
+            systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarDividerColor: Colors.transparent,
+            systemNavigationBarIconBrightness: Brightness.dark,
+            systemStatusBarContrastEnforced: false,
+          ),
+          child: ShadApp.custom(
+            themeMode: ThemeMode.system,
+            theme: shadLightTheme,
+            darkTheme: shadDarkTheme,
+            appBuilder: (appContext) {
+              final materialTheme = Theme.of(appContext);
+              return MaterialApp.router(
+                title: 'MiniLine',
+                theme: materialTheme,
+                darkTheme: materialTheme,
+                themeMode: ThemeMode.system,
+                routerConfig: router.appRouter,
+                localizationsDelegates: context.localizationDelegates,
+                supportedLocales: context.supportedLocales,
+                locale: context.locale,
+                builder: (context, child) {
+                  return ShadAppBuilder(child: child!);
+                },
+              );
+            },
+          ),
         );
       },
     );

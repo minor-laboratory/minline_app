@@ -283,6 +283,16 @@ return SafeArea(
 - Android (제스처 네비게이션): 약 16-20dp
 - Android (버튼 네비게이션): 0dp (시스템이 자동 처리)
 
+**네이티브 설정 (Android):**
+- **파일**: `android/app/src/main/kotlin/com/minorlab/miniline/MainActivity.kt`
+- **내용**: Edge-to-edge 설정으로 시스템 바 투명화 (북랩 앱 패턴 참조)
+```kotlin
+// Edge-to-edge 설정 (시스템 바 투명화)
+WindowCompat.setDecorFitsSystemWindows(window, false)
+window.statusBarColor = android.graphics.Color.TRANSPARENT
+window.navigationBarColor = android.graphics.Color.TRANSPARENT
+```
+
 **적용 위치:**
 - bottomNavigationBar
 - 하단 고정 버튼
