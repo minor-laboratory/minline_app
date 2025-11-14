@@ -110,7 +110,7 @@ let syncQueue = $state([]);
 
 **앱**: Riverpod + Background Isolate
 ```dart
-// miniline_app/lib/core/services/sync/isar_watch_service.dart
+// miniline_app/lib/core/services/sync/isar_watch_sync_service.dart
 final syncQueueProvider = StateNotifierProvider<SyncQueue, List<SyncItem>>(...);
 ```
 

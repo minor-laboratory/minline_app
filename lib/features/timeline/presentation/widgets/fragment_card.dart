@@ -176,7 +176,8 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
         logger.d('현재 userTags: ${fragment.userTags}');
 
         if (!fragment.userTags.contains(tag)) {
-          fragment.userTags.add(tag);
+          // ✅ Isar 리스트 수정: 새로운 리스트 생성하여 할당
+          fragment.userTags = [...fragment.userTags, tag];
           fragment.synced = false;
           fragment.refreshAt = DateTime.now();
           await isar.fragments.put(fragment);
@@ -206,8 +207,8 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
         final fragment = await isar.fragments.get(widget.fragment.id);
         if (fragment == null) return;
 
-        // 수정 가능한 리스트로 변환 후 필터링
-        fragment.userTags.removeWhere((t) => t == tag);
+        // ✅ Isar 리스트 수정: 새로운 리스트 생성하여 할당
+        fragment.userTags = fragment.userTags.where((t) => t != tag).toList();
         fragment.synced = false;
         fragment.refreshAt = DateTime.now();
         await isar.fragments.put(fragment);
@@ -232,8 +233,8 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
         final fragment = await isar.fragments.get(widget.fragment.id);
         if (fragment == null) return;
 
-        // 수정 가능한 리스트로 변환 후 필터링
-        fragment.tags.removeWhere((t) => t == tag);
+        // ✅ Isar 리스트 수정: 새로운 리스트 생성하여 할당
+        fragment.tags = fragment.tags.where((t) => t != tag).toList();
         fragment.synced = false;
         fragment.refreshAt = DateTime.now();
         await isar.fragments.put(fragment);

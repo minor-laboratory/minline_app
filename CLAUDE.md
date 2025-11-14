@@ -68,7 +68,7 @@ final fragment = Fragment()
   ..synced = false
   ..refreshAt = DateTime.now();
 await isar.writeTxn(() => isar.fragments.put(fragment));
-// SyncWatcher가 자동으로 업로드
+// IsarWatchSyncService가 자동으로 업로드
 ```
 
 ### 2. 하드코딩 금지
@@ -145,13 +145,18 @@ lib/
 │   │   └── storage_utils.dart   # 스토리지 유틸
 │   └── services/                # 핵심 서비스
 │       ├── device_info_service.dart
+│       ├── device_info_provider.dart
 │       ├── share_handler_service.dart
-│       ├── notification_service.dart
+│       ├── share_handler_provider.dart
+│       ├── local_notification_service.dart
+│       ├── fcm_service.dart
+│       ├── feedback_service.dart
 │       ├── local_change_tracker.dart  # 로컬 변경사항 추적
 │       └── sync/
-│           ├── isar_watch_service.dart
+│           ├── isar_watch_sync_service.dart
 │           ├── supabase_stream_service.dart
-│           └── lifecycle_service.dart
+│           ├── lifecycle_service.dart
+│           └── sync_metadata_service.dart
 │
 ├── models/                      # Isar 데이터 모델
 │   ├── fragment.dart
@@ -203,9 +208,9 @@ class Base {
 ## 동기화 아키텍처
 
 **패턴**: 북랩 3-서비스 구조 동일 ([참조](../minorlab_book/lib/core/services/sync/))
-1. **IsarWatchService**: 로컬 변경 감지 → 업로드
-2. **SupabaseStreamService**: Realtime 구독 → 다운로드
-3. **LifecycleService**: 앱 재시작 시 동기화
+1. **IsarWatchSyncService**: 로컬 변경 감지 → 업로드 (lib/core/services/sync/isar_watch_sync_service.dart)
+2. **SupabaseStreamService**: Realtime 구독 → 다운로드 (lib/core/services/sync/supabase_stream_service.dart)
+3. **LifecycleService**: 앱 재시작 시 동기화 (lib/core/services/sync/lifecycle_service.dart)
 
 **❌ 동기화 실패 시 저장 차단**
 ```dart
@@ -217,7 +222,7 @@ await supabase.from('fragments').insert(fragment.toJson());
 **✅ 로컬 우선 → 백그라운드 동기화**
 ```dart
 await isar.writeTxn(() => isar.fragments.put(fragment));
-// IsarWatchService가 자동 업로드 (1초 디바운스)
+// IsarWatchSyncService가 자동 업로드 (1초 디바운스)
 ```
 
 ## 앱 특화 기능

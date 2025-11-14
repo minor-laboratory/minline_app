@@ -11,10 +11,7 @@ import '../../../../core/utils/app_icons.dart';
 class TagEditPage extends StatefulWidget {
   final String fragmentId;
 
-  const TagEditPage({
-    super.key,
-    required this.fragmentId,
-  });
+  const TagEditPage({super.key, required this.fragmentId});
 
   @override
   State<TagEditPage> createState() => _TagEditPageState();
@@ -99,7 +96,9 @@ class _TagEditPageState extends State<TagEditPage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                color: colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(

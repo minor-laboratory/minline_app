@@ -59,10 +59,12 @@ const spacing16 = 16.0;
 **AppIcons 사용 필수**:
 ```dart
 // ❌ 직접 사용
+Icon(Icons.add)
 Icon(LucideIcons.sparkles)
 
 // ✅ AppIcons 사용
 Icon(AppIcons.timeline)
+Icon(AppIcons.sparkles)
 ```
 
 ---
@@ -98,7 +100,7 @@ Container(
   decoration: BoxDecoration(
     color: theme.colorScheme.surface,
     border: Border(
-      top: BorderSide(color: theme.colorScheme.outline.withOpacity(0.2)),
+      top: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
     ),
   ),
 )
@@ -345,7 +347,7 @@ Container(
     borderRadius: BorderRadius.circular(8),  // rounded-lg
     boxShadow: [
       BoxShadow(
-        color: Colors.black.withOpacity(0.05),
+        color: Colors.black.withValues(alpha: 0.05),
         blurRadius: 8,
         offset: Offset(0, 2),
       ),
@@ -480,7 +482,7 @@ Container(
 Container(
   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
   decoration: BoxDecoration(
-    color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+    color: theme.colorScheme.surfaceVariant.withValues(alpha: 0.5),
     borderRadius: BorderRadius.circular(6),
   ),
   child: Row(
@@ -500,7 +502,7 @@ GestureDetector(
   child: Container(
     padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
     decoration: BoxDecoration(
-      color: theme.colorScheme.primary.withOpacity(0.1),
+      color: theme.colorScheme.primary.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(4),
     ),
     child: Row(
@@ -619,7 +621,7 @@ Row(
     Container(
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: getStatusColor(draft.status).withOpacity(0.1),
+        color: getStatusColor(draft.status).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
@@ -841,7 +843,7 @@ Row(
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: post.isPublic
-          ? theme.colorScheme.primary.withOpacity(0.1)
+          ? theme.colorScheme.primary.withValues(alpha: 0.1)
           : theme.colorScheme.surfaceVariant,
         borderRadius: BorderRadius.circular(4),
       ),

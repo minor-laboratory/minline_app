@@ -211,7 +211,7 @@ lib/features/auth/
 **우선순위:** 높음
 
 **작업:**
-- [x] IsarWatchService (로컬 → 서버)
+- [x] IsarWatchSyncService (로컬 → 서버)
 - [x] SupabaseStreamService (서버 → 로컬)
 - [x] LifecycleService (앱 재시작 시)
 - [x] Sync Provider 통합
@@ -219,10 +219,10 @@ lib/features/auth/
 **파일:**
 ```
 lib/core/services/sync/
-├── isar_watch_service.dart
+├── isar_watch_sync_service.dart
 ├── supabase_stream_service.dart
 ├── lifecycle_service.dart
-└── sync_provider.dart
+└── sync_metadata_service.dart
 ```
 
 **참조:**
