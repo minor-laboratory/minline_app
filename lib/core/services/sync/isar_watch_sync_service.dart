@@ -244,7 +244,8 @@ class IsarWatchSyncService {
 
     // Supabase에 upsert
     // created_at, updated_at은 서버에서 자동 관리 (클라이언트에서 보내지 않음)
-    final response = await _supabase.from('fragments').upsert({
+    // 최신 supabase_flutter: 에러 시 예외 throw, 성공 시 데이터 반환
+    await _supabase.from('fragments').upsert({
       'id': fragment.remoteID,
       'user_id': user.id,
       'content': fragment.content,
@@ -256,10 +257,6 @@ class IsarWatchSyncService {
       'user_tags': fragment.userTags,
       'deleted': fragment.deleted,
     });
-
-    if (response.error != null) {
-      throw Exception('Supabase upsert failed: ${response.error}');
-    }
 
     // 성공 시 synced = true로 업데이트
     final isar = DatabaseService.instance.isar;
@@ -282,7 +279,8 @@ class IsarWatchSyncService {
     }
 
     // created_at, updated_at은 서버에서 자동 관리
-    final response = await _supabase.from('drafts').upsert({
+    // 최신 supabase_flutter: 에러 시 예외 throw, 성공 시 데이터 반환
+    await _supabase.from('drafts').upsert({
       'id': draft.remoteID,
       'user_id': user.id,
       'title': draft.title,
@@ -291,10 +289,6 @@ class IsarWatchSyncService {
       'viewed': draft.viewed,
       'deleted': draft.deleted,
     });
-
-    if (response.error != null) {
-      throw Exception('Supabase upsert failed: ${response.error}');
-    }
 
     // 성공 시 synced = true로 업데이트
     final isar = DatabaseService.instance.isar;
@@ -317,7 +311,8 @@ class IsarWatchSyncService {
     }
 
     // created_at, updated_at은 서버에서 자동 관리
-    final response = await _supabase.from('posts').upsert({
+    // 최신 supabase_flutter: 에러 시 예외 throw, 성공 시 데이터 반환
+    await _supabase.from('posts').upsert({
       'id': post.remoteID,
       'user_id': user.id,
       'draft_id': post.draftId,
@@ -330,10 +325,6 @@ class IsarWatchSyncService {
       'viewed': post.viewed,
       'deleted': post.deleted,
     });
-
-    if (response.error != null) {
-      throw Exception('Supabase upsert failed: ${response.error}');
-    }
 
     // 성공 시 synced = true로 업데이트
     final isar = DatabaseService.instance.isar;

@@ -65,8 +65,8 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     // 초기화 완료 후 서비스 시작
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // LifecycleService 초기화 (Provider ref와 함께)
-      ref.read(lifecycleServiceProvider).initialize();
+      // LifecycleService 초기화 (Singleton 패턴, Ref 전달)
+      LifecycleService().initialize(ref);
       logger.i('[Main] LifecycleService initialized');
 
       // ShareHandlerService 초기화

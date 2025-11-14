@@ -698,11 +698,18 @@ lib/shared/theme/app_theme.dart
 - Isar Inspector에서 스키마 확인
 - 샘플 데이터 저장/조회 성공
 
+**자동화 도구:**
+- `/check-errors` - Flutter 에러/경고 자동 체크 (Claude Code 명령어)
+- `.claude/scripts/check-flutter-errors.sh` - 수동 에러 체크 스크립트
+- `.claude/scripts/watch-flutter-errors.sh` - Hot reload 자동 모니터링
+
 **명령:**
 ```bash
 cd miniline_app
 flutter pub run build_runner build --delete-conflicting-outputs
 flutter analyze
+# 또는 자동 체크
+.claude/scripts/check-flutter-errors.sh
 ```
 
 ---

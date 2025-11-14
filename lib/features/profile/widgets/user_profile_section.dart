@@ -308,7 +308,11 @@ class UserProfileSection extends ConsumerWidget {
     dynamic currentUser,
   ) {
     String? imageUrl;
-    if (profile?['photo_url'] != null && currentUser != null) {
+    // userId가 실제로 존재하는 경우에만 이미지 로드
+    if (profile?['photo_url'] != null &&
+        currentUser != null &&
+        currentUser.id != null &&
+        currentUser.id.isNotEmpty) {
       final photoUrl = profile!['photo_url'] as String;
       final userId = currentUser.id;
       imageUrl = StorageUtils.getUserPhotoUrl(userId, photoUrl);

@@ -590,8 +590,8 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('messages.logout_success'.tr())),
           );
-          // 타임라인으로 이동
-          context.go('/timeline');
+          // 타임라인으로 이동 (로컬 퍼스트: 로그아웃 후에도 사용 가능)
+          context.go('/');
         }
       } catch (e, stackTrace) {
         logger.e('Logout failed', e, stackTrace);

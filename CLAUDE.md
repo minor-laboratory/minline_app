@@ -14,6 +14,11 @@ AI 기반 자동 조합 저널 앱 (Flutter 버전)
 - [ ] 실제 동작 확인 (에뮬레이터/실기기)
 - [ ] 동기화 확인 (웹↔앱 데이터 일치)
 
+**자동화 도구**:
+- `/check-errors` - Flutter 에러/경고 자동 체크 (Claude Code 명령어)
+- `.claude/scripts/check-flutter-errors.sh` - 수동 에러 체크 스크립트
+- `.claude/scripts/watch-flutter-errors.sh` - Hot reload 자동 모니터링
+
 ## 필수 참조 문서
 
 **언제 읽어야 하는가:**

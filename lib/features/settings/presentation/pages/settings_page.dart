@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/utils/app_icons.dart';
 import '../../../../shared/widgets/standard_bottom_sheet.dart';
+import '../../../auth/data/auth_repository.dart';
 import '../../../profile/widgets/user_profile_section.dart';
 import '../../providers/settings_provider.dart';
 import '../widgets/daily_reminder_sheet.dart';
@@ -60,11 +61,16 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
     if (confirmed == true && mounted) {
       try {
-        await Supabase.instance.client.auth.signOut();
+        // AuthRepository를 통해 로그아웃 (로컬 데이터 정리 포함)
+        final authRepo = ref.read(authRepositoryProvider);
+        await authRepo.signOut();
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('settings.logout'.tr())),
           );
+          // 타임라인으로 이동 (로컬 퍼스트: 로그아웃 후에도 사용 가능)
+          context.go('/');
         }
       } catch (e) {
         if (mounted) {

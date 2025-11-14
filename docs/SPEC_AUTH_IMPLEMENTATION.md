@@ -328,6 +328,63 @@ lib/features/auth/
    - width: 24, height: 24 고정
    - 미지정 시 입력창 높이 변경됨
 
+## Common Pitfalls
+
+### 1. 프로필 이미지 로딩
+
+**문제**: 로그아웃 후 userId가 null/빈 문자열인 상태에서 프로필 이미지 로드 시도
+```dart
+// ❌ 잘못된 예
+if (profile?['photo_url'] != null && currentUser != null) {
+  imageUrl = StorageUtils.getUserPhotoUrl(userId, photoUrl);
+  // userId가 빈 문자열이면 Invalid statusCode: 400 발생
+}
+```
+
+**이유**:
+- Supabase Storage URL: `{supabaseUrl}/storage/v1/object/public/users/users/{userId}/{photoPath}`
+- userId가 빈 문자열이면 `.../users/users//{photoPath}` 형태의 잘못된 URL 생성
+- 400 Bad Request 에러 발생
+
+**해결**:
+```dart
+// ✅ 올바른 예
+if (profile?['photo_url'] != null &&
+    currentUser != null &&
+    currentUser.id != null &&
+    currentUser.id.isNotEmpty) {
+  final photoUrl = profile!['photo_url'] as String;
+  final userId = currentUser.id;
+  imageUrl = StorageUtils.getUserPhotoUrl(userId, photoUrl);
+}
+```
+
+**적용 위치**: [user_profile_section.dart:311-315](../lib/features/profile/widgets/user_profile_section.dart#L311-L315)
+
+### 2. 로그아웃 후 라우팅
+
+**문제**: 로그아웃 후 `/auth`로 이동 시 뒤로가기 버튼으로 앱 종료
+
+**이유**:
+- 미니라인은 로컬 퍼스트 앱
+- 로그아웃 후에도 로컬 데이터 사용 가능
+- `/auth`에서 뒤로가기는 앱 종료 (스택에 홈이 없음)
+
+**해결**:
+```dart
+// ❌ 잘못된 예
+await authRepo.signOut();
+context.go('/auth'); // 뒤로가기로 앱 종료
+
+// ✅ 올바른 예
+await authRepo.signOut();
+context.go('/'); // 타임라인으로 이동 (로컬 데이터 계속 사용)
+```
+
+**적용 위치**:
+- [settings_page.dart:72](../lib/features/settings/presentation/pages/settings_page.dart#L72)
+- [profile_detail_page.dart](../lib/features/profile/presentation/pages/profile_detail_page.dart)
+
 ## 참고 문서
 
 - [GUIDE_STYLE_COMPONENTS.md](/docs/common/GUIDE_STYLE_COMPONENTS.md) - 컴포넌트 가이드

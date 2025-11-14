@@ -431,7 +431,12 @@ class AuthRepository {
     try {
       logger.i('Initializing Isar database for new user...');
       await DatabaseService.instance.init();
-      logger.i('Database initialized. Initial sync will be handled by auth state listener');
+
+      // SyncMetadata 초기화 (이전 사용자 동기화 시간 제거)
+      await SyncMetadataService.resetAllSyncMetadata();
+      logger.i('SyncMetadata reset for new user login');
+
+      logger.i('Database initialized. Initial sync will be handled by lifecycle service');
     } catch (e) {
       logger.e('Error initializing database', e);
     }
