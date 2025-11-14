@@ -355,6 +355,46 @@ pubspec.yaml (flutter_markdown: ^0.7.4+1) ✅
 - 공개/비공개 상태 토글 확인
 - viewed 플래그 자동 업데이트 확인
 
+### 2.4.1 Post 생성 화면 ✅ 완료
+
+**우선순위:** 중간
+
+**작업:**
+- [x] PostCreatePage 구현
+- [x] 5개 템플릿 선택 UI (Essay, Timeline, Product Review, Travel, Project)
+- [x] AI 스트리밍 (SSE) 연동 (Edge Function 'generate-post')
+- [x] 실시간 미리보기 (타이핑 애니메이션 + 커서)
+- [x] Progress bar (0-100%)
+- [x] 재생성 지원 (previousVersionId 쿼리 파라미터)
+- [x] 에러 처리 (최소 Fragment 수, 무료 한도)
+- [x] PostTemplates 상수 파일 생성
+- [x] Fragment 목록 토글 (PostDetailPage)
+- [x] Markdown 내보내기 (share_plus)
+- [x] 피드백 신고 기능
+- [x] Preview/Source 모드 토글
+
+**파일:**
+```
+lib/features/posts/presentation/pages/post_create_page.dart ✅
+lib/core/constants/post_templates.dart ✅
+lib/features/posts/presentation/pages/post_detail_page.dart (신규 기능 추가) ✅
+lib/router/app_router.dart (previousVersionId 쿼리 파라미터) ✅
+assets/translations/ko.json, en.json (template.*, post.* 키 추가) ✅
+pubspec.yaml (share_plus: ^10.1.4) ✅
+```
+
+**검증:** ✅
+- 템플릿 선택 UI 확인 (그리드 2열)
+- AI 스트리밍 동작 확인 (SSE, 실시간 타이핑)
+- 미리보기 타이핑 애니메이션 확인
+- Progress bar 0-100% 진행 확인
+- 재생성 시 previousVersionId 전달 확인
+- Fragment 2개 미만 시 에러 메시지 확인
+- Fragment 목록 토글 확인 (내용, 시간, AI 태그)
+- Markdown 내보내기 확인 (share_plus)
+- 피드백 신고 확인 (FeedbackDialog)
+- Preview/Source 모드 토글 확인
+
 ### 2.5 라우팅 ✅ 완료
 
 **우선순위:** 높음

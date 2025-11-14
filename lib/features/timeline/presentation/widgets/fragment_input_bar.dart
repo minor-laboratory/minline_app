@@ -47,7 +47,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
   /// 갤러리에서 이미지 선택
   Future<void> _pickImages() async {
     if (_selectedImages.length >= _maxImages) {
-      _showError('media.max_files_limit'.tr(args: [_maxImages.toString()]));
+      _showError('media.max_files_exceeded'.tr(namedArgs: {'count': _maxImages.toString()}));
       return;
     }
 
@@ -64,7 +64,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
       final imagesToSelect = images.take(availableSlots).toList();
 
       if (images.length > availableSlots) {
-        _showError('media.max_files_limit'.tr(args: [_maxImages.toString()]));
+        _showError('media.max_files_exceeded'.tr(namedArgs: {'count': _maxImages.toString()}));
       }
 
       // 선택된 이미지들의 크기 검증

@@ -121,8 +121,9 @@ Icon(AppIcons.settings)
 - **로컬 DB**: isar_community ^3.3.0-dev.1 (북랩 동일)
 - **백엔드**: supabase_flutter ^2.10.3 (웹과 공유)
 - **UI**: shadcn_ui ^0.39.3, flutter_lucide ^1.7.0
+- **Markdown**: flutter_markdown ^0.7.4+1
 - **알림**: firebase_messaging ^16.0.4, flutter_local_notifications ^19.4.2
-- **공유**: share_handler ^0.0.25
+- **공유**: share_handler ^0.0.25 (수신), share_plus ^10.1.4 (전송)
 - **다국어**: easy_localization ^3.0.7
 - **공통**: minorlab_common (로컬 경로)
 

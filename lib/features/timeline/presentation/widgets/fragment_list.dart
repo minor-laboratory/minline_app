@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/app_icons.dart';
+import '../../../../models/draft.dart';
+import '../../../drafts/providers/drafts_provider.dart';
 import '../../providers/fragments_provider.dart';
 import 'fragment_card.dart';
 
@@ -15,12 +17,23 @@ class FragmentList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final fragmentsAsync = ref.watch(filteredFragmentsProvider);
+    final draftsAsync = ref.watch(draftsStreamProvider);
 
     return fragmentsAsync.when(
       data: (fragments) {
         if (fragments.isEmpty) {
           return _buildEmptyState(context);
         }
+
+        // Draft Map 생성 (Fragment remoteID -> Draft)
+        final draftMap = <String, Draft>{};
+        draftsAsync.whenData((drafts) {
+          for (final draft in drafts) {
+            for (final fragmentId in draft.fragmentIds) {
+              draftMap[fragmentId] = draft;
+            }
+          }
+        });
 
         return ListView.builder(
           padding: const EdgeInsets.only(
@@ -29,7 +42,12 @@ class FragmentList extends ConsumerWidget {
           ),
           itemCount: fragments.length,
           itemBuilder: (context, index) {
-            return FragmentCard(fragment: fragments[index]);
+            final fragment = fragments[index];
+            final draft = draftMap[fragment.remoteID];
+            return FragmentCard(
+              fragment: fragment,
+              draft: draft,
+            );
           },
         );
       },

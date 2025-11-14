@@ -98,8 +98,36 @@
     "private": "Private",
     "snap_count": "{count} snaps",
     "exported": "Exported",
+    "export": "Export",
+    "export_success": "Shared as Markdown file",
+    "regenerate": "Regenerate",
+    "regenerate_confirm": "Do you want to regenerate this post?\nA new version will be created.",
     "delete_title": "Delete Post",
-    "delete_confirm": "Are you sure you want to delete this post?"
+    "delete_confirm": "Are you sure you want to delete this post?",
+    "create_title": "Create Post",
+    "draft_not_found": "Draft not found",
+    "create_not_implemented": "Not implemented yet",
+    "generate": "Generate",
+    "select_template": "Select Template",
+    "template_essay": "Essay",
+    "template_timeline": "Timeline Story",
+    "template_product_review": "Product Review",
+    "template_travel": "Travel Log",
+    "template_project": "Project Record",
+    "template_essay_desc": "Organize your thoughts in free form",
+    "template_timeline_desc": "Tell your story in chronological order",
+    "template_product_review_desc": "Record your product experience in detail",
+    "template_travel_desc": "Share your travel experience vividly",
+    "template_project_desc": "Document your project systematically",
+    "preview": "Preview",
+    "preview_placeholder": "Click Generate button to create your post",
+    "generating": "Generating...",
+    "generation_complete": "Generation complete!",
+    "generation_failed": "Generation failed",
+    "not_enough_fragments": "Not enough fragments (minimum 2 required)",
+    "free_limit_exceeded": "Free limit exceeded",
+    "show_preview": "Preview",
+    "show_source": "Source"
   },
   "settings": {
     "title": "Settings",
@@ -236,7 +264,18 @@
     "content_or_media_required": "Please add content or images",
     "save_failed": "Save failed",
     "empty": "No snaps yet.",
-    "empty_hint": "Write your first snap below!"
+    "empty_hint": "Write your first snap below!",
+    "delete_title": "Delete Snap",
+    "delete_confirm": "Are you sure you want to delete this snap?"
+  },
+  "tag": {
+    "add_tag": "Add Tag",
+    "add_tag_placeholder": "Enter tag...",
+    "hide": "Hide",
+    "remove_tag": "Remove"
+  },
+  "sync": {
+    "waiting": "Waiting to sync"
   },
   "common": {
     "input_placeholder": "What's on your mind?",
@@ -246,7 +285,10 @@
     "saved": "Saved",
     "loading": "Loading...",
     "delete": "Delete",
+    "deleting": "Deleting...",
     "cancel": "Cancel",
+    "edit": "Edit",
+    "more": "More",
     "error": "An error occurred",
     "enable": "Enable",
     "notifications_on": "Notifications on",
@@ -268,7 +310,13 @@
     "retry": "Retry",
     "user": "User",
     "change": "Change",
-    "set": "Set"
+    "set": "Set",
+    "include_time": "Include Time",
+    "select_time": "Select Time",
+    "generating": "Generating...",
+    "generate": "Generate",
+    "regenerating": "Regenerating...",
+    "regenerate": "Regenerate"
   },
   "profile": {
     "title": "Profile",
@@ -320,8 +368,10 @@
     "just_now": "Just now",
     "minutes_ago": "{minutes}m ago",
     "hours_ago": "{hours}h ago",
+    "days_ago": "{days}d ago",
     "date_format": "MMM d",
-    "datetime_format": "MMM d, HH:mm"
+    "datetime_format": "MMM d, HH:mm",
+    "event_time": "Event Time"
   },
   "media": {
     "file_size_exceeded": "File size exceeded: {files} (max {maxMB}MB)",
@@ -330,5 +380,32 @@
     "upload_failed": "Upload failed: {message}",
     "delete_failed": "Delete failed: {message}",
     "select_failed": "File selection failed"
+  },
+  "embedding": {
+    "description": "Generate embedding for AI analysis"
+  },
+  "feedback": {
+    "report_issue": "Report Issue",
+    "submitted": "Submitted",
+    "what_went_wrong": "What went wrong?",
+    "select_or_describe": "Please select at least one option or enter your feedback",
+    "additional_optional": "Additional feedback? (optional)",
+    "submit": "Submit",
+    "submit_success": "Thank you for your feedback!",
+    "error_input_required": "Please select at least one option or enter your feedback",
+    "error_already_submitted": "You've already submitted feedback for this",
+    "error_auth_required": "Not authenticated",
+    "error_server_error": "Something went wrong. Please try again",
+    "draft": {
+      "irrelevant": "Not relevant to my snaps",
+      "poor_quality": "Poor content quality",
+      "wrong_grouping": "Snaps grouped incorrectly"
+    },
+    "post": {
+      "inaccurate": "Inaccurate",
+      "poor_writing": "Poor writing quality",
+      "wrong_tone": "Wrong tone",
+      "too_short": "Too short"
+    }
   }
 }

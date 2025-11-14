@@ -143,6 +143,146 @@ static ThemeData lightTheme = MinorLabTheme.minimal(
 - 동일한 색상 팔레트 사용
 - 라이트/다크 모드 지원
 
+### Post 생성 (PostCreatePage)
+
+**웹**: 드롭다운 + 단순 로딩
+```typescript
+// miniline/src/routes/posts/new/+page.svelte
+<select bind:value={selectedTemplate}>
+  <option value="essay">생각 정리</option>
+  <option value="timeline">시간순 스토리</option>
+  ...
+</select>
+
+{#if isGenerating}
+  <div class="spinner" /> <!-- 로딩 스피너 -->
+{/if}
+```
+
+**앱**: 그리드 카드 + 실시간 미리보기
+```dart
+// miniline_app/lib/features/posts/presentation/pages/post_create_page.dart
+GridView.builder(
+  crossAxisCount: 2,
+  children: PostTemplates.all.map((t) => _buildTemplateCard(t)).toList(),
+)
+
+// AI 생성 중
+LinearProgressIndicator(value: _progress / 100) // 0-100% progress bar
+MarkdownBody(data: _generatingContent + '_') // 타이핑 커서 애니메이션
+```
+
+**차이점**:
+- 웹: 드롭다운 선택, 로딩 스피너
+- 앱: 그리드 카드 UI (2열), Progress bar (0-100%), 타이핑 애니메이션 + 깜빡이는 커서
+
+### Post 상세 (PostDetailPage)
+
+#### Markdown 내보내기
+
+**웹**: 브라우저 다운로드
+```typescript
+// miniline/src/routes/posts/[id]/+page.svelte
+function exportMarkdown() {
+  const blob = new Blob([`# ${post.title}\n\n${post.content}`], {
+    type: 'text/markdown'
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${post.title}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+```
+
+**앱**: share_plus 패키지 (공유 시트)
+```dart
+// miniline_app/lib/features/posts/presentation/pages/post_detail_page.dart
+Future<void> _handleExport() async {
+  final markdown = '# ${_post.title}\n\n${_post.content}';
+  final tempDir = await getTemporaryDirectory();
+  final file = File('${tempDir.path}/${_post.title}.md');
+  await file.writeAsString(markdown);
+
+  await Share.shareXFiles(
+    [XFile(file.path)],
+    text: _post.title,
+  );
+}
+```
+
+**차이점**:
+- 웹: 파일 시스템에 직접 다운로드
+- 앱: 공유 시트로 다른 앱에 전송
+
+#### Fragment 목록 토글
+
+**웹**: 항상 표시 (접기/펼치기 없음)
+```svelte
+<!-- miniline/src/routes/posts/[id]/+page.svelte -->
+{#if fragments.length > 0}
+  <div class="fragments">
+    {#each fragments as fragment}
+      <FragmentCard {fragment} />
+    {/each}
+  </div>
+{/if}
+```
+
+**앱**: 토글 버튼 (접기/펼치기)
+```dart
+// miniline_app/lib/features/posts/presentation/pages/post_detail_page.dart
+ShadButton.ghost(
+  onPressed: () => setState(() => _showFragments = !_showFragments),
+  child: Row(
+    children: [
+      Icon(_showFragments ? AppIcons.chevronDown : AppIcons.chevronRight),
+      Text('draft.snap_count'.tr(namedArgs: {'count': _fragments.length})),
+    ],
+  ),
+)
+
+if (_showFragments) ...fragments.map((f) => Card(...))
+```
+
+**차이점**:
+- 웹: 항상 표시
+- 앱: 토글 버튼으로 공간 절약 (모바일 화면 최적화)
+
+#### Preview/Source 모드
+
+**웹**: 없음 (Preview만 표시)
+
+**앱**: 토글 버튼 (Preview ↔ Source)
+```dart
+// miniline_app/lib/features/posts/presentation/pages/post_detail_page.dart
+Row(
+  children: [
+    ShadButton(
+      onPressed: _viewMode == 'preview' ? null : () => setState(() => _viewMode = 'preview'),
+      child: Text('post.show_preview'.tr()),
+    ),
+    ShadButton.outline(
+      onPressed: _viewMode == 'source' ? null : () => setState(() => _viewMode = 'source'),
+      child: Text('post.show_source'.tr()),
+    ),
+  ],
+)
+
+// Preview 모드
+if (_viewMode == 'preview')
+  MarkdownBody(data: _post.content, styleSheet: ...)
+
+// Source 모드
+else
+  Text(_post.content, style: TextStyle(fontFamily: 'monospace'))
+```
+
+**차이점**:
+- 웹: Preview만 표시
+- 앱: Preview/Source 모드 전환 가능 (원본 Markdown 확인)
+
 ---
 
 ## UI 차이

@@ -5,6 +5,7 @@ import 'package:minorlab_common/minorlab_common.dart' as common;
 
 import '../features/auth/presentation/pages/auth_page.dart';
 import '../features/drafts/presentation/pages/drafts_page.dart';
+import '../features/posts/presentation/pages/post_create_page.dart';
 import '../features/posts/presentation/pages/post_detail_page.dart';
 import '../features/posts/presentation/pages/posts_page.dart';
 import '../features/profile/presentation/pages/account_withdrawal_page.dart';
@@ -63,6 +64,18 @@ final appRouter = GoRouter(
       name: 'posts',
       builder: (context, state) => const PostsPage(),
       routes: [
+        // Post 생성
+        GoRoute(
+          path: 'create/:draftId',
+          builder: (context, state) {
+            final draftId = state.pathParameters['draftId']!;
+            final previousVersionId = state.uri.queryParameters['previousVersionId'];
+            return PostCreatePage(
+              draftId: draftId,
+              previousVersionId: previousVersionId,
+            );
+          },
+        ),
         // Post 상세
         GoRoute(
           path: ':postId',

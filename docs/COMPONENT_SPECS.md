@@ -915,7 +915,180 @@ Row(
 
 ---
 
-## 6. PostDetailPage (공개글 상세)
+## 6. PostCreatePage (글 생성 화면)
+
+### 기본 정보
+
+- **파일**: `lib/features/posts/presentation/pages/post_create_page.dart`
+- **패키지**: `supabase_flutter` (SSE), `shadcn_ui` (버튼, 카드)
+- **웹 참조**: 웹 버전과 UI 차이 (드롭다운 → 그리드 카드)
+
+### 레이아웃
+
+```
+┌─────────────────────────────────────────┐
+│ ← 글 만들기              [생성하기 ✨]  │ ← AppBar
+├─────────────────────────────────────────┤
+│ 📄 제안                                 │
+│ AI가 관련있는 스냅들을 묶어 제안했어요  │
+│                                         │
+│ 템플릿 선택                              │
+│ ┌────────────┐ ┌────────────┐          │
+│ │ 📝 생각정리 │ │ ⏱️ 시간순  │          │ ← 그리드 (2열)
+│ └────────────┘ └────────────┘          │
+│ ┌────────────┐ ┌────────────┐          │
+│ │ 📦 제품사용│ │ ✈️ 여행기  │          │
+│ └────────────┘ └────────────┘          │
+│ ┌────────────┐                          │
+│ │ 🚀 프로젝트│                          │
+│ └────────────┘                          │
+│                                         │
+│ 미리보기                                │
+│ ━━━━━━━━━━━━━━━━ 65% ━━━━━━━━━━━━━━━━│ ← Progress bar
+│ ┌─────────────────────────────────────┐│
+│ │ # 제목이 여기에 나타납니다_         ││ ← 실시간 타이핑
+│ │                                     ││
+│ │ 본문 내용이 스트리밍으로 추가됩니다 ││
+│ │                                     ││
+│ └─────────────────────────────────────┘│
+└─────────────────────────────────────────┘
+```
+
+### 상세 스펙
+
+**템플릿 카드** (`_buildTemplateCard`):
+```dart
+Card(
+  color: isSelected ? primaryContainer : null,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(12),
+    side: isSelected
+        ? BorderSide(color: primary, width: 2)
+        : BorderSide.none,
+  ),
+  child: Row(
+    children: [
+      Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: isSelected ? primary : surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(template.icon),
+      ),
+      Column(
+        children: [
+          Text(template.nameKey.tr()), // 예: "생각 정리"
+          Text(template.descKey.tr()), // 예: "자유로운 형식으로..."
+        ],
+      ),
+      if (isSelected) Icon(AppIcons.checkCircle),
+    ],
+  ),
+)
+```
+
+**5개 템플릿** (`lib/core/constants/post_templates.dart`):
+1. **Essay** (생각 정리): 자유로운 형식
+2. **Timeline** (시간순 스토리): 시간 순서대로
+3. **Product Review** (제품 사용기): 제품 경험 상세히
+4. **Travel** (여행기): 여행 경험 생생하게
+5. **Project** (프로젝트 기록): 프로젝트 과정 체계적으로
+
+**AI 생성 상태**:
+```dart
+// Progress bar
+LinearProgressIndicator(
+  value: _progress / 100, // 0.0 ~ 1.0
+  minHeight: 6,
+)
+Text('${_progress.toInt()}%')
+
+// 실시간 타이핑
+Row(
+  children: [
+    Expanded(child: Text(_generatingContent)),
+    if (_isGenerating) _CursorBlinker(), // 깜빡이는 커서
+  ],
+)
+
+// 커서 애니메이션
+class _CursorBlinker extends StatefulWidget {
+  // FadeTransition으로 500ms 반복
+  AnimationController(duration: 500ms)..repeat(reverse: true);
+}
+```
+
+**에러 처리**:
+```dart
+if (_errorMessage != null)
+  Container(
+    padding: EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: errorContainer,
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Row(
+      children: [
+        Icon(AppIcons.error, color: error),
+        Text(_errorMessage!),
+      ],
+    ),
+  )
+```
+
+- Fragment 2개 미만: `post.not_enough_fragments`
+- 무료 한도 초과: `post.free_limit_exceeded`
+
+**재생성 지원**:
+- `previousVersionId` 쿼리 파라미터로 전달
+- Edge Function에서 이전 버전 참고하여 새 버전 생성
+- 라우트: `/posts/create/:draftId?previousVersionId=:postId`
+
+### Edge Function 연동 (SSE)
+
+**함수 이름**: `generate-post`
+
+**요청**:
+```json
+{
+  "draftId": "uuid",
+  "fragmentIds": ["uuid1", "uuid2", ...],
+  "template": "essay",
+  "previousVersionId": "uuid" // 재생성 시만
+}
+```
+
+**응답 (Server-Sent Events)**:
+```
+data: {"type": "title", "content": "제목"}
+
+data: {"type": "content", "content": "본문 일부"}
+data: {"type": "content", "content": "더 많은 본문"}
+...
+
+data: {"type": "done", "postId": "uuid"}
+```
+
+또는 에러:
+```
+data: {"type": "error", "message": "free_limit_exceeded"}
+```
+
+### 검증 사항
+
+- [x] 템플릿 선택 시 border + primaryContainer 색상 변경
+- [x] AI 생성 중 progress bar 0-100% 진행
+- [x] 타이핑 애니메이션 (한 글자씩 추가)
+- [x] 커서 깜빡임 (500ms 반복)
+- [x] 생성 완료 후 Post 상세 페이지로 이동 (`/posts/:postId`)
+- [x] Fragment 2개 미만 시 에러 메시지
+- [x] 재생성 시 previousVersionId 전달
+
+---
+
+## 7. PostDetailPage (공개글 상세)
 
 ### 기본 정보
 
@@ -1108,6 +1281,176 @@ Card(
 | 공개 토글 | 버튼 클릭 | SwitchListTile |
 | 삭제 | 인라인 버튼 | 더보기 메뉴 |
 | 메타 정보 | 상단 고정 | 스크롤 가능 |
+| Preview/Source 모드 | 없음 | 토글 버튼 |
+| Markdown 내보내기 | 브라우저 다운로드 | share_plus (공유 시트) |
+| Fragment 목록 표시 | 항상 표시 | 토글 버튼 (접기/펼치기) |
+| 재생성 | 별도 페이지 | 더보기 메뉴 |
+| 피드백 신고 | 모달 | 더보기 메뉴 → FeedbackDialog |
+
+### 신규 기능 (앱 전용)
+
+#### Fragment 목록 토글
+
+**위치**: Post 하단
+
+**UI**:
+```dart
+ShadButton.ghost(
+  onPressed: () => setState(() => _showFragments = !_showFragments),
+  child: Row(
+    children: [
+      Icon(_showFragments ? AppIcons.chevronDown : AppIcons.chevronRight),
+      Text('draft.snap_count'.tr(namedArgs: {'count': fragments.length})),
+    ],
+  ),
+)
+
+if (_showFragments) ...fragments.map((f) =>
+  Card(
+    child: Column(
+      children: [
+        Text(f.content),
+        Text(DateFormat('MMM d, HH:mm').format(f.eventTime)),
+        // AI 태그 (최대 3개)
+        Wrap(children: f.tags.take(3).map((tag) => Chip(tag))),
+      ],
+    ),
+  ),
+)
+```
+
+#### Markdown 내보내기
+
+**위치**: AppBar 우측
+
+**동작**:
+```dart
+Future<void> _handleExport() async {
+  final markdown = '# ${_post.title}\n\n${_post.content}';
+  final tempDir = await getTemporaryDirectory();
+  final file = File('${tempDir.path}/${_post.title}.md');
+  await file.writeAsString(markdown);
+
+  await Share.shareXFiles(
+    [XFile(file.path)],
+    text: _post.title,
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('post.export_success'.tr())),
+  );
+}
+```
+
+#### 재생성 기능
+
+**위치**: 더보기 메뉴
+
+**조건**: `_post.draftId != null` 일 때만 표시
+
+**동작**:
+```dart
+Future<void> _handleRegenerate() async {
+  final confirmed = await showShadDialog<bool>(
+    context: context,
+    builder: (context) => ShadDialog(
+      title: Text('post.regenerate'.tr()),
+      description: Text('post.regenerate_confirm'.tr()),
+      actions: [
+        ShadButton.outline(
+          onPressed: () => Navigator.pop(false),
+          child: Text('common.cancel'.tr()),
+        ),
+        ShadButton(
+          onPressed: () => Navigator.pop(true),
+          child: Text('post.regenerate'.tr()),
+        ),
+      ],
+    ),
+  );
+
+  if (confirmed == true) {
+    context.push(
+      '/posts/create/${_post.draftId}?previousVersionId=${_post.remoteID}',
+    );
+  }
+}
+```
+
+#### 피드백 신고
+
+**위치**: 더보기 메뉴
+
+**동작**:
+```dart
+Future<void> _handleFeedback() async {
+  // 중복 제출 체크
+  final hasExisting = await FeedbackService.instance.checkExistingFeedback(
+    targetType: 'post',
+    targetId: _post.remoteID,
+  );
+
+  if (hasExisting) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('feedback.error_already_submitted'.tr())),
+    );
+    return;
+  }
+
+  await showShadDialog<bool>(
+    context: context,
+    builder: (context) => FeedbackDialog(
+      targetType: 'post',
+      targetId: _post.remoteID,
+    ),
+  );
+}
+```
+
+**신고 사유** (`FeedbackTemplates.post`):
+1. **inaccurate**: 부정확한 내용
+2. **poor_writing**: 글쓰기 품질 낮음
+3. **wrong_tone**: 톤앤매너 잘못됨
+4. **too_short**: 너무 짧음
+
+#### Preview/Source 모드 토글
+
+**위치**: Post 내용 상단
+
+**UI**:
+```dart
+Row(
+  mainAxisAlignment: MainAxisAlignment.end,
+  children: [
+    _viewMode == 'preview'
+        ? ShadButton(onPressed: null, child: Text('post.show_preview'.tr()))
+        : ShadButton.outline(
+            onPressed: () => setState(() => _viewMode = 'preview'),
+            child: Text('post.show_preview'.tr()),
+          ),
+    _viewMode == 'source'
+        ? ShadButton(onPressed: null, child: Text('post.show_source'.tr()))
+        : ShadButton.outline(
+            onPressed: () => setState(() => _viewMode = 'source'),
+            child: Text('post.show_source'.tr()),
+          ),
+  ],
+)
+```
+
+**렌더링**:
+```dart
+if (_viewMode == 'preview')
+  MarkdownBody(
+    data: _post.content,
+    styleSheet: MarkdownStyleSheet(...),
+  )
+else
+  Text(
+    _post.content,
+    style: textTheme.bodyMedium?.copyWith(fontFamily: 'monospace'),
+  )
+```
 
 ### 언제 읽어야 하는가
 

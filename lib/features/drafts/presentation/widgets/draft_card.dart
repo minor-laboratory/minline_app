@@ -1,12 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/database/database_service.dart';
+import '../../../../core/services/feedback_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../models/draft.dart';
 import '../../../../models/fragment.dart';
+import '../../../../shared/widgets/feedback_dialog.dart';
 
 /// Draft 카드 위젯
 class DraftCard extends ConsumerStatefulWidget {
@@ -27,12 +30,25 @@ class _DraftCardState extends ConsumerState<DraftCard> {
   List<Fragment> _fragments = [];
   bool _showFragments = false;
   bool _isLoading = false;
+  bool _hasSubmittedFeedback = false;
 
   @override
   void initState() {
     super.initState();
     _loadFragments();
     _markAsViewed();
+    _checkFeedback();
+  }
+
+  Future<void> _checkFeedback() async {
+    final hasSubmitted = await FeedbackService.instance.checkExistingFeedback(
+      targetType: 'draft',
+      targetId: widget.draft.remoteID,
+    );
+
+    if (mounted) {
+      setState(() => _hasSubmittedFeedback = hasSubmitted);
+    }
   }
 
   Future<void> _loadFragments() async {
@@ -156,6 +172,51 @@ class _DraftCardState extends ConsumerState<DraftCard> {
     }
   }
 
+  Future<void> _showMoreMenu() async {
+    showShadSheet(
+      context: context,
+      builder: (context) => ShadSheet(
+        title: Text('common.more'.tr()),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(
+                _hasSubmittedFeedback ? AppIcons.checkCircle : AppIcons.flag,
+              ),
+              title: Text(
+                _hasSubmittedFeedback
+                    ? 'feedback.submitted'.tr()
+                    : 'feedback.report_issue'.tr(),
+              ),
+              enabled: !_hasSubmittedFeedback,
+              onTap: _hasSubmittedFeedback
+                  ? null
+                  : () {
+                      Navigator.of(context).pop();
+                      _showFeedbackDialog();
+                    },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showFeedbackDialog() async {
+    final result = await showShadDialog<bool>(
+      context: context,
+      builder: (context) => FeedbackDialog(
+        targetType: 'draft',
+        targetId: widget.draft.remoteID,
+      ),
+    );
+
+    if (result == true) {
+      _checkFeedback();
+    }
+  }
+
   Color _getStatusColor() {
     switch (widget.draft.status) {
       case 'pending':
@@ -193,7 +254,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 제목 & 상태
+            // 제목 & 상태 & 더보기
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -231,6 +292,12 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                           fontWeight: FontWeight.w600,
                         ),
                   ),
+                ),
+                const SizedBox(width: 4),
+                ShadButton.ghost(
+                  onPressed: _showMoreMenu,
+                  padding: EdgeInsets.zero,
+                  child: Icon(AppIcons.moreVert, size: 16),
                 ),
               ],
             ),
@@ -402,7 +469,9 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                   ),
                   const SizedBox(width: 8),
                   ShadButton(
-                    onPressed: _isLoading ? null : () => _updateStatus('accepted'),
+                    onPressed: _isLoading
+                        ? null
+                        : () => context.push('/posts/create/${widget.draft.remoteID}'),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

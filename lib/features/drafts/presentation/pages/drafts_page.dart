@@ -86,7 +86,7 @@ class _DraftsPageState extends ConsumerState<DraftsPage> {
   @override
   Widget build(BuildContext context) {
     final filter = ref.watch(draftFilterProvider);
-    final filteredDraftsStream = ref.watch(filteredDraftsProvider);
+    final draftsStream = ref.watch(draftsStreamProvider);
     final countsStream = ref.watch(draftCountsProvider);
 
     return Scaffold(
@@ -137,150 +137,55 @@ class _DraftsPageState extends ConsumerState<DraftsPage> {
               ),
             ),
 
-          // 필터 버튼
-          countsStream.when(
-            data: (counts) => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _FilterChip(
-                    label: 'draft.filter_all'.tr(),
-                    count: counts['all'] ?? 0,
-                    isSelected: filter.status == 'all',
-                    onTap: () => ref
-                        .read(draftFilterProvider.notifier)
-                        .setStatus('all'),
+          // Shadcn Tabs
+          Expanded(
+            child: countsStream.when(
+              data: (counts) => ShadTabs<String>(
+                value: filter.status,
+                onChanged: (value) {
+                  ref.read(draftFilterProvider.notifier).setStatus(value);
+                },
+                tabs: [
+                  ShadTab(
+                    value: 'all',
+                    content: _DraftTabContent(
+                      status: 'all',
+                      draftsStream: draftsStream,
+                      onRefresh: () => ref.invalidate(draftsStreamProvider),
+                    ),
+                    child: Text('${'draft.filter_all'.tr()} (${counts['all'] ?? 0})'),
                   ),
-                  _FilterChip(
-                    label: 'draft.filter_pending'.tr(),
-                    count: counts['pending'] ?? 0,
-                    isSelected: filter.status == 'pending',
-                    onTap: () => ref
-                        .read(draftFilterProvider.notifier)
-                        .setStatus('pending'),
+                  ShadTab(
+                    value: 'pending',
+                    content: _DraftTabContent(
+                      status: 'pending',
+                      draftsStream: draftsStream,
+                      onRefresh: () => ref.invalidate(draftsStreamProvider),
+                    ),
+                    child: Text('${'draft.filter_pending'.tr()} (${counts['pending'] ?? 0})'),
                   ),
-                  _FilterChip(
-                    label: 'draft.filter_accepted'.tr(),
-                    count: counts['accepted'] ?? 0,
-                    isSelected: filter.status == 'accepted',
-                    onTap: () => ref
-                        .read(draftFilterProvider.notifier)
-                        .setStatus('accepted'),
+                  ShadTab(
+                    value: 'accepted',
+                    content: _DraftTabContent(
+                      status: 'accepted',
+                      draftsStream: draftsStream,
+                      onRefresh: () => ref.invalidate(draftsStreamProvider),
+                    ),
+                    child: Text('${'draft.filter_accepted'.tr()} (${counts['accepted'] ?? 0})'),
                   ),
-                  _FilterChip(
-                    label: 'draft.filter_rejected'.tr(),
-                    count: counts['rejected'] ?? 0,
-                    isSelected: filter.status == 'rejected',
-                    onTap: () => ref
-                        .read(draftFilterProvider.notifier)
-                        .setStatus('rejected'),
+                  ShadTab(
+                    value: 'rejected',
+                    content: _DraftTabContent(
+                      status: 'rejected',
+                      draftsStream: draftsStream,
+                      onRefresh: () => ref.invalidate(draftsStreamProvider),
+                    ),
+                    child: Text('${'draft.filter_rejected'.tr()} (${counts['rejected'] ?? 0})'),
                   ),
                 ],
               ),
-            ),
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
-          ),
-
-          // Draft 리스트
-          Expanded(
-            child: filteredDraftsStream.when(
-              data: (drafts) {
-                if (drafts.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            AppIcons.sparkles,
-                            size: 64,
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            filter.status == 'all'
-                                ? 'draft.empty_message'.tr()
-                                : 'draft.empty_filter'.tr(),
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          if (filter.status == 'all') ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              'draft.empty_hint'.tr(),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  );
-                }
-
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    ref.invalidate(draftsStreamProvider);
-                  },
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: drafts.length,
-                    itemBuilder: (context, index) {
-                      final draft = drafts[index];
-                      return DraftCard(
-                        draft: draft,
-                        onUpdate: () {
-                          ref.invalidate(draftsStreamProvider);
-                        },
-                      );
-                    },
-                  ),
-                );
-              },
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ),
-              error: (error, stack) => Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        AppIcons.error,
-                        size: 64,
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'timeline.error_title'.tr(),
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        error.toString(),
-                        style:
-                            Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (_, __) => const Center(child: Text('Error loading counts')),
             ),
           ),
         ],
@@ -289,39 +194,183 @@ class _DraftsPageState extends ConsumerState<DraftsPage> {
   }
 }
 
-/// 필터 칩 위젯
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final int count;
-  final bool isSelected;
-  final VoidCallback onTap;
+/// Draft 탭 컨텐츠 위젯
+class _DraftTabContent extends StatefulWidget {
+  final String status;
+  final AsyncValue<List<dynamic>> draftsStream;
+  final VoidCallback onRefresh;
 
-  const _FilterChip({
-    required this.label,
-    required this.count,
-    required this.isSelected,
-    required this.onTap,
+  const _DraftTabContent({
+    required this.status,
+    required this.draftsStream,
+    required this.onRefresh,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+  State<_DraftTabContent> createState() => _DraftTabContentState();
+}
 
-    return FilterChip(
-      label: Text('$label ($count)'),
-      selected: isSelected,
-      onSelected: (_) => onTap(),
-      backgroundColor: isSelected
-          ? theme.colorScheme.primaryContainer
-          : theme.colorScheme.surfaceContainerHighest,
-      selectedColor: theme.colorScheme.primaryContainer,
-      labelStyle: TextStyle(
-        color: isSelected
-            ? theme.colorScheme.onPrimaryContainer
-            : theme.colorScheme.onSurface,
-        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+class _DraftTabContentState extends State<_DraftTabContent> {
+  static const _pageSize = 20;
+  final _scrollController = ScrollController();
+  int _displayLimit = _pageSize;
+  bool _isLoadingMore = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(_DraftTabContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 필터 변경 시 페이지네이션 리셋
+    if (oldWidget.status != widget.status) {
+      setState(() => _displayLimit = _pageSize);
+    }
+  }
+
+  void _onScroll() {
+    if (_isLoadingMore) return;
+
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    final threshold = maxScroll - 100; // 100px 전에 미리 로드
+
+    if (currentScroll >= threshold) {
+      _loadMore();
+    }
+  }
+
+  void _loadMore() {
+    setState(() => _isLoadingMore = true);
+
+    // 100ms 디바운스
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        setState(() {
+          _displayLimit += _pageSize;
+          _isLoadingMore = false;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.draftsStream.when(
+      data: (allDrafts) {
+        // 필터링
+        final filteredDrafts = widget.status == 'all'
+            ? allDrafts
+            : allDrafts.where((d) => d.status == widget.status).toList();
+
+        if (filteredDrafts.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    AppIcons.sparkles,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    widget.status == 'all'
+                        ? 'draft.empty_message'.tr()
+                        : 'draft.empty_filter'.tr(),
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  if (widget.status == 'all') ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      'draft.empty_hint'.tr(),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          );
+        }
+
+        // 무한 스크롤을 위한 슬라이싱
+        final displayedDrafts = filteredDrafts.take(_displayLimit).toList();
+        final hasMore = filteredDrafts.length > _displayLimit;
+
+        return RefreshIndicator(
+          onRefresh: () async {
+            widget.onRefresh();
+          },
+          child: ListView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.all(16),
+            itemCount: displayedDrafts.length + (hasMore ? 1 : 0),
+            itemBuilder: (context, index) {
+              if (index < displayedDrafts.length) {
+                final draft = displayedDrafts[index];
+                return DraftCard(
+                  draft: draft,
+                  onUpdate: widget.onRefresh,
+                );
+              } else {
+                // 로딩 인디케이터
+                return const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+            },
+          ),
+        );
+      },
+      loading: () => const Center(
+        child: CircularProgressIndicator(),
       ),
-      showCheckmark: false,
+      error: (error, stack) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                AppIcons.error,
+                size: 64,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'timeline.error_title'.tr(),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                error.toString(),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

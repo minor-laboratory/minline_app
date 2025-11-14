@@ -369,6 +369,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.11"
+  desktop_drop:
+    dependency: "direct main"
+    description:
+      name: desktop_drop
+      sha256: d55a010fe46c8e8fcff4ea4b451a9ff84a162217bdb3b2a0aa1479776205e15d
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.4"
   device_info_plus:
     dependency: "direct main"
     description:
@@ -401,6 +409,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  easy_image_viewer:
+    dependency: "direct main"
+    description:
+      name: easy_image_viewer
+      sha256: fb6cb123c3605552cc91150dcdb50ca977001dcddfb71d20caa0c5edc9a80947
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.5.1"
   easy_localization:
     dependency: "direct main"
     description:
@@ -1093,6 +1109,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  irondash_engine_context:
+    dependency: transitive
+    description:
+      name: irondash_engine_context
+      sha256: "086fbbcaef07b821b304b0371e472c687715f326219b69b18dc5c962dab09b55"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.1"
+  irondash_message_channel:
+    dependency: transitive
+    description:
+      name: irondash_message_channel
+      sha256: "081ff9631a2c6782a47ef4fdf9c97206053af1bb174e2a25851692b04f3bc126"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.1"
   isar_community:
     dependency: "direct main"
     description:
@@ -1581,6 +1613,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.6"
+  share_plus:
+    dependency: "direct main"
+    description:
+      name: share_plus
+      sha256: fce43200aa03ea87b91ce4c3ac79f0cecd52e2a7a56c7a4185023c271fbfa6da
+      url: "https://pub.dev"
+    source: hosted
+    version: "10.1.4"
+  share_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: share_plus_platform_interface
+      sha256: cc012a23fc2d479854e6c80150696c4a5f5bb62cb89af4de1c505cf78d0a5d0b
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.2"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -1842,6 +1890,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.10.3"
+  super_clipboard:
+    dependency: "direct main"
+    description:
+      name: super_clipboard
+      sha256: "81005aa8f3ebdbe9f3473cb1ddb188e34f5d8bf6d1fde855f55da8801f9ab608"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.7+6"
+  super_native_extensions:
+    dependency: transitive
+    description:
+      name: super_native_extensions
+      sha256: "14c91b510baa58135d11136c17feef802cff320e72f9f3d3673eb64baf901af2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.8+2"
   synchronized:
     dependency: "direct main"
     description:
