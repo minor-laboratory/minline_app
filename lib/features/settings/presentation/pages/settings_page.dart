@@ -126,6 +126,59 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('settings.title'.tr()),
+        actions: [
+          // 디자인 Variant 전환 버튼 (디버그용)
+          ValueListenableBuilder<ProfileDesignVariant>(
+            valueListenable: profileDesignVariantNotifier,
+            builder: (context, currentVariant, _) {
+              return PopupMenuButton<ProfileDesignVariant>(
+                icon: Icon(AppIcons.palette),
+                tooltip: 'settings.profile_design'.tr(),
+                onSelected: (variant) {
+                  profileDesignVariantNotifier.value = variant;
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: ProfileDesignVariant.instagram,
+                    child: Row(
+                      children: [
+                        if (currentVariant == ProfileDesignVariant.instagram)
+                          Icon(AppIcons.check, size: 16),
+                        if (currentVariant == ProfileDesignVariant.instagram)
+                          const SizedBox(width: 8),
+                        Text('settings.design_instagram'.tr()),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: ProfileDesignVariant.bear,
+                    child: Row(
+                      children: [
+                        if (currentVariant == ProfileDesignVariant.bear)
+                          Icon(AppIcons.check, size: 16),
+                        if (currentVariant == ProfileDesignVariant.bear)
+                          const SizedBox(width: 8),
+                        Text('settings.design_bear'.tr()),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: ProfileDesignVariant.notion,
+                    child: Row(
+                      children: [
+                        if (currentVariant == ProfileDesignVariant.notion)
+                          Icon(AppIcons.check, size: 16),
+                        if (currentVariant == ProfileDesignVariant.notion)
+                          const SizedBox(width: 8),
+                        Text('settings.design_notion'.tr()),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
       body: ListView(
         children: [

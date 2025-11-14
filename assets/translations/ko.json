@@ -1,6 +1,7 @@
 {
   "timeline": {
     "title": "타임라인",
+    "fragments": "Fragments",
     "empty_title": "아직 Fragment가 없습니다",
     "empty_message": "아래에서 짧은 생각을 입력해보세요",
     "empty_subtitle": "짧은 생각을 입력하면 AI가 자동으로 연결합니다",
@@ -102,6 +103,14 @@
   },
   "settings": {
     "title": "설정",
+    "profile_design": "프로필 디자인",
+    "design_instagram": "인스타그램 스타일",
+    "design_bear": "베어 스타일",
+    "design_notion": "노션 스타일",
+    "language_korean": "한국어",
+    "language_korean_desc": "한국어",
+    "language_english": "English",
+    "language_english_desc": "영어",
     "ux": "사용자 경험",
     "theme": "테마",
     "theme_description": "라이트/다크 모드 선택",

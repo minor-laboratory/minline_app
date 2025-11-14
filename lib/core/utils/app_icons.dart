@@ -33,6 +33,7 @@ class AppIcons {
   static const IconData save = LucideIcons.check;
   static const IconData cancel = LucideIcons.x;
   static const IconData share = LucideIcons.share_2;
+  static const IconData send = LucideIcons.send;
   static const IconData close = LucideIcons.x;
   static const IconData check = LucideIcons.check;
   static const IconData checkCircle = LucideIcons.circle_check;

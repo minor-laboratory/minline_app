@@ -1,6 +1,7 @@
 {
   "timeline": {
     "title": "Timeline",
+    "fragments": "Fragments",
     "empty_title": "No Fragments Yet",
     "empty_message": "Start by writing a short thought below",
     "empty_subtitle": "AI will automatically connect your thoughts",
@@ -102,6 +103,14 @@
   },
   "settings": {
     "title": "Settings",
+    "profile_design": "Profile Design",
+    "design_instagram": "Instagram Style",
+    "design_bear": "Bear Style",
+    "design_notion": "Notion Style",
+    "language_korean": "한국어",
+    "language_korean_desc": "Korean",
+    "language_english": "English",
+    "language_english_desc": "English",
     "ux": "User Experience",
     "theme": "Theme",
     "theme_description": "Choose light/dark mode",

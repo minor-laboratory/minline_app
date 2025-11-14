@@ -78,7 +78,7 @@ class LanguageSettingsSheet extends ConsumerWidget {
                     style: TextStyle(fontSize: 32),
                   ),
                   title: Text(
-                    '한국어',
+                    'settings.language_korean'.tr(),
                     style: ShadTheme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: (!useSystemLocale && selectedCode == 'ko') ||
                                   (useSystemLocale && selectedCode == 'ko')
@@ -86,7 +86,7 @@ class LanguageSettingsSheet extends ConsumerWidget {
                               : FontWeight.normal,
                         ),
                   ),
-                  subtitle: const Text('Korean'),
+                  subtitle: Text('settings.language_korean_desc'.tr()),
                   trailing: ((!useSystemLocale && selectedCode == 'ko') ||
                           (useSystemLocale && selectedCode == 'ko'))
                       ? Icon(
@@ -124,7 +124,7 @@ class LanguageSettingsSheet extends ConsumerWidget {
                     style: TextStyle(fontSize: 32),
                   ),
                   title: Text(
-                    'English',
+                    'settings.language_english'.tr(),
                     style: ShadTheme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: (!useSystemLocale && selectedCode == 'en') ||
                                   (useSystemLocale && selectedCode == 'en')
@@ -132,7 +132,7 @@ class LanguageSettingsSheet extends ConsumerWidget {
                               : FontWeight.normal,
                         ),
                   ),
-                  subtitle: const Text('English'),
+                  subtitle: Text('settings.language_english_desc'.tr()),
                   trailing: ((!useSystemLocale && selectedCode == 'en') ||
                           (useSystemLocale && selectedCode == 'en'))
                       ? Icon(
