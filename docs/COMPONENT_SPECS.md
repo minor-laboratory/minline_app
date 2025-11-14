@@ -112,13 +112,24 @@ Container(
 
 **텍스트 입력**:
 ```dart
-// 다줄 입력 (Textarea)
-ShadTextarea(
+// 단일 줄 입력 (자동 확장, 최대 3줄)
+ShadInput(
   controller: _contentController,
+  enabled: !_isLoading,
   placeholder: Text('snap.input_placeholder'.tr()),
-  minLines: 2,
-  maxLines: null,  // 자동 확장
-  maxLength: 300,  // MAX_LENGTH
+  minLines: 1,
+  maxLines: 3,
+  keyboardType: TextInputType.multiline,
+  onChanged: (value) {
+    // 300자 제한
+    if (value.length > _maxLength) {
+      _contentController.text = value.substring(0, _maxLength);
+      _contentController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _maxLength),
+      );
+    }
+    setState(() {});
+  },
 )
 ```
 
@@ -243,27 +254,29 @@ Container(
 )
 ```
 
-**SafeArea vs MediaQuery.padding:**
+**SafeArea 처리 (권장):**
 ```dart
-// ❌ SafeArea: 전체 컨테이너에 적용 (불필요한 공간)
-SafeArea(
+// ✅ SafeArea: 시스템 바 영역 자동 처리
+return SafeArea(
   child: Container(
-    padding: EdgeInsets.all(16),
-    child: FragmentInput(),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: colorScheme.surface,
+      border: Border(
+        top: BorderSide(color: colorScheme.outline.withValues(alpha: 0.2)),
+      ),
+    ),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // 입력 UI
+      ],
+    ),
   ),
-)
-
-// ✅ MediaQuery.padding: 필요한 곳에만 적용 (정확한 패딩)
-Container(
-  padding: EdgeInsets.only(
-    left: 16,
-    right: 16,
-    top: 16,
-    bottom: 16 + MediaQuery.of(context).padding.bottom,
-  ),
-  child: FragmentInput(),
-)
+);
 ```
+
+**이유:** SafeArea가 시스템 바, 노치 등을 자동으로 처리하므로 더 안전하고 간단합니다.
 
 **iOS vs Android:**
 - iOS: 홈 인디케이터 영역 약 34dp

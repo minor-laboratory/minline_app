@@ -120,16 +120,25 @@ ListView.builder(
 
 **특징:**
 - 채팅 앱 스타일 (하단 고정)
-- Scaffold의 `bottomNavigationBar` 사용
-- 키보드 올라올 때 자동 상승
+- `Column`의 마지막 자식으로 배치
+- `SafeArea`로 시스템 바 영역 처리
+- 키보드 올라올 때 자동 상승 (`resizeToAvoidBottomInset: true`)
 
 **구조:**
 ```dart
 Scaffold(
-  body: FragmentList(),
-  bottomNavigationBar: FragmentInputBar(),
+  resizeToAvoidBottomInset: true,
+  body: Column(
+    children: [
+      FilterBar(),           // 검색/필터 (상단 고정)
+      Expanded(child: FragmentList()),
+      FragmentInputBar(),    // 입력바 (하단 고정)
+    ],
+  ),
 )
 ```
+
+**이유:** `bottomNavigationBar` 대신 Column 사용 (FilterBar 추가, 키보드 가림 방지)
 
 ---
 
@@ -185,10 +194,10 @@ if (content.trim().isEmpty && images.isEmpty) {
 ### 입력 방식
 
 **텍스트:**
-- `TextField` (multiline)
-- `maxLength: 300`
-- `minLines: 2, maxLines: 5`
-- Enter: 줄바꿈, Shift+Enter: 저장 (선택사항)
+- `ShadInput` (multiline)
+- `minLines: 1, maxLines: 3`
+- 300자 제한 (`onChanged`에서 처리)
+- Enter: 줄바꿈 (저장은 버튼만)
 
 **이미지:**
 1. 📷 버튼 탭 → ImagePicker

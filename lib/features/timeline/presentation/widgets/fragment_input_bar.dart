@@ -47,7 +47,11 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
   /// 갤러리에서 이미지 선택
   Future<void> _pickImages() async {
     if (_selectedImages.length >= _maxImages) {
-      _showError('media.max_files_exceeded'.tr(namedArgs: {'count': _maxImages.toString()}));
+      _showError(
+        'media.max_files_exceeded'.tr(
+          namedArgs: {'count': _maxImages.toString()},
+        ),
+      );
       return;
     }
 
@@ -64,7 +68,11 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
       final imagesToSelect = images.take(availableSlots).toList();
 
       if (images.length > availableSlots) {
-        _showError('media.max_files_exceeded'.tr(namedArgs: {'count': _maxImages.toString()}));
+        _showError(
+          'media.max_files_exceeded'.tr(
+            namedArgs: {'count': _maxImages.toString()},
+          ),
+        );
       }
 
       // 선택된 이미지들의 크기 검증
@@ -133,7 +141,6 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
     setState(() => _isLoading = true);
 
     try {
-
       // Fragment ID 생성 (이미지 업로드 경로용)
       final fragmentId = const Uuid().v4();
 
@@ -209,42 +216,33 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
-    return Container(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 16,
-        bottom: 16 + bottomPadding,
-      ),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: colorScheme.outline.withValues(alpha: 0.2),
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          border: Border(
+            top: BorderSide(color: colorScheme.outline.withValues(alpha: 0.2)),
           ),
         ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 이미지 프리뷰
-          if (_selectedImages.isNotEmpty) ...[
-            _buildImagePreview(colorScheme),
-            const SizedBox(height: 12),
-          ],
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 이미지 프리뷰
+            if (_selectedImages.isNotEmpty) ...[
+              _buildImagePreview(colorScheme),
+              const SizedBox(height: 12),
+            ],
 
-          // 텍스트 입력
-          ConstrainedBox(
-            constraints: const BoxConstraints(
-              minHeight: 80,
-              maxHeight: 200,
-            ),
-            child: ShadTextarea(
+            // 텍스트 입력
+            ShadInput(
               controller: _contentController,
               enabled: !_isLoading,
               placeholder: Text('snap.input_placeholder'.tr()),
+              minLines: 1, // 기본 1줄
+              maxLines: 3, // 최대 3줄
+              keyboardType: TextInputType.multiline,
               onChanged: (value) {
                 // 300자 제한
                 if (value.length > _maxLength) {
@@ -256,27 +254,27 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
                 setState(() {});
               },
             ),
-          ),
 
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          // 액션 영역
-          Row(
-            children: [
-              // 이미지 추가 버튼
-              _buildImageButton(colorScheme),
-              const SizedBox(width: 8),
+            // 액션 영역
+            Row(
+              children: [
+                // 이미지 추가 버튼
+                _buildImageButton(colorScheme),
+                const SizedBox(width: 8),
 
-              // 글자수 표시
-              _buildCharCounter(colorScheme),
+                // 글자수 표시
+                _buildCharCounter(colorScheme),
 
-              const Spacer(),
+                const Spacer(),
 
-              // 저장 버튼
-              _buildSaveButton(colorScheme),
-            ],
-          ),
-        ],
+                // 저장 버튼
+                _buildSaveButton(colorScheme),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -360,7 +358,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
             if (_selectedImages.isNotEmpty) ...[
               const SizedBox(width: 6),
               Text(
-                '${ _selectedImages.length}/$_maxImages',
+                '${_selectedImages.length}/$_maxImages',
                 style: TextStyle(
                   fontSize: 12,
                   color: _isLoading

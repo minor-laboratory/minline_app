@@ -37,10 +37,13 @@ class _TimelinePageState extends ConsumerState<TimelinePage> {
     final fragmentsAsync = ref.watch(fragmentsStreamProvider);
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text(_viewMode == 'timeline'
-            ? 'timeline.title'.tr()
-            : 'calendar.title'.tr()),
+        title: Text(
+          _viewMode == 'timeline'
+              ? 'timeline.title'.tr()
+              : 'calendar.title'.tr(),
+        ),
         actions: [
           // 뷰 토글 버튼
           ShadIconButton.ghost(
@@ -88,16 +91,15 @@ class _TimelinePageState extends ConsumerState<TimelinePage> {
               children: [
                 const FilterBar(),
                 const Expanded(child: FragmentList()),
+                const FragmentInputBar(),
               ],
             )
           : fragmentsAsync.when(
               data: (fragments) => CalendarView(allFragments: fragments),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Center(
-                child: Text('timeline.error_title'.tr()),
-              ),
+              error: (error, stack) =>
+                  Center(child: Text('timeline.error_title'.tr())),
             ),
-      bottomNavigationBar: _viewMode == 'timeline' ? const FragmentInputBar() : null,
     );
   }
 }
