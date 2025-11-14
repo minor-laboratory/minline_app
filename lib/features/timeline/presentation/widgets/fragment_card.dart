@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
@@ -50,22 +51,31 @@ class FragmentCard extends StatelessWidget {
               children: fragment.mediaUrls.map((url) {
                 return ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    url,
+                  child: CachedNetworkImage(
+                    imageUrl: url,
                     width: 128,
                     height: 128,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 128,
-                        height: 128,
-                        color: colorScheme.surfaceContainerHighest,
-                        child: Icon(
-                          AppIcons.image,
-                          color: colorScheme.onSurfaceVariant,
+                    placeholder: (context, url) => Container(
+                      width: 128,
+                      height: 128,
+                      color: colorScheme.surfaceContainerHighest,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: colorScheme.primary,
                         ),
-                      );
-                    },
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      width: 128,
+                      height: 128,
+                      color: colorScheme.surfaceContainerHighest,
+                      child: Icon(
+                        AppIcons.image,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ),
                 );
               }).toList(),

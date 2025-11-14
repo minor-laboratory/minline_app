@@ -9,6 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../shared/widgets/standard_bottom_sheet.dart';
 import '../../../profile/widgets/user_profile_section.dart';
+import '../../providers/settings_provider.dart';
 import '../widgets/daily_reminder_sheet.dart';
 import '../widgets/draft_notification_sheet.dart';
 import '../widgets/language_settings_sheet.dart';
@@ -140,20 +141,61 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           // UX 설정 섹션
           _buildSectionHeader(context, 'settings.ux'.tr()),
 
-          ListTile(
-            leading: Icon(AppIcons.palette),
-            title: Text('settings.theme'.tr()),
-            subtitle: Text('settings.theme_description'.tr()),
-            trailing: Icon(AppIcons.chevronRight, size: 20),
-            onTap: _showThemeSettings,
+          Consumer(
+            builder: (context, ref, child) {
+              final themeModeAsync = ref.watch(themeModeProvider);
+              return themeModeAsync.when(
+                data: (themeMode) => ListTile(
+                  leading: Icon(AppIcons.palette),
+                  title: Text('settings.theme'.tr()),
+                  subtitle: Text(_getThemeModeLabel(themeMode)),
+                  trailing: Icon(AppIcons.chevronRight, size: 20),
+                  onTap: _showThemeSettings,
+                ),
+                loading: () => ListTile(
+                  leading: Icon(AppIcons.palette),
+                  title: Text('settings.theme'.tr()),
+                  trailing: Icon(AppIcons.chevronRight, size: 20),
+                  onTap: _showThemeSettings,
+                ),
+                error: (_, __) => ListTile(
+                  leading: Icon(AppIcons.palette),
+                  title: Text('settings.theme'.tr()),
+                  trailing: Icon(AppIcons.chevronRight, size: 20),
+                  onTap: _showThemeSettings,
+                ),
+              );
+            },
           ),
 
-          ListTile(
-            leading: Icon(AppIcons.language),
-            title: Text('settings.language'.tr()),
-            subtitle: Text('settings.language_description'.tr()),
-            trailing: Icon(AppIcons.chevronRight, size: 20),
-            onTap: _showLanguageSettings,
+          Consumer(
+            builder: (context, ref, child) {
+              final localeAsync = ref.watch(localeProvider);
+              return localeAsync.when(
+                data: (locale) {
+                  final currentLocale = locale ?? context.locale;
+                  return ListTile(
+                    leading: Icon(AppIcons.language),
+                    title: Text('settings.language'.tr()),
+                    subtitle: Text(_getLanguageLabel(currentLocale)),
+                    trailing: Icon(AppIcons.chevronRight, size: 20),
+                    onTap: _showLanguageSettings,
+                  );
+                },
+                loading: () => ListTile(
+                  leading: Icon(AppIcons.language),
+                  title: Text('settings.language'.tr()),
+                  trailing: Icon(AppIcons.chevronRight, size: 20),
+                  onTap: _showLanguageSettings,
+                ),
+                error: (_, __) => ListTile(
+                  leading: Icon(AppIcons.language),
+                  title: Text('settings.language'.tr()),
+                  trailing: Icon(AppIcons.chevronRight, size: 20),
+                  onTap: _showLanguageSettings,
+                ),
+              );
+            },
           ),
 
           ShadSeparator.horizontal(
@@ -247,5 +289,27 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         ),
       ),
     );
+  }
+
+  String _getThemeModeLabel(ThemeMode mode) {
+    switch (mode) {
+      case ThemeMode.system:
+        return 'settings.system_mode'.tr();
+      case ThemeMode.light:
+        return 'settings.light_mode'.tr();
+      case ThemeMode.dark:
+        return 'settings.dark_mode'.tr();
+    }
+  }
+
+  String _getLanguageLabel(Locale locale) {
+    switch (locale.languageCode) {
+      case 'ko':
+        return 'settings.language_korean'.tr();
+      case 'en':
+        return 'settings.language_english'.tr();
+      default:
+        return locale.languageCode;
+    }
   }
 }

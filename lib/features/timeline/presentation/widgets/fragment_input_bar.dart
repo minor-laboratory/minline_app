@@ -401,8 +401,11 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
 
   /// 저장 버튼
   Widget _buildSaveButton(ColorScheme colorScheme) {
+    final isEnabled = _isValid && !_isLoading;
+
     return ShadButton(
-      onPressed: _isValid && !_isLoading ? _save : null,
+      enabled: isEnabled,
+      onPressed: isEnabled ? _save : null,
       child: _isLoading
           ? Row(
               mainAxisSize: MainAxisSize.min,

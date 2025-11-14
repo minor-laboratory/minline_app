@@ -133,11 +133,14 @@ lib/
 │   ├── constants/               # 상수
 │   ├── utils/                   # 유틸리티
 │   │   ├── app_icons.dart       # 아이콘 매핑
-│   │   └── logger.dart          # 로깅
+│   │   ├── logger.dart          # 로깅
+│   │   ├── network_error_handler.dart  # 네트워크 에러 처리
+│   │   └── storage_utils.dart   # 스토리지 유틸
 │   └── services/                # 핵심 서비스
 │       ├── device_info_service.dart
 │       ├── share_handler_service.dart
 │       ├── notification_service.dart
+│       ├── local_change_tracker.dart  # 로컬 변경사항 추적
 │       └── sync/
 │           ├── isar_watch_service.dart
 │           ├── supabase_stream_service.dart

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -341,14 +342,11 @@ class UserProfileSection extends ConsumerWidget {
         child: SizedBox(
           width: 96,
           height: 96,
-          child: Image.network(
-            imageUrl,
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => defaultAvatar,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return defaultAvatar;
-            },
+            placeholder: (context, url) => defaultAvatar,
+            errorWidget: (context, url, error) => defaultAvatar,
           ),
         ),
       );
