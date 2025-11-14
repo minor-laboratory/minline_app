@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
@@ -41,8 +42,10 @@ void main() async {
       supportedLocales: const [Locale('ko'), Locale('en')],
       path: 'assets/translations',
       fallbackLocale: const Locale('ko'),
-      child: const ProviderScope(
-        child: MyApp(),
+      child: const KeyboardDismissOnTap(
+        child: ProviderScope(
+          child: MyApp(),
+        ),
       ),
     ),
   );
@@ -152,6 +155,9 @@ class _MyAppState extends ConsumerState<MyApp> {
                   localizationsDelegates: context.localizationDelegates,
                   supportedLocales: context.supportedLocales,
                   locale: localeAsync.value ?? context.locale,
+                  builder: (context, child) {
+                    return ShadAppBuilder(child: child!);
+                  },
                 );
               },
             );
@@ -189,6 +195,9 @@ class _MyAppState extends ConsumerState<MyApp> {
                 localizationsDelegates: context.localizationDelegates,
                 supportedLocales: context.supportedLocales,
                 locale: localeAsync.value ?? context.locale,
+                builder: (context, child) {
+                  return ShadAppBuilder(child: child!);
+                },
               );
             },
           );
@@ -226,6 +235,9 @@ class _MyAppState extends ConsumerState<MyApp> {
               localizationsDelegates: context.localizationDelegates,
               supportedLocales: context.supportedLocales,
               locale: context.locale,
+              builder: (context, child) {
+                return ShadAppBuilder(child: child!);
+              },
             );
           },
         );
