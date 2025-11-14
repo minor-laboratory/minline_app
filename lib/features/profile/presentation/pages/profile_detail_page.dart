@@ -11,6 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
+import '../../../../core/utils/storage_utils.dart';
 import '../../../auth/data/auth_repository.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../../widgets/logout_confirmation_bottom_sheet.dart';
@@ -301,7 +302,10 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
                         ? FileImage(_selectedImage!)
                         : currentPhotoUrl != null
                             ? NetworkImage(
-                                    'https://your-project.supabase.co/storage/v1/object/public/users/users/${ref.read(currentUserProvider)?.id}/$currentPhotoUrl',
+                                    StorageUtils.getUserPhotoUrl(
+                                      ref.read(currentUserProvider)?.id ?? '',
+                                      currentPhotoUrl,
+                                    ),
                                   )
                                   as ImageProvider
                             : null,

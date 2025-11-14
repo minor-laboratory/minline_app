@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
 
-import '../features/auth/presentation/pages/login_page.dart';
+import '../features/auth/presentation/pages/auth_page.dart';
 import '../features/drafts/presentation/pages/drafts_page.dart';
 import '../features/posts/presentation/pages/post_detail_page.dart';
 import '../features/posts/presentation/pages/posts_page.dart';
@@ -40,7 +40,7 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/auth',
       name: 'auth',
-      builder: (context, state) => const LoginPage(),
+      builder: (context, state) => const AuthPage(),
       routes: [
         // 비밀번호 재설정
         GoRoute(

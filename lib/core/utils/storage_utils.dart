@@ -18,6 +18,7 @@ class StorageUtils {
     final supabaseUrl = AppEnv.supabaseUrl;
 
     // 상대 경로를 전체 URL로 변환
-    return '$supabaseUrl/storage/v1/object/public/users/$userId/$photoPath';
+    // 버킷: users, 폴더 구조: users/{userId}/{filename}
+    return '$supabaseUrl/storage/v1/object/public/users/users/$userId/$photoPath';
   }
 }
