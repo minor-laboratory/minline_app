@@ -867,6 +867,13 @@ Row(
 
 ## 5. FilterBar (필터/정렬)
 
+> 검색, 태그 필터, 정렬 기능을 제공하는 Timeline 필터 바
+
+**언제 읽어야 하는가:**
+- Timeline 검색/필터 기능 구현 시
+- ShadInput 기반 검색 UI 참조 시
+- 태그 필터링 UI 확인 시
+
 ### 기본 정보
 
 - **파일**: `lib/features/timeline/presentation/widgets/filter_bar.dart`
@@ -875,47 +882,418 @@ Row(
 ### 레이아웃
 
 ```
-[🔍 검색] [🏷️ 태그] [📅 날짜] [↕ 정렬] [⟳]
+┌────────────────────────────────────────────────────┐
+│ [#태그1 ✕] [#태그2 ✕] 검색...  [정렬▼] [↕]      │
+└────────────────────────────────────────────────────┘
 ```
 
-### 상세 스펙
+### 구조
 
 ```dart
 Row(
   children: [
+    // 검색 입력 (태그 Pills 포함)
     Expanded(
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'filter.search_placeholder'.tr(),
-          prefixIcon: Icon(AppIcons.search),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+      child: Focus(
+        onKeyEvent: (node, event) {
+          // Backspace로 마지막 태그 삭제
+          if (event is KeyDownEvent &&
+              event.logicalKey == LogicalKeyboardKey.backspace &&
+              _searchController.text.isEmpty &&
+              filter.selectedTags.isNotEmpty) {
+            final lastTag = filter.selectedTags.last;
+            ref.read(fragmentFilterProvider.notifier).removeTag(lastTag);
+            return KeyEventResult.handled;
+          }
+          return KeyEventResult.ignored;
+        },
+        child: ShadInput(
+          controller: _searchController,
+          focusNode: _focusNode,
+          placeholder: filter.selectedTags.isEmpty
+              ? Text('filter.search_placeholder'.tr())
+              : null,
+          onChanged: (value) {
+            ref.read(fragmentFilterProvider.notifier).setQuery(value);
+          },
+          style: const TextStyle(fontSize: 14),
+          leading: filter.selectedTags.isNotEmpty
+              ? SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: filter.selectedTags.map((tag) {
+                      return Container(
+                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: colorScheme.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(9999),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(tag, style: TextStyle(fontSize: 12)),
+                            SizedBox(width: 2),
+                            GestureDetector(
+                              onTap: () => removeTag(tag),
+                              child: Icon(AppIcons.close, size: 12),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                )
+              : null,
         ),
       ),
     ),
     SizedBox(width: 8),
-    IconButton(
-      icon: Icon(AppIcons.filter),
-      onPressed: showFilterDialog,
-    ),
-    IconButton(
-      icon: Icon(AppIcons.calendar),
-      onPressed: showDatePicker,
-    ),
-    IconButton(
+
+    // 정렬 버튼
+    PopupMenuButton<String>(
       icon: Icon(AppIcons.sort),
-      onPressed: showSortMenu,
+      tooltip: 'filter.sort'.tr(),
+      onSelected: (value) {
+        ref.read(fragmentFilterProvider.notifier).setSortBy(value);
+      },
+      itemBuilder: (context) => [
+        _buildSortMenuItem('event', 'filter.sort_event'.tr()),
+        _buildSortMenuItem('created', 'filter.sort_created'.tr()),
+        _buildSortMenuItem('updated', 'filter.sort_updated'.tr()),
+      ],
     ),
-    IconButton(
-      icon: Icon(AppIcons.refresh),
-      onPressed: refresh,
+
+    // 정렬 방향 토글
+    ShadIconButton.ghost(
+      icon: Icon(
+        filter.sortOrder == 'desc' ? AppIcons.arrowDown : AppIcons.arrowUp,
+        size: 20,
+      ),
+      onPressed: () {
+        ref.read(fragmentFilterProvider.notifier).toggleSortOrder();
+      },
     ),
   ],
 )
 ```
 
+### 핵심 기능
+
+#### 1. 태그 Pills (인라인 태그 표시)
+
+선택된 태그를 검색창 내부 왼쪽에 pill 형태로 표시:
+
+```dart
+leading: filter.selectedTags.isNotEmpty
+    ? SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: filter.selectedTags.map((tag) {
+            return Container(
+              padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(9999), // rounded-full
+              ),
+              child: Row(
+                children: [
+                  Text(tag, style: TextStyle(fontSize: 12, color: colorScheme.primary)),
+                  SizedBox(width: 2),
+                  GestureDetector(
+                    onTap: () => ref.read(fragmentFilterProvider.notifier).removeTag(tag),
+                    child: Icon(AppIcons.close, size: 12, color: colorScheme.primary),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      )
+    : null,
+```
+
+#### 2. 키보드 단축키
+
+- **Backspace** (빈 입력창): 마지막 태그 삭제
+- **일반 입력**: 실시간 검색
+
+```dart
+Focus(
+  onKeyEvent: (node, event) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.backspace &&
+        _searchController.text.isEmpty &&
+        filter.selectedTags.isNotEmpty) {
+      final lastTag = filter.selectedTags.last;
+      ref.read(fragmentFilterProvider.notifier).removeTag(lastTag);
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  },
+  child: ShadInput(...),
+)
+```
+
+#### 3. 정렬 메뉴
+
+선택된 항목 표시:
+
+```dart
+PopupMenuItem<String> _buildSortMenuItem(String value, String label, bool isSelected) {
+  return PopupMenuItem<String>(
+    value: value,
+    child: Row(
+      children: [
+        Text(label),
+        if (isSelected) ...[
+          Spacer(),
+          Icon(AppIcons.checkCircle, size: 16, color: colorScheme.primary),
+        ],
+      ],
+    ),
+  );
+}
+```
+
+### 웹과의 차이점
+
+| 항목 | 웹 (miniline) | 앱 (miniline_app) |
+|------|--------------|------------------|
+| 검색 입력 | 일반 `<input>` | ShadInput |
+| 태그 Pills | bg-primary/10 | colorScheme.primary.withValues(alpha: 0.1) |
+| 정렬 UI | `<select>` 태그 | PopupMenuButton |
+| Border | rounded-md (6px) | 테마 radius (12px) |
+
 ---
 
-## 6. PostCreatePage (글 생성 화면)
+## 6. TagEditPage (태그 추가 페이지)
+
+> 모바일 텍스트 입력 원칙 준수: Dialog/Sheet 대신 페이지 사용
+
+**언제 읽어야 하는가:**
+- Fragment 태그 관리 구현 시
+- 사용자 태그 추가/편집 UI 확인 시
+- 모바일 텍스트 입력 패턴 참조 시
+
+### 기본 정보
+
+- **파일**: `lib/features/timeline/presentation/pages/tag_edit_page.dart`
+- **라우트**: `/tag/edit/:fragmentId`
+- **참조**: [MOBILE_DIALOG_SHEET_RULES.md](MOBILE_DIALOG_SHEET_RULES.md) - 텍스트 입력은 페이지로
+
+### 레이아웃
+
+```
+┌─────────────────────────────────────────┐
+│ ✕ 태그 추가                    [저장]   │ ← AppBar
+├─────────────────────────────────────────┤
+│ 이 스냅에 추가할 태그를 입력하세요       │ ← 설명
+│                                         │
+│ ┌─────────────────────────────────────┐│
+│ │ 태그 입력...                        ││ ← ShadInput (autofocus)
+│ └─────────────────────────────────────┘│
+│                                         │
+│ ┌─────────────────────────────────────┐│
+│ │ ℹ 태그는 스냅을 분류하고 필터링하는 ││ ← 힌트
+│ │   데 사용됩니다                     ││
+│ └─────────────────────────────────────┘│
+└─────────────────────────────────────────┘
+```
+
+### 상세 스펙
+
+#### AppBar
+
+```dart
+AppBar(
+  title: Text('tag.add_tag'.tr()),
+  leading: IconButton(
+    icon: Icon(AppIcons.close),
+    onPressed: () => context.pop(),
+  ),
+  actions: [
+    ShadButton(
+      enabled: _tagController.text.trim().isNotEmpty,
+      onPressed: _save,
+      child: Text('common.save'.tr()),
+    ),
+    SizedBox(width: 8),
+  ],
+)
+```
+
+#### 입력 필드
+
+```dart
+ShadInput(
+  controller: _tagController,
+  focusNode: _focusNode,
+  placeholder: Text('tag.add_tag_placeholder'.tr()),
+  onChanged: (value) => setState(() {}), // 저장 버튼 활성화 상태 업데이트
+  onSubmitted: (value) => _save(),
+)
+```
+
+#### 자동 포커스
+
+```dart
+@override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _focusNode.requestFocus();
+  });
+}
+```
+
+#### 저장 및 반환
+
+```dart
+void _save() {
+  final tag = _tagController.text.trim();
+  if (tag.isEmpty) return;
+  context.pop(tag);  // 결과 반환
+}
+```
+
+### FragmentCard 통합
+
+#### 태그 추가 페이지 열기
+
+```dart
+Future<void> _showAddTagPage() async {
+  logger.d('태그 추가 페이지 이동: ${widget.fragment.remoteID}');
+
+  final tag = await context.push<String>('/tag/edit/${widget.fragment.remoteID}');
+
+  logger.d('입력한 태그: $tag');
+  if (tag == null || tag.isEmpty) {
+    logger.d('태그 입력 취소됨');
+    return;
+  }
+
+  setState(() => _isLoading = true);
+
+  try {
+    final isar = DatabaseService.instance.isar;
+    logger.d('Isar 트랜잭션 시작 - Fragment ID: ${widget.fragment.id}');
+
+    await isar.writeTxn(() async {
+      // ⚠️ 중요: 트랜잭션 내부에서 다시 읽기 (Isar 필수)
+      final fragment = await isar.fragments.get(widget.fragment.id);
+      if (fragment == null) {
+        logger.e('Fragment를 찾을 수 없음: ${widget.fragment.id}');
+        return;
+      }
+
+      logger.d('현재 userTags: ${fragment.userTags}');
+
+      if (!fragment.userTags.contains(tag)) {
+        fragment.userTags.add(tag);
+        fragment.synced = false;
+        fragment.refreshAt = DateTime.now();
+        await isar.fragments.put(fragment);
+        logger.i('✅ 태그 추가 완료: $tag, 전체 태그: ${fragment.userTags}');
+      } else {
+        logger.d('이미 존재하는 태그: $tag');
+      }
+    });
+
+    logger.d('onUpdate 호출');
+    widget.onUpdate?.call();
+  } catch (e, stack) {
+    logger.e('태그 추가 실패', e, stack);
+  } finally {
+    setState(() => _isLoading = false);
+  }
+}
+```
+
+#### 태그 삭제
+
+```dart
+Future<void> _handleRemoveUserTag(String tag) async {
+  setState(() => _isLoading = true);
+
+  try {
+    final isar = DatabaseService.instance.isar;
+    await isar.writeTxn(() async {
+      // 트랜잭션 내부에서 다시 읽기 (Isar 필수)
+      final fragment = await isar.fragments.get(widget.fragment.id);
+      if (fragment == null) return;
+
+      fragment.userTags.removeWhere((t) => t == tag);
+      fragment.synced = false;
+      fragment.refreshAt = DateTime.now();
+      await isar.fragments.put(fragment);
+    });
+
+    widget.onUpdate?.call();
+  } catch (e, stack) {
+    logger.e('태그 삭제 실패', e, stack);
+  } finally {
+    setState(() => _isLoading = false);
+  }
+}
+```
+
+### Isar 트랜잭션 주의사항
+
+⚠️ **중요**: Isar에서 객체를 수정할 때는 **트랜잭션 내부에서 다시 읽어야** 합니다.
+
+**❌ 잘못된 방법**:
+```dart
+await isar.writeTxn(() async {
+  widget.fragment.userTags.add(tag); // Widget 객체 직접 수정
+  await isar.fragments.put(widget.fragment);
+});
+```
+
+**✅ 올바른 방법**:
+```dart
+await isar.writeTxn(() async {
+  final fragment = await isar.fragments.get(widget.fragment.id);
+  if (fragment == null) return;
+
+  fragment.userTags.add(tag);
+  fragment.synced = false;
+  fragment.refreshAt = DateTime.now();
+  await isar.fragments.put(fragment);
+});
+```
+
+### 웹과의 차이점
+
+| 항목 | 웹 (miniline) | 앱 (miniline_app) |
+|------|--------------|------------------|
+| 태그 추가 UI | 인라인 입력 (Sheet) | 전용 페이지 (TagEditPage) |
+| 키보드 처리 | 자동 | 자동 포커스 + Enter 저장 |
+| 태그 삭제 | Hover → X 버튼 | GestureDetector → X 버튼 |
+| 페이지 이동 | N/A | context.push('/tag/edit/:id') |
+
+### 모바일 원칙
+
+**❌ Dialog/Sheet 사용 금지**:
+```dart
+// 절대 금지!
+showShadDialog(
+  context: context,
+  builder: (context) => ShadDialog(
+    child: ShadInput(),  // 텍스트 입력 금지
+  ),
+);
+```
+
+**✅ 페이지 사용**:
+```dart
+// 올바른 방법
+final tag = await context.push<String>('/tag/edit/:fragmentId');
+```
+
+**이유**: [MOBILE_DIALOG_SHEET_RULES.md](MOBILE_DIALOG_SHEET_RULES.md) 참조 - 텍스트 입력은 키보드 관리와 UX 문제로 페이지로만 구현
+
+---
+
+## 7. PostCreatePage (글 생성 화면)
 
 ### 기본 정보
 

@@ -477,6 +477,184 @@ showShadSheet(
 | Post 작성 | 복잡한 입력 | 페이지 | 여러 필드 입력 |
 | 정렬 방식 | 단순 선택 | Sheet | 3-4개 옵션 선택 |
 | 알림 시간 | 시간 선택 | Sheet | TimePicker 사용 |
+| **태그 추가** | **텍스트 입력** | **페이지** | **실제 구현 예시** |
+
+### 실제 구현 예시: Fragment 태그 추가
+
+**참조**: [COMPONENT_SPECS.md - TagEditPage](COMPONENT_SPECS.md#6-tageditpage-태그-추가-페이지)
+
+#### 1. 라우트 정의
+
+```dart
+// lib/router/app_router.dart
+GoRoute(
+  path: '/',
+  name: 'timeline',
+  routes: [
+    GoRoute(
+      path: 'tag/edit/:fragmentId',
+      builder: (context, state) {
+        final fragmentId = state.pathParameters['fragmentId']!;
+        return TagEditPage(fragmentId: fragmentId);
+      },
+    ),
+  ],
+),
+```
+
+#### 2. 페이지 구현
+
+```dart
+// lib/features/timeline/presentation/pages/tag_edit_page.dart
+class TagEditPage extends StatefulWidget {
+  final String fragmentId;
+
+  const TagEditPage({super.key, required this.fragmentId});
+
+  @override
+  State<TagEditPage> createState() => _TagEditPageState();
+}
+
+class _TagEditPageState extends State<TagEditPage> {
+  final _tagController = TextEditingController();
+  final _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    // 페이지 진입 시 자동 포커스
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _tagController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final tag = _tagController.text.trim();
+    if (tag.isEmpty) return;
+
+    // 결과 반환하고 페이지 닫기
+    context.pop(tag);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('tag.add_tag'.tr()),
+        leading: IconButton(
+          icon: Icon(AppIcons.close),
+          onPressed: () => context.pop(),
+        ),
+        actions: [
+          ShadButton(
+            enabled: _tagController.text.trim().isNotEmpty,
+            onPressed: _save,
+            child: Text('common.save'.tr()),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'tag.add_tag_description'.tr(),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            ShadInput(
+              controller: _tagController,
+              focusNode: _focusNode,
+              placeholder: Text('tag.add_tag_placeholder'.tr()),
+              onChanged: (value) => setState(() {}),
+              onSubmitted: (value) => _save(),
+            ),
+
+            const SizedBox(height: 24),
+
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(AppIcons.info, size: 16, color: colorScheme.onSurfaceVariant),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'tag.hint'.tr(),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+#### 3. 호출 및 결과 처리
+
+```dart
+// lib/features/timeline/presentation/widgets/fragment_card.dart
+Future<void> _showAddTagPage() async {
+  final tag = await context.push<String>('/tag/edit/${widget.fragment.remoteID}');
+
+  if (tag != null && tag.isNotEmpty) {
+    final isar = DatabaseService.instance.isar;
+    await isar.writeTxn(() async {
+      // Isar 트랜잭션 내부에서 다시 읽기 (필수)
+      final fragment = await isar.fragments.get(widget.fragment.id);
+      if (fragment == null) return;
+
+      if (!fragment.userTags.contains(tag)) {
+        fragment.userTags.add(tag);
+        fragment.synced = false;
+        fragment.refreshAt = DateTime.now();
+        await isar.fragments.put(fragment);
+      }
+    });
+
+    widget.onUpdate?.call();
+  }
+}
+```
+
+**왜 페이지를 사용했는가?**
+- ✅ 텍스트 입력 필요 → 페이지 사용 원칙
+- ✅ 키보드가 자동으로 올라오고 관리됨
+- ✅ AppBar에 저장/취소 버튼 배치 가능
+- ✅ 추가 설명 텍스트와 힌트 표시 공간 확보
+- ✅ Enter 키로 저장, ESC/뒤로가기로 취소
+
+**Dialog/Sheet를 사용하지 않은 이유:**
+- ❌ 키보드가 Dialog를 가림
+- ❌ 저장/취소 버튼 배치가 어색함
+- ❌ 설명 텍스트 추가 공간 부족
+- ❌ 모바일 UX 가이드라인 위반
 
 ---
 

@@ -12,6 +12,7 @@ import '../features/profile/presentation/pages/account_withdrawal_page.dart';
 import '../features/profile/presentation/pages/password_change_page.dart';
 import '../features/profile/presentation/pages/profile_detail_page.dart';
 import '../features/settings/presentation/pages/settings_page.dart';
+import '../features/timeline/presentation/pages/tag_edit_page.dart';
 import '../features/timeline/presentation/pages/timeline_page.dart';
 
 /// Navigator Key for ShareHandlerService
@@ -35,6 +36,16 @@ final appRouter = GoRouter(
       path: '/',
       name: 'timeline',
       builder: (context, state) => const TimelinePage(),
+      routes: [
+        // 태그 추가
+        GoRoute(
+          path: 'tag/edit/:fragmentId',
+          builder: (context, state) {
+            final fragmentId = state.pathParameters['fragmentId']!;
+            return TagEditPage(fragmentId: fragmentId);
+          },
+        ),
+      ],
     ),
 
     // Auth

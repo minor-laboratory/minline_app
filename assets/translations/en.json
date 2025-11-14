@@ -16,7 +16,8 @@
     "sort_created": "Created time",
     "sort_updated": "Updated time",
     "sort_desc": "Newest first",
-    "sort_asc": "Oldest first"
+    "sort_asc": "Oldest first",
+    "remove_tag": "Remove tag"
   },
   "calendar": {
     "title": "Calendar",
@@ -271,8 +272,14 @@
   "tag": {
     "add_tag": "Add Tag",
     "add_tag_placeholder": "Enter tag...",
+    "add_tag_description": "Enter a tag to add to this snap",
+    "hint": "Tags are used to categorize and filter snaps",
     "hide": "Hide",
-    "remove_tag": "Remove"
+    "hide_tag": "Hide",
+    "remove_tag": "Remove",
+    "click_to_filter": "Click to filter",
+    "confirm_remove": "Are you sure you want to remove the {tag} tag?",
+    "confirm_hide": "Are you sure you want to hide the {tag} tag?"
   },
   "sync": {
     "waiting": "Waiting to sync"

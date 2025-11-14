@@ -8,20 +8,71 @@ import '../../../drafts/providers/drafts_provider.dart';
 import '../../providers/fragments_provider.dart';
 import 'fragment_card.dart';
 
-/// Fragment 리스트 위젯
+/// Fragment 리스트 위젯 (무한 스크롤)
 ///
 /// Timeline 화면의 메인 리스트
-class FragmentList extends ConsumerWidget {
+class FragmentList extends ConsumerStatefulWidget {
   const FragmentList({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FragmentList> createState() => _FragmentListState();
+}
+
+class _FragmentListState extends ConsumerState<FragmentList> {
+  static const int _pageSize = 30; // 웹과 동일
+  int _displayLimit = _pageSize;
+  bool _isLoadingMore = false;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isLoadingMore) return;
+
+    // 하단 100px 이내에 도달하면 더 로드
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 100) {
+      _loadMore();
+    }
+  }
+
+  void _loadMore() {
+    if (_isLoadingMore) return;
+
+    setState(() {
+      _isLoadingMore = true;
+    });
+
+    // 다음 프레임에서 로드 (UI 업데이트 우선)
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        setState(() {
+          _displayLimit += _pageSize;
+          _isLoadingMore = false;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final fragmentsAsync = ref.watch(filteredFragmentsProvider);
     final draftsAsync = ref.watch(draftsStreamProvider);
 
     return fragmentsAsync.when(
-      data: (fragments) {
-        if (fragments.isEmpty) {
+      data: (allFragments) {
+        if (allFragments.isEmpty) {
           return _buildEmptyState(context);
         }
 
@@ -35,18 +86,39 @@ class FragmentList extends ConsumerWidget {
           }
         });
 
+        // 표시할 fragments (페이지네이션)
+        final displayedFragments = allFragments.take(_displayLimit).toList();
+        final hasMore = allFragments.length > _displayLimit;
+
         return ListView.builder(
+          controller: _scrollController,
           padding: const EdgeInsets.only(
             top: 8,
             bottom: 100, // 하단 입력바 여유 공간
           ),
-          itemCount: fragments.length,
+          itemCount: displayedFragments.length + (hasMore ? 1 : 0),
           itemBuilder: (context, index) {
-            final fragment = fragments[index];
+            // 마지막 항목 + 더 많은 항목이 있으면 로딩 인디케이터
+            if (index == displayedFragments.length && hasMore) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: _isLoadingMore
+                      ? const CircularProgressIndicator()
+                      : const SizedBox.shrink(),
+                ),
+              );
+            }
+
+            final fragment = displayedFragments[index];
             final draft = draftMap[fragment.remoteID];
             return FragmentCard(
               fragment: fragment,
               draft: draft,
+              onTagClick: (tag) {
+                // 태그 필터 토글
+                ref.read(fragmentFilterProvider.notifier).toggleTag(tag);
+              },
             );
           },
         );

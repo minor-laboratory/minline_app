@@ -16,7 +16,8 @@
     "sort_created": "작성 시간순",
     "sort_updated": "수정 시간순",
     "sort_desc": "최신순",
-    "sort_asc": "오래된순"
+    "sort_asc": "오래된순",
+    "remove_tag": "{tag} 태그 제거"
   },
   "calendar": {
     "title": "캘린더",
@@ -272,8 +273,14 @@
   "tag": {
     "add_tag": "태그 추가",
     "add_tag_placeholder": "태그 입력...",
+    "add_tag_description": "이 스냅에 추가할 태그를 입력하세요",
+    "hint": "태그는 스냅을 분류하고 필터링하는데 사용됩니다",
     "hide": "숨기기",
-    "remove_tag": "삭제"
+    "hide_tag": "숨기기",
+    "remove_tag": "삭제",
+    "click_to_filter": "클릭하여 필터링",
+    "confirm_remove": "{tag} 태그를 삭제하시겠습니까?",
+    "confirm_hide": "{tag} 태그를 숨기시겠습니까?"
   },
   "sync": {
     "waiting": "동기화 대기 중"
