@@ -221,7 +221,7 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       appBar: _isSearchMode ? _buildSearchAppBar() : _buildDefaultAppBar(),
       body: PageView(
         controller: _pageController,

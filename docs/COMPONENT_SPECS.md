@@ -188,7 +188,11 @@ ListView.builder(
 
 - **파일**: `lib/features/timeline/presentation/widgets/fragment_input_bar.dart`
 - **웹 참조**: `miniline/src/lib/components/FragmentInput.svelte`
-- **위치**: Scaffold의 `bottomNavigationBar` 또는 `persistentFooter`
+- **위치**: Column의 마지막 자식으로 배치 (하단 고정)
+- **특징**:
+  - 앱 시작 시 자동 포커스 (설정 가능)
+  - KeyboardAnimationBuilder로 부드러운 애니메이션
+  - `resizeToAvoidBottomInset: false` 사용 (수동 레이아웃 제어)
 
 ### 레이아웃
 
@@ -311,6 +315,43 @@ ElevatedButton(
 
 ### 키보드 동작
 
+**자동 포커스**:
+```dart
+// MainPage에서 포커스 트리거 콜백 등록
+FragmentInputBar(
+  onRegisterFocusTrigger: (trigger) {
+    _timelineFocusTrigger = trigger;
+  },
+)
+
+// 앱 시작/포그라운드 진입 시
+void _handleAppResumed() async {
+  final enabled = await ref.read(autoFocusInputProvider.future);
+  if (enabled && _timelineFocusTrigger != null) {
+    _timelineFocusTrigger!.call();
+  }
+}
+```
+
+**KeyboardAnimationBuilder**:
+```dart
+// timeline_view.dart에서 사용
+KeyboardAnimationBuilder(
+  builder: (context, keyboardHeight) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: keyboardHeight),
+      child: Column(
+        children: [
+          Expanded(child: FragmentList()),
+          FragmentInputBar(),
+        ],
+      ),
+    );
+  },
+)
+```
+
+**Enter 키 동작**:
 ```dart
 // Enter: 저장
 // Shift+Enter: 줄바꿈 (자동 처리됨)

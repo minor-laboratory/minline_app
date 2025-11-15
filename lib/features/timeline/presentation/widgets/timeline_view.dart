@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../shared/widgets/keyboard_animation_builder.dart';
 import '../../providers/fragments_provider.dart';
 import 'calendar_view.dart';
 import 'fragment_input_bar.dart';
@@ -37,17 +38,24 @@ class _TimelineViewState extends ConsumerState<TimelineView>
     final fragmentsAsync = ref.watch(fragmentsStreamProvider);
 
     return widget.viewMode == 'timeline'
-        ? Column(
-            children: [
-              Expanded(
-                child: FragmentList(
-                  onEnterSearchMode: widget.onEnterSearchMode,
-                ),
-              ),
-              FragmentInputBar(
-                onRegisterFocusTrigger: widget.onRegisterFocusTrigger,
-              ),
-            ],
+        ? KeyboardAnimationBuilder(
+            builder: (context, keyboardHeight) {
+              return Column(
+                children: [
+                  Expanded(
+                    child: FragmentList(
+                      onEnterSearchMode: widget.onEnterSearchMode,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: keyboardHeight),
+                    child: FragmentInputBar(
+                      onRegisterFocusTrigger: widget.onRegisterFocusTrigger,
+                    ),
+                  ),
+                ],
+              );
+            },
           )
         : fragmentsAsync.when(
             data: (fragments) => CalendarView(allFragments: fragments),

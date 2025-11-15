@@ -282,22 +282,32 @@ lib/features/main/presentation/pages/main_page.dart (Timeline/Drafts/Posts 통�
 - [x] 이미지 첨부 (최대 3개)
 - [x] 이미지 프리뷰
 - [x] 저장 로직
+- [x] 앱 시작 시 입력 자동 활성화 (설정 가능)
+- [x] KeyboardAnimationBuilder로 부드러운 애니메이션
 
 **파일:**
 ```
 lib/features/timeline/presentation/widgets/
-└── fragment_input_bar.dart
+├── fragment_input_bar.dart ✅
+└── timeline_view.dart ✅ (KeyboardAnimationBuilder 적용)
+lib/shared/widgets/keyboard_animation_builder.dart ✅
+lib/features/settings/providers/settings_provider.dart ✅ (autoFocusInputProvider)
+lib/features/main/presentation/pages/main_page.dart ✅ (포커스 트리거)
+assets/translations/ko.json, en.json ✅ (settings.auto_focus_input)
 ```
 
 **참조:**
 - [../miniline/src/lib/components/FragmentInput.svelte](../miniline/src/lib/components/FragmentInput.svelte) (웹 참조)
 - [docs/DESIGN_UI.md](DESIGN_UI.md) - FragmentInputBar 섹션
+- [docs/COMPONENT_SPECS.md](COMPONENT_SPECS.md) - FragmentInputBar 상세 스펙
 
 **검증:**
-- 텍스트 입력 → 저장 → Timeline 표시
-- 이미지 첨부 → 업로드 → Timeline 표시
-- 글자수/이미지 개수 제한 확인
-- 오프라인 저장 확인
+- 텍스트 입력 → 저장 → Timeline 표시 ✅
+- 이미지 첨부 → 업로드 → Timeline 표시 ✅
+- 글자수/이미지 개수 제한 확인 ✅
+- 오프라인 저장 확인 ✅
+- 앱 시작/포그라운드 진입 시 자동 포커스 ✅
+- 키보드 부드러운 애니메이션 확인 ✅
 
 ### 2.3 Drafts 화면 ✅ 완료
 

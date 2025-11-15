@@ -331,10 +331,12 @@ else
 
 **앱**: 하단 고정 입력바 (채팅 스타일)
 ```dart
-// miniline_app/lib/features/timeline/widgets/fragment_input_bar.dart
-Scaffold(
-  body: ListView(...),
-  bottomNavigationBar: FragmentInputBar(), // 하단 고정
+// miniline_app/lib/features/timeline/presentation/widgets/fragment_input_bar.dart
+Column(
+  children: [
+    Expanded(child: FragmentList()),
+    FragmentInputBar(), // 하단 고정
+  ],
 )
 ```
 
@@ -381,7 +383,7 @@ MainPage(
 
 **앱**: ImagePicker + 갤러리/카메라
 ```dart
-// miniline_app/lib/features/timeline/widgets/fragment_input_bar.dart
+// miniline_app/lib/features/timeline/presentation/widgets/fragment_input_bar.dart
 final images = await ImagePicker().pickMultiImage();
 // 또는
 final photo = await ImagePicker().pickImage(source: ImageSource.camera);

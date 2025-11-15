@@ -226,6 +226,10 @@ lib/
 │
 └── shared/
     ├── widgets/                 # 공통 위젯
+    │   ├── keyboard_animation_builder.dart  # 키보드 애니메이션
+    │   ├── standard_bottom_sheet.dart       # 북랩 패턴
+    │   ├── responsive_modal_sheet.dart      # 북랩 패턴
+    │   └── user_avatar_button.dart
     └── theme/                   # 테마 설정
         └── app_theme.dart       # minorlab_common 기반
 ```

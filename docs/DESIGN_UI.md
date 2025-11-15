@@ -192,23 +192,29 @@ ListView.builder(
 - 채팅 앱 스타일 (하단 고정)
 - `Column`의 마지막 자식으로 배치
 - `SafeArea`로 시스템 바 영역 처리
-- 키보드 올라올 때 자동 상승 (`resizeToAvoidBottomInset: true`)
+- KeyboardAnimationBuilder로 부드러운 애니메이션 (`resizeToAvoidBottomInset: false`)
 
 **구조:**
 ```dart
 Scaffold(
-  resizeToAvoidBottomInset: true,
-  body: Column(
-    children: [
-      FilterBar(),           // 검색/필터 (상단 고정)
-      Expanded(child: FragmentList()),
-      FragmentInputBar(),    // 입력바 (하단 고정)
-    ],
+  resizeToAvoidBottomInset: false,
+  body: KeyboardAnimationBuilder(
+    builder: (context, keyboardHeight) {
+      return Column(
+        children: [
+          Expanded(child: FragmentList()),
+          Padding(
+            padding: EdgeInsets.only(bottom: keyboardHeight),
+            child: FragmentInputBar(),
+          ),
+        ],
+      );
+    },
   ),
 )
 ```
 
-**이유:** `bottomNavigationBar` 대신 Column 사용 (FilterBar 추가, 키보드 가림 방지)
+**이유:** `bottomNavigationBar` 대신 Column 사용 (FilterBar 추가, KeyboardAnimationBuilder로 수동 레이아웃 제어)
 
 ---
 
@@ -580,8 +586,18 @@ FragmentCard(
 
 ### 키보드
 
+**입력 자동 활성화**:
+- 앱 시작 시 자동으로 입력창 포커스 (설정 가능)
+- Settings → 입력 자동 활성화 토글
+- 앱 재시작/포그라운드 진입 시 적용
+
+**KeyboardAnimationBuilder**:
+- 키보드 애니메이션을 부드럽게 처리
+- `DartPerformanceMode.latency` 사용
+- 서브픽셀 jank 방지 (0.5px 단위 반올림)
+
 **입력 중:**
-- 키보드 올라올 때 입력바 자동 상승
+- 키보드 올라올 때 입력바 자동 상승 (부드러운 애니메이션)
 - 리스트 스크롤 유지
 
 **완료 시:**
@@ -617,7 +633,7 @@ Container(
 1. **하드코딩된 색상/텍스트** → 테마 시스템, `.tr()` 사용
 2. **고정 높이 입력창** → 동적 높이 조정 필요
 3. **이미지 업로드 실패 시 저장 차단** → 로컬 저장 우선
-4. **키보드 올라올 때 레이아웃 깨짐** → `resizeToAvoidBottomInset: true`
+4. **키보드 올라올 때 레이아웃 깨짐** → KeyboardAnimationBuilder 사용 (`resizeToAvoidBottomInset: false`)
 5. **Pull to refresh 없음** → 수동 새로고침 방법 제공 필요
 
 ---
