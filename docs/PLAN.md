@@ -312,7 +312,9 @@ lib/features/drafts/
 │   ├── pages/
 │   │   ├── drafts_page.dart
 │   │   └── draft_detail_page.dart
-│   └── widgets/draft_card.dart
+│   └── widgets/
+│       ├── draft_card.dart
+│       └── draft_card_actions.dart
 └── providers/drafts_provider.dart
 ```
 
@@ -378,8 +380,11 @@ pubspec.yaml (flutter_markdown: ^0.7.4+1) ✅
 lib/features/posts/presentation/pages/post_create_page.dart ✅
 lib/core/constants/post_templates.dart ✅
 lib/features/posts/presentation/pages/post_detail_page.dart (신규 기능 추가) ✅
-lib/router/app_router.dart (previousVersionId 쿼리 파라미터) ✅
-assets/translations/ko.json, en.json (template.*, post.* 키 추가) ✅
+lib/features/feedback/presentation/pages/feedback_page.dart ✅
+lib/core/services/feedback_service.dart ✅
+lib/core/constants/feedback_templates.dart ✅
+lib/router/app_router.dart (previousVersionId 쿼리 파라미터, feedback 라우트) ✅
+assets/translations/ko.json, en.json (template.*, post.*, feedback.* 키 추가) ✅
 pubspec.yaml (share_plus: ^10.1.4) ✅
 ```
 
