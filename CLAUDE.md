@@ -146,18 +146,20 @@ lib/
 │   │   ├── network_error_handler.dart  # 네트워크 에러 처리
 │   │   └── storage_utils.dart   # 스토리지 유틸
 │   └── services/                # 핵심 서비스
-│       ├── device_info_service.dart
+│       ├── device_info_service.dart          # Singleton + keepAlive Provider
 │       ├── device_info_provider.dart
-│       ├── share_handler_service.dart
+│       ├── share_handler_service.dart        # Singleton + keepAlive Provider
 │       ├── share_handler_provider.dart
-│       ├── local_notification_service.dart
-│       ├── fcm_service.dart
+│       ├── local_notification_service.dart   # Singleton (Provider 없음)
+│       ├── fcm_service.dart                  # Singleton (Provider 없음)
 │       ├── feedback_service.dart
-│       ├── local_change_tracker.dart  # 로컬 변경사항 추적
+│       ├── local_change_tracker.dart
 │       └── sync/
-│           ├── isar_watch_sync_service.dart
-│           ├── supabase_stream_service.dart
-│           ├── lifecycle_service.dart
+│           ├── isar_watch_sync_service.dart           # keepAlive Provider
+│           ├── isar_watch_sync_service_provider.dart
+│           ├── supabase_stream_service.dart           # keepAlive Provider
+│           ├── supabase_stream_service_provider.dart
+│           ├── lifecycle_service.dart                 # Singleton (ref.read() 사용)
 │           └── sync_metadata_service.dart
 │
 ├── models/                      # Isar 데이터 모델
@@ -210,21 +212,21 @@ class Base {
 ## 동기화 아키텍처
 
 **패턴**: 북랩 3-서비스 구조 동일 ([참조](../minorlab_book/lib/core/services/sync/))
-1. **IsarWatchSyncService**: 로컬 변경 감지 → 업로드 (Riverpod Provider)
-2. **SupabaseStreamService**: Realtime 구독 → 다운로드 (Singleton 패턴)
-3. **LifecycleService**: 앱 재시작 시 동기화 (Singleton 패턴)
+1. **IsarWatchSyncService**: 로컬 변경 감지 → 업로드 (`@Riverpod(keepAlive: true)` Provider)
+2. **SupabaseStreamService**: Realtime 구독 → 다운로드 (`@Riverpod(keepAlive: true)` Provider)
+3. **LifecycleService**: 앱 생명주기 관리 (Singleton 패턴, `ref.read()`로 서비스 접근)
 
-**중요**: SupabaseStreamService는 Singleton 패턴 필수
-- Why: LifecycleService가 인스턴스를 직접 저장 및 재사용 (중복 생성 방지)
-- How: Factory constructor로 `_instance` 반환
-- Riverpod Provider 사용하지 않음 (Provider는 매번 새 인스턴스 생성)
+**중요**: 모든 동기화 서비스는 `keepAlive` Provider로 관리
+- Why: 앱 생명주기 동안 인스턴스 유지 (중복 생성 방지)
+- How: `@Riverpod(keepAlive: true)` 사용, LifecycleService에서 `ref.read()`로 접근
+- Singleton 패턴 제거됨 (Riverpod이 인스턴스 관리)
 
 **초기화 순서**:
-1. LifecycleService.initialize() 호출 (main.dart)
+1. LifecycleService.initialize(ref) 호출 (main.dart)
 2. Auth 상태 확인: 이미 로그인되어 있으면 _onUserLoggedIn() 즉시 실행
-3. _onUserLoggedIn()에서 SupabaseStreamService 인스턴스 생성 및 저장
-4. _updateSyncServices()에서 조건 확인 후 _startAllServices() 호출
-5. 저장된 인스턴스로 startListening() 실행
+3. _updateSyncServices()에서 조건 확인 후 _startAllServices() 호출
+4. `ref.read(supabaseStreamServiceProvider).startListening()` 실행 (Provider를 통한 접근)
+5. `ref.read(isarWatchSyncServiceProvider).start()` 실행
 
 **❌ 동기화 실패 시 저장 차단**
 ```dart
@@ -275,6 +277,39 @@ class MyWidget extends ConsumerWidget {
   }
 }
 ```
+
+**Service 패턴** (앱 생명주기 동안 유지):
+```dart
+// 1. Service 클래스 (Singleton 패턴 - 선택 사항)
+class MyService {
+  static final MyService _instance = MyService._internal();
+  factory MyService() => _instance;
+  MyService._internal();
+
+  Future<void> start() async { /* ... */ }
+  void dispose() { /* ... */ }
+}
+
+// 2. keepAlive Provider 정의
+@Riverpod(keepAlive: true)
+MyService myService(Ref ref) {
+  final service = MyService();
+  ref.onDispose(() => service.dispose());
+  return service;
+}
+
+// 3. 사용 (LifecycleService 등)
+class LifecycleService {
+  WidgetRef? _ref;
+
+  void start() {
+    // Provider를 통해 접근 (인스턴스 재사용 보장)
+    _ref!.read(myServiceProvider).start();
+  }
+}
+```
+
+**중요**: keepAlive Provider는 앱 종료까지 인스턴스 유지 (Singleton 역할)
 
 ### Isar
 

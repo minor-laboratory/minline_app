@@ -108,22 +108,33 @@ class Fragment extends Base {
 let syncQueue = $state([]);
 ```
 
-**앱**: Singleton + Riverpod (혼합)
+**앱**: Riverpod keepAlive Provider (통일)
 ```dart
-// miniline_app/lib/core/services/sync/supabase_stream_service.dart
-// SupabaseStreamService는 Singleton 패턴 사용 (Riverpod Provider 아님)
-// Why: LifecycleService가 인스턴스를 직접 관리 (중복 생성 방지)
-class SupabaseStreamService {
-  static SupabaseStreamService? _instance;
-  factory SupabaseStreamService() {
-    _instance ??= SupabaseStreamService._();
-    return _instance!;
-  }
+// miniline_app/lib/core/services/sync/supabase_stream_service_provider.dart
+// 모든 동기화 서비스는 keepAlive Provider로 관리
+@Riverpod(keepAlive: true)
+SupabaseStreamService supabaseStreamService(Ref ref) {
+  final service = SupabaseStreamService();
+  ref.onDispose(() => service.dispose());
+  return service;
 }
 
-// miniline_app/lib/core/services/sync/isar_watch_sync_service.dart
-// IsarWatchSyncService는 Riverpod Provider 사용
-final isarWatchSyncServiceProvider = Provider<IsarWatchSyncService>(...);
+// miniline_app/lib/core/services/sync/isar_watch_sync_service_provider.dart
+@Riverpod(keepAlive: true)
+IsarWatchSyncService isarWatchSyncService(Ref ref) {
+  final service = IsarWatchSyncService();
+  ref.onDispose(() => service.stop());
+  return service;
+}
+
+// miniline_app/lib/core/services/sync/lifecycle_service.dart
+// LifecycleService가 ref.read()로 Provider 접근
+class LifecycleService {
+  void _startAllServices() {
+    _ref!.read(supabaseStreamServiceProvider).startListening();
+    _ref!.read(isarWatchSyncServiceProvider).start();
+  }
+}
 ```
 
 **공통점**:
@@ -132,8 +143,8 @@ final isarWatchSyncServiceProvider = Provider<IsarWatchSyncService>(...);
 - 충돌 해결 (서버 우선)
 
 **중요한 차이**:
-- **SupabaseStreamService**: Singleton 필수 (LifecycleService가 인스턴스 저장/재사용)
-- **IsarWatchSyncService**: Riverpod Provider 사용 (상태 관리 필요)
+- **웹**: Svelte 5 Runes로 반응형 상태 관리
+- **앱**: Riverpod keepAlive Provider로 인스턴스 생명주기 관리 (Singleton 패턴 제거)
 
 ### 테마 시스템
 

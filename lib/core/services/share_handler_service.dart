@@ -105,4 +105,10 @@ class ShareHandlerService {
 
     logger.w('[ShareHandler] No valid data in shared media');
   }
+
+  /// 서비스 정리
+  void dispose() {
+    logger.i('[ShareHandler] Disposing share handler service');
+    // ShareHandlerPlatform.instance의 stream은 자동으로 정리됨
+  }
 }

@@ -176,20 +176,21 @@ supabase
 ### Database Stream 방식 (권장)
 
 ```dart
-// 1. SupabaseStreamService (Singleton 패턴)
+// 1. SupabaseStreamService (Riverpod keepAlive Provider)
 class SupabaseStreamService {
-  static SupabaseStreamService? _instance;
-  factory SupabaseStreamService() {
-    _instance ??= SupabaseStreamService._();
-    return _instance!;
-  }
+  final SupabaseClient _supabase = Supabase.instance.client;
+  StreamSubscription<List<Map<String, dynamic>>>? _fragmentStreamSubscription;
+  bool _isListening = false;
 
   Future<void> startListening() async {
+    if (_isListening) return;
+    _isListening = true;
+
     // 마지막 동기화 시간 저장
     final lastSync = await SyncMetadataService.getLastSyncTime('fragments');
 
     // 서버 사이드 필터링 스트림 구독
-    _fragmentStreamSubscription = supabase
+    _fragmentStreamSubscription = _supabase
       .from('fragments')
       .stream(primaryKey: ['id'])
       .gt('updated_at', lastSync.toIso8601String())  // 서버 필터링
@@ -211,30 +212,44 @@ class SupabaseStreamService {
   }
 }
 
-// 2. LifecycleService가 인스턴스 관리
-class LifecycleService {
-  SupabaseStreamService? _supabaseStreamService;
+// 2. Riverpod Provider 정의 (keepAlive: true)
+@Riverpod(keepAlive: true)
+SupabaseStreamService supabaseStreamService(Ref ref) {
+  final service = SupabaseStreamService();
+  ref.onDispose(() => service.dispose());
+  return service;
+}
 
-  void _onUserLoggedIn() {
-    // 싱글톤 인스턴스 생성 및 저장
-    _supabaseStreamService = SupabaseStreamService();
+// 3. LifecycleService가 Provider를 통해 접근
+class LifecycleService {
+  WidgetRef? _ref;
+
+  Future<void> initialize(WidgetRef ref) async {
+    _ref = ref;
+    // ... 초기화 로직
   }
 
   void _startAllServices() {
-    // 저장된 인스턴스 사용 (중복 생성 방지)
-    _supabaseStreamService?.startListening();
+    if (_ref == null) return;
+
+    // keepAlive Provider를 통해 접근 (인스턴스 재사용 보장)
+    _ref!.read(supabaseStreamServiceProvider).startListening();
+    _ref!.read(isarWatchSyncServiceProvider).start();
   }
 
   void _stopAllServices() {
-    // 저장된 인스턴스 사용
-    _supabaseStreamService?.stopListening();
+    if (_ref == null) return;
+
+    // 동일한 인스턴스 접근
+    _ref!.read(supabaseStreamServiceProvider).stopListening();
+    _ref!.read(isarWatchSyncServiceProvider).stop();
   }
 }
 ```
 
 **핵심 요소**:
-1. **Singleton 패턴**: SupabaseStreamService는 Singleton (중복 생성 방지)
-2. **인스턴스 관리**: LifecycleService가 `_supabaseStreamService` 필드에 저장
+1. **keepAlive Provider**: 앱 생명주기 동안 인스턴스 유지 (Singleton 대체)
+2. **ref.read() 접근**: LifecycleService가 Provider를 통해 서비스 접근 (필드 저장 불필요)
 3. **타임스탬프 필터링**: `gt('updated_at', lastSync)` → 증분 업데이트만
 4. **RLS 자동 적용**: 서버에서 user_id 필터링
 5. **메타데이터 관리**: 마지막 동기화 시간 저장
