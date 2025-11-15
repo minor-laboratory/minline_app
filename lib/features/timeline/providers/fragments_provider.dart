@@ -197,8 +197,32 @@ Stream<List<Fragment>> filteredFragments(Ref ref) async* {
   // AsyncValue가 로딩 중이면 기본값 사용 (UI 깜빡임 방지)
   final filter = filterAsync.asData?.value ?? const FragmentFilterState();
 
-  // 필터링 및 정렬 로직을 함수로 추출
-  List<Fragment> filterAndSort(List<Fragment> fragments) {
+  // Isar에서 정렬된 데이터 가져오기 (성능 최적화)
+  Future<List<Fragment>> fetchSortedFragments() async {
+    var query = isar.fragments.filter().deletedEqualTo(false);
+
+    // Isar에서 정렬 처리 (인덱스 활용)
+    List<Fragment> fragments;
+    if (filter.sortBy == 'created') {
+      fragments = filter.sortOrder == 'desc'
+          ? await query.sortByCreatedAtDesc().findAll()
+          : await query.sortByCreatedAt().findAll();
+    } else if (filter.sortBy == 'updated') {
+      fragments = filter.sortOrder == 'desc'
+          ? await query.sortByUpdatedAtDesc().findAll()
+          : await query.sortByUpdatedAt().findAll();
+    } else {
+      // event (기본값)
+      fragments = filter.sortOrder == 'desc'
+          ? await query.sortByEventTimeDesc().findAll()
+          : await query.sortByEventTime().findAll();
+    }
+
+    return fragments;
+  }
+
+  // Dart에서 검색어/태그 필터링 (전체 텍스트 검색은 Isar 한계)
+  List<Fragment> applyDartFilters(List<Fragment> fragments) {
     var result = fragments;
 
     // 검색어 필터링
@@ -217,44 +241,16 @@ Stream<List<Fragment>> filteredFragments(Ref ref) async* {
       }).toList();
     }
 
-    // 정렬
-    result.sort((a, b) {
-      DateTime aTime, bTime;
-
-      if (filter.sortBy == 'created') {
-        aTime = a.createdAt;
-        bTime = b.createdAt;
-      } else if (filter.sortBy == 'updated') {
-        aTime = a.updatedAt;
-        bTime = b.updatedAt;
-      } else {
-        // event (기본값)
-        aTime = a.eventTime;
-        bTime = b.eventTime;
-      }
-
-      final diff = aTime.compareTo(bTime);
-      return filter.sortOrder == 'desc' ? -diff : diff;
-    });
-
     return result;
   }
 
   // 초기값 먼저 방출
-  final initialFragments = await isar.fragments
-      .filter()
-      .deletedEqualTo(false)
-      .findAll();
-
-  yield filterAndSort(initialFragments);
+  final initialFragments = await fetchSortedFragments();
+  yield applyDartFilters(initialFragments);
 
   // watchLazy로 변경 이벤트만 감지
   await for (final _ in isar.fragments.watchLazy()) {
-    final fragments = await isar.fragments
-        .filter()
-        .deletedEqualTo(false)
-        .findAll();
-
-    yield filterAndSort(fragments);
+    final fragments = await fetchSortedFragments();
+    yield applyDartFilters(fragments);
   }
 }
