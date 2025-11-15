@@ -202,11 +202,23 @@ Stream<List<Fragment>> filteredFragments(Ref ref) async* {
     var query = isar.fragments.filter().deletedEqualTo(false);
 
     // 검색어 필터링 (Isar Full Text Search)
+    // Filter에서도 인덱스가 있으면 자동으로 활용됨
     if (filter.query.isNotEmpty) {
-      query = query.contentMatches(filter.query, caseSensitive: false);
+      final words = Isar.splitWords(filter.query);
+      if (words.isNotEmpty) {
+        // OR 조건: 단어 중 하나라도 매칭되면 표시
+        query = query.group((q) {
+          var condition = q.contentWordsElementStartsWith(words.first, caseSensitive: false);
+          for (var i = 1; i < words.length; i++) {
+            condition = condition.or().contentWordsElementStartsWith(words[i], caseSensitive: false);
+          }
+          return condition;
+        });
+      }
     }
 
     // 태그 필터링 (Isar 인덱스 활용)
+    // 검색어와 AND 조건으로 결합
     if (filter.selectedTags.isNotEmpty) {
       query = query.group((q) => q
         .anyOf(filter.selectedTags, (q, tag) => q.tagsElementEqualTo(tag))

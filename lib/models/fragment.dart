@@ -13,8 +13,7 @@ class Fragment extends Base {
   @Name('user_id')
   String? userId;
 
-  /// 텍스트 콘텐츠 (전체 텍스트 검색 인덱스)
-  @Index(type: IndexType.value, caseSensitive: false)
+  /// 텍스트 콘텐츠
   String content = '';
 
   /// 미디어 URL 배열
@@ -47,6 +46,10 @@ class Fragment extends Base {
   @Index(type: IndexType.value)
   @Name('user_tags')
   List<String> userTags = [];
+
+  /// 전체 텍스트 검색용 단어 인덱스 (Isar.splitWords 사용)
+  @Index(type: IndexType.value, caseSensitive: false)
+  List<String> get contentWords => Isar.splitWords(content);
 
   /// 기본 생성자 - Isar requires
   Fragment();
