@@ -197,9 +197,23 @@ Stream<List<Fragment>> filteredFragments(Ref ref) async* {
   // AsyncValue가 로딩 중이면 기본값 사용 (UI 깜빡임 방지)
   final filter = filterAsync.asData?.value ?? const FragmentFilterState();
 
-  // Isar에서 정렬된 데이터 가져오기 (성능 최적화)
-  Future<List<Fragment>> fetchSortedFragments() async {
+  // Isar에서 모든 필터링/정렬 처리 (성능 최적화)
+  Future<List<Fragment>> fetchFilteredAndSortedFragments() async {
     var query = isar.fragments.filter().deletedEqualTo(false);
+
+    // 검색어 필터링 (Isar Full Text Search)
+    if (filter.query.isNotEmpty) {
+      query = query.contentMatches(filter.query, caseSensitive: false);
+    }
+
+    // 태그 필터링 (Isar 인덱스 활용)
+    if (filter.selectedTags.isNotEmpty) {
+      query = query.group((q) => q
+        .anyOf(filter.selectedTags, (q, tag) => q.tagsElementEqualTo(tag))
+        .or()
+        .anyOf(filter.selectedTags, (q, tag) => q.userTagsElementEqualTo(tag))
+      );
+    }
 
     // Isar에서 정렬 처리 (인덱스 활용)
     List<Fragment> fragments;
@@ -221,36 +235,11 @@ Stream<List<Fragment>> filteredFragments(Ref ref) async* {
     return fragments;
   }
 
-  // Dart에서 검색어/태그 필터링 (전체 텍스트 검색은 Isar 한계)
-  List<Fragment> applyDartFilters(List<Fragment> fragments) {
-    var result = fragments;
-
-    // 검색어 필터링
-    if (filter.query.isNotEmpty) {
-      final searchQuery = filter.query.toLowerCase();
-      result = result.where((f) =>
-        f.content.toLowerCase().contains(searchQuery)
-      ).toList();
-    }
-
-    // 태그 필터링
-    if (filter.selectedTags.isNotEmpty) {
-      result = result.where((f) {
-        final allTags = [...f.tags, ...f.userTags];
-        return filter.selectedTags.any((tag) => allTags.contains(tag));
-      }).toList();
-    }
-
-    return result;
-  }
-
   // 초기값 먼저 방출
-  final initialFragments = await fetchSortedFragments();
-  yield applyDartFilters(initialFragments);
+  yield await fetchFilteredAndSortedFragments();
 
   // watchLazy로 변경 이벤트만 감지
   await for (final _ in isar.fragments.watchLazy()) {
-    final fragments = await fetchSortedFragments();
-    yield applyDartFilters(fragments);
+    yield await fetchFilteredAndSortedFragments();
   }
 }

@@ -13,7 +13,8 @@ class Fragment extends Base {
   @Name('user_id')
   String? userId;
 
-  /// 텍스트 콘텐츠
+  /// 텍스트 콘텐츠 (전체 텍스트 검색 인덱스)
+  @Index(type: IndexType.value, caseSensitive: false)
   String content = '';
 
   /// 미디어 URL 배열
@@ -38,10 +39,12 @@ class Fragment extends Base {
   @Name('event_time_source')
   String eventTimeSource = 'auto';
 
-  /// AI 태그 (AI가 자동 생성)
+  /// AI 태그 (AI가 자동 생성) - 인덱스로 빠른 필터링
+  @Index(type: IndexType.value)
   List<String> tags = [];
 
-  /// 사용자 태그 (사용자가 수동 추가)
+  /// 사용자 태그 (사용자가 수동 추가) - 인덱스로 빠른 필터링
+  @Index(type: IndexType.value)
   @Name('user_tags')
   List<String> userTags = [];
 
