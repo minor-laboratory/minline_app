@@ -16,12 +16,12 @@ import 'supabase_stream_service_provider.dart';
 /// 2. 네트워크 상태 변경 감지 및 처리
 /// 3. 인증 상태 변경 처리
 /// 4. 동기화 서비스들의 시작/중지 제어
+///
+/// Lifecycle: @Riverpod(keepAlive: true) Provider로 관리
 class LifecycleService with WidgetsBindingObserver {
-  static final LifecycleService _instance = LifecycleService._internal();
-  factory LifecycleService() => _instance;
-  LifecycleService._internal();
+  final Ref _ref;
 
-  WidgetRef? _ref;
+  LifecycleService(this._ref);
 
   // 서비스 상태
   bool _isInitialized = false;
@@ -40,14 +40,13 @@ class LifecycleService with WidgetsBindingObserver {
   /// 동기화 가능 조건
   bool get _canSync => _isLoggedIn && _isInForeground && _hasNetwork;
 
-  /// 초기화 (main.dart에서 WidgetRef와 함께 호출)
-  Future<void> initialize(WidgetRef ref) async {
+  /// 초기화 (main.dart에서 호출)
+  Future<void> initialize() async {
     if (_isInitialized) {
       logger.d('[LifecycleService] Already initialized');
       return;
     }
 
-    _ref = ref;
     logger.i('[LifecycleService] Initializing...');
 
     // WidgetsBinding 옵저버 등록
@@ -167,11 +166,6 @@ class LifecycleService with WidgetsBindingObserver {
 
   /// 동기화 서비스 상태 업데이트
   void _updateSyncServices() {
-    if (_ref == null) {
-      logger.w('[LifecycleService] Ref not initialized, skipping sync update');
-      return;
-    }
-
     logger.d('[LifecycleService] Checking sync conditions - '
         'logged in: $_isLoggedIn, foreground: $_isInForeground, network: $_hasNetwork, running: $_isServicesRunning');
 
@@ -194,11 +188,6 @@ class LifecycleService with WidgetsBindingObserver {
 
   /// 모든 동기화 서비스 시작
   void _startAllServices() {
-    if (_ref == null) {
-      logger.w('[LifecycleService] Ref not initialized, cannot start services');
-      return;
-    }
-
     // 중복 시작 방지
     if (_isServicesRunning) {
       logger.d('[LifecycleService] Services already running - skipping start');
@@ -209,7 +198,7 @@ class LifecycleService with WidgetsBindingObserver {
     logger.i('[LifecycleService] Starting all sync services');
 
     // IsarWatchSyncService 시작 (로컬 → 서버) - keepAlive Provider로 접근
-    _ref!.read(isarWatchSyncServiceProvider).start().then((_) {
+    _ref.read(isarWatchSyncServiceProvider).start().then((_) {
       logger.d('[LifecycleService] IsarWatchSyncService started');
     }).catchError((e, stack) {
       logger.e('[LifecycleService] Failed to start IsarWatchSyncService', e,
@@ -217,7 +206,7 @@ class LifecycleService with WidgetsBindingObserver {
     });
 
     // SupabaseStreamService 시작 (서버 → 로컬) - keepAlive Provider로 접근
-    _ref!.read(supabaseStreamServiceProvider).startListening().then((_) {
+    _ref.read(supabaseStreamServiceProvider).startListening().then((_) {
       logger.d('[LifecycleService] SupabaseStreamService started');
     }).catchError((e, stack) {
       logger.e(
@@ -227,11 +216,6 @@ class LifecycleService with WidgetsBindingObserver {
 
   /// 모든 동기화 서비스 중지
   void _stopAllServices() {
-    if (_ref == null) {
-      logger.d('[LifecycleService] Ref not initialized, skipping stop');
-      return;
-    }
-
     // 중복 중지 방지
     if (!_isServicesRunning) {
       logger.d('[LifecycleService] Services not running - skipping stop');
@@ -242,11 +226,11 @@ class LifecycleService with WidgetsBindingObserver {
     logger.i('[LifecycleService] Stopping all sync services');
 
     // IsarWatchSyncService 중지 - keepAlive Provider로 접근
-    _ref!.read(isarWatchSyncServiceProvider).stop();
+    _ref.read(isarWatchSyncServiceProvider).stop();
     logger.d('[LifecycleService] IsarWatchSyncService stopped');
 
     // SupabaseStreamService 중지 - keepAlive Provider로 접근
-    _ref!.read(supabaseStreamServiceProvider).stopListening();
+    _ref.read(supabaseStreamServiceProvider).stopListening();
     logger.d('[LifecycleService] SupabaseStreamService stopped');
   }
 
@@ -286,7 +270,6 @@ class LifecycleService with WidgetsBindingObserver {
     _stopAllServices();
 
     _isInitialized = false;
-    _ref = null;
     logger.i('[LifecycleService] Disposed');
   }
 }

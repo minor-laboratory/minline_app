@@ -8,8 +8,9 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/database/database_service.dart';
+import 'core/services/share_handler_provider.dart';
 import 'core/services/share_handler_service.dart';
-import 'core/services/sync/lifecycle_service.dart';
+import 'core/services/sync/lifecycle_service_provider.dart';
 import 'core/utils/logger.dart';
 import 'env/app_env.dart';
 import 'features/settings/providers/settings_provider.dart';
@@ -65,12 +66,12 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     // 초기화 완료 후 서비스 시작
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // LifecycleService 초기화 (Singleton 패턴, Ref 전달)
-      LifecycleService().initialize(ref);
+      // LifecycleService 초기화 (Provider 패턴)
+      ref.read(lifecycleServiceProvider).initialize();
       logger.i('[Main] LifecycleService initialized');
 
       // ShareHandlerService 초기화
-      ShareHandlerService().initialize();
+      ref.read(shareHandlerServiceProvider).initialize();
       logger.i('[Main] ShareHandlerService initialized');
     });
   }

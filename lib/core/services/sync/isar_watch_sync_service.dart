@@ -329,4 +329,10 @@ class IsarWatchSyncService {
 
     logger.i('Successfully synced post ${post.remoteID}');
   }
+
+  /// 서비스 정리 (Provider의 ref.onDispose()에서 호출)
+  void dispose() {
+    stop();
+    logger.i('IsarWatchSyncService disposed');
+  }
 }

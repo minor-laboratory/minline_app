@@ -10,10 +10,10 @@ import '../utils/logger.dart';
 /// 역할:
 /// 1. 다른 앱에서 텍스트/이미지 공유 받기
 /// 2. Timeline 화면으로 이동하여 입력창에 pre-fill
+///
+/// Lifecycle: @Riverpod(keepAlive: true) Provider로 관리
 class ShareHandlerService {
-  static final ShareHandlerService _instance = ShareHandlerService._internal();
-  factory ShareHandlerService() => _instance;
-  ShareHandlerService._internal();
+  ShareHandlerService();
 
   /// 글로벌 Navigator Key (main.dart에서 설정)
   static GlobalKey<NavigatorState>? navigatorKey;

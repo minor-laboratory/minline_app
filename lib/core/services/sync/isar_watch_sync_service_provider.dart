@@ -14,7 +14,7 @@ IsarWatchSyncService isarWatchSyncService(Ref ref) {
 
   // 서비스 정리는 LifecycleService에서 관리 (로그아웃 시)
   ref.onDispose(() {
-    service.stop();
+    service.dispose();
   });
 
   return service;
