@@ -108,10 +108,10 @@ class Fragment extends Base {
 let syncQueue = $state([]);
 ```
 
-**앱**: Riverpod keepAlive Provider (통일)
+**앱**: Riverpod keepAlive Provider + Singleton 병행
 ```dart
 // miniline_app/lib/core/services/sync/supabase_stream_service_provider.dart
-// 모든 동기화 서비스는 keepAlive Provider로 관리
+// 동기화 서비스는 keepAlive Provider로 관리
 @Riverpod(keepAlive: true)
 SupabaseStreamService supabaseStreamService(Ref ref) {
   final service = SupabaseStreamService();
@@ -128,8 +128,12 @@ IsarWatchSyncService isarWatchSyncService(Ref ref) {
 }
 
 // miniline_app/lib/core/services/sync/lifecycle_service.dart
-// LifecycleService가 ref.read()로 Provider 접근
+// LifecycleService는 Singleton 패턴 유지 (ref.read()로 Provider 접근)
 class LifecycleService {
+  static final LifecycleService _instance = LifecycleService._internal();
+  factory LifecycleService() => _instance;
+  LifecycleService._internal();
+
   void _startAllServices() {
     _ref!.read(supabaseStreamServiceProvider).startListening();
     _ref!.read(isarWatchSyncServiceProvider).start();
@@ -144,7 +148,9 @@ class LifecycleService {
 
 **중요한 차이**:
 - **웹**: Svelte 5 Runes로 반응형 상태 관리
-- **앱**: Riverpod keepAlive Provider로 인스턴스 생명주기 관리 (Singleton 패턴 제거)
+- **앱**:
+  - 동기화 서비스: Riverpod keepAlive Provider로 관리
+  - LifecycleService: Singleton 패턴 유지 (앱 생명주기 동안 단일 인스턴스)
 
 ### 테마 시스템
 

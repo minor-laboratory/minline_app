@@ -168,13 +168,29 @@ lib/
 │   └── post.dart
 │
 ├── features/
-│   ├── timeline/                # 메인 화면
+│   ├── main/                    # 메인 화면 (PageView + Tabs)
+│   │   └── presentation/
+│   │       └── pages/
+│   │           └── main_page.dart    # Timeline/Drafts/Posts 통합
+│   ├── timeline/                # Timeline 뷰
 │   │   ├── presentation/
 │   │   │   ├── pages/
 │   │   │   └── widgets/
+│   │   │       ├── timeline_view.dart     # Timeline/Calendar 모드
+│   │   │       ├── calendar_view.dart     # 캘린더 위젯
+│   │   │       ├── fragment_list.dart
+│   │   │       └── fragment_input_bar.dart
 │   │   └── providers/
-│   ├── drafts/
-│   ├── posts/
+│   ├── drafts/                  # Drafts 뷰
+│   │   ├── presentation/
+│   │   │   └── widgets/
+│   │   │       └── drafts_view.dart
+│   │   └── providers/
+│   ├── posts/                   # Posts 뷰
+│   │   ├── presentation/
+│   │   │   └── widgets/
+│   │   │       └── posts_view.dart
+│   │   └── providers/
 │   ├── auth/
 │   └── settings/
 │

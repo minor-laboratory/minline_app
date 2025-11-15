@@ -22,14 +22,25 @@ while true; do
     # 최근 50줄만 체크 (효율성)
     OUTPUT=$(tmux capture-pane -t "$SESSION_NAME" -p -S -50)
 
-    # Hot reload 감지
+    # Hot reload/restart 감지
+    RELOAD_TYPE=""
     if echo "$OUTPUT" | grep -q "Reloaded"; then
+        RELOAD_TYPE="reload"
+    elif echo "$OUTPUT" | grep -q "Restarted"; then
+        RELOAD_TYPE="restart"
+    fi
+
+    if [ -n "$RELOAD_TYPE" ]; then
         CURRENT_TIME=$(date +%s)
 
         # 이전 체크로부터 최소 3초 경과 (중복 방지)
         if [ -z "$LAST_CHECK" ] || [ $((CURRENT_TIME - LAST_CHECK)) -gt 3 ]; then
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "🔄 Hot Reload 감지됨 ($(date '+%H:%M:%S'))"
+            if [ "$RELOAD_TYPE" = "reload" ]; then
+                echo "🔄 Hot Reload 감지됨 ($(date '+%H:%M:%S'))"
+            else
+                echo "♻️  Hot Restart 감지됨 ($(date '+%H:%M:%S'))"
+            fi
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
             # 에러 체크 (최근 100줄)

@@ -4,17 +4,15 @@ import 'package:go_router/go_router.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
 
 import '../features/auth/presentation/pages/auth_page.dart';
-import '../features/drafts/presentation/pages/drafts_page.dart';
 import '../features/feedback/presentation/pages/feedback_page.dart';
+import '../features/main/presentation/pages/main_page.dart';
 import '../features/posts/presentation/pages/post_create_page.dart';
 import '../features/posts/presentation/pages/post_detail_page.dart';
-import '../features/posts/presentation/pages/posts_page.dart';
 import '../features/profile/presentation/pages/account_withdrawal_page.dart';
 import '../features/profile/presentation/pages/password_change_page.dart';
 import '../features/profile/presentation/pages/profile_detail_page.dart';
 import '../features/settings/presentation/pages/settings_page.dart';
 import '../features/timeline/presentation/pages/tag_edit_page.dart';
-import '../features/timeline/presentation/pages/timeline_page.dart';
 
 /// Navigator Key for ShareHandlerService
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -32,11 +30,11 @@ final appRouter = GoRouter(
   navigatorKey: navigatorKey,
   initialLocation: '/',
   routes: [
-    // Timeline (메인 화면)
+    // Main (메인 화면 - Timeline/Drafts/Posts)
     GoRoute(
       path: '/',
-      name: 'timeline',
-      builder: (context, state) => const TimelinePage(),
+      name: 'main',
+      builder: (context, state) => const MainPage(),
       routes: [
         // 태그 추가
         GoRoute(
@@ -63,40 +61,24 @@ final appRouter = GoRouter(
       ],
     ),
 
-    // Drafts
+    // Post 관련 라우트 (MainPage 밖에서 독립)
     GoRoute(
-      path: '/drafts',
-      name: 'drafts',
-      builder: (context, state) => const DraftsPage(),
+      path: '/posts/create/:draftId',
+      builder: (context, state) {
+        final draftId = state.pathParameters['draftId']!;
+        final previousVersionId = state.uri.queryParameters['previousVersionId'];
+        return PostCreatePage(
+          draftId: draftId,
+          previousVersionId: previousVersionId,
+        );
+      },
     ),
-
-    // Posts
     GoRoute(
-      path: '/posts',
-      name: 'posts',
-      builder: (context, state) => const PostsPage(),
-      routes: [
-        // Post 생성
-        GoRoute(
-          path: 'create/:draftId',
-          builder: (context, state) {
-            final draftId = state.pathParameters['draftId']!;
-            final previousVersionId = state.uri.queryParameters['previousVersionId'];
-            return PostCreatePage(
-              draftId: draftId,
-              previousVersionId: previousVersionId,
-            );
-          },
-        ),
-        // Post 상세
-        GoRoute(
-          path: ':postId',
-          builder: (context, state) {
-            final postId = state.pathParameters['postId']!;
-            return PostDetailPage(postId: postId);
-          },
-        ),
-      ],
+      path: '/posts/:postId',
+      builder: (context, state) {
+        final postId = state.pathParameters['postId']!;
+        return PostDetailPage(postId: postId);
+      },
     ),
 
     // Profile

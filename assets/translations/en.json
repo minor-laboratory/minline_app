@@ -1,6 +1,7 @@
 {
   "timeline": {
     "title": "Timeline",
+    "calendar": "Calendar",
     "fragments": "Fragments",
     "empty_title": "No Fragments Yet",
     "empty_message": "Start by writing a short thought below",

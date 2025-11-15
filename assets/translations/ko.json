@@ -1,6 +1,7 @@
 {
   "timeline": {
     "title": "타임라인",
+    "calendar": "달력",
     "fragments": "Fragments",
     "empty_title": "아직 Fragment가 없습니다",
     "empty_message": "아래에서 짧은 생각을 입력해보세요",
