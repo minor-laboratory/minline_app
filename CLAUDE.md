@@ -210,9 +210,21 @@ class Base {
 ## 동기화 아키텍처
 
 **패턴**: 북랩 3-서비스 구조 동일 ([참조](../minorlab_book/lib/core/services/sync/))
-1. **IsarWatchSyncService**: 로컬 변경 감지 → 업로드 (lib/core/services/sync/isar_watch_sync_service.dart)
-2. **SupabaseStreamService**: Realtime 구독 → 다운로드 (lib/core/services/sync/supabase_stream_service.dart)
-3. **LifecycleService**: 앱 재시작 시 동기화 (lib/core/services/sync/lifecycle_service.dart)
+1. **IsarWatchSyncService**: 로컬 변경 감지 → 업로드 (Riverpod Provider)
+2. **SupabaseStreamService**: Realtime 구독 → 다운로드 (Singleton 패턴)
+3. **LifecycleService**: 앱 재시작 시 동기화 (Singleton 패턴)
+
+**중요**: SupabaseStreamService는 Singleton 패턴 필수
+- Why: LifecycleService가 인스턴스를 직접 저장 및 재사용 (중복 생성 방지)
+- How: Factory constructor로 `_instance` 반환
+- Riverpod Provider 사용하지 않음 (Provider는 매번 새 인스턴스 생성)
+
+**초기화 순서**:
+1. LifecycleService.initialize() 호출 (main.dart)
+2. Auth 상태 확인: 이미 로그인되어 있으면 _onUserLoggedIn() 즉시 실행
+3. _onUserLoggedIn()에서 SupabaseStreamService 인스턴스 생성 및 저장
+4. _updateSyncServices()에서 조건 확인 후 _startAllServices() 호출
+5. 저장된 인스턴스로 startListening() 실행
 
 **❌ 동기화 실패 시 저장 차단**
 ```dart

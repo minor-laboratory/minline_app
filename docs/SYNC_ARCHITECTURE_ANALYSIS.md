@@ -176,34 +176,69 @@ supabase
 ### Database Stream 방식 (권장)
 
 ```dart
-// 1. 마지막 동기화 시간 저장
-final lastSync = await SyncMetadataService.getLastSyncTime('fragments');
+// 1. SupabaseStreamService (Singleton 패턴)
+class SupabaseStreamService {
+  static SupabaseStreamService? _instance;
+  factory SupabaseStreamService() {
+    _instance ??= SupabaseStreamService._();
+    return _instance!;
+  }
 
-// 2. 서버 사이드 필터링 스트림 구독
-supabase
-  .from('fragments')
-  .stream(primaryKey: ['id'])
-  .gt('updated_at', lastSync.toIso8601String())  // 서버 필터링
-  .listen((List<Map<String, dynamic>> data) {
-    // RLS가 user_id 필터링 자동 처리
-    // 변경된 데이터만 수신 (증분 업데이트)
-    handleFragmentUpdate(data);
-  });
+  Future<void> startListening() async {
+    // 마지막 동기화 시간 저장
+    final lastSync = await SyncMetadataService.getLastSyncTime('fragments');
 
-// 3. 로컬 DB 업데이트
-await isar.writeTxn(() async {
-  await isar.fragments.putAll(fragments);
-});
+    // 서버 사이드 필터링 스트림 구독
+    _fragmentStreamSubscription = supabase
+      .from('fragments')
+      .stream(primaryKey: ['id'])
+      .gt('updated_at', lastSync.toIso8601String())  // 서버 필터링
+      .listen((List<Map<String, dynamic>> data) {
+        // RLS가 user_id 필터링 자동 처리
+        // 변경된 데이터만 수신 (증분 업데이트)
+        _handleFragmentUpdate(data);
+      });
+  }
 
-// 4. 동기화 시간 업데이트
-await SyncMetadataService.setLastSyncTime('fragments', maxUpdatedAt);
+  Future<void> _handleFragmentUpdate(List<Map<String, dynamic>> data) async {
+    // 로컬 DB 업데이트
+    await isar.writeTxn(() async {
+      await isar.fragments.putAll(fragments);
+    });
+
+    // 동기화 시간 업데이트
+    await SyncMetadataService.setLastSyncTime('fragments', maxUpdatedAt);
+  }
+}
+
+// 2. LifecycleService가 인스턴스 관리
+class LifecycleService {
+  SupabaseStreamService? _supabaseStreamService;
+
+  void _onUserLoggedIn() {
+    // 싱글톤 인스턴스 생성 및 저장
+    _supabaseStreamService = SupabaseStreamService();
+  }
+
+  void _startAllServices() {
+    // 저장된 인스턴스 사용 (중복 생성 방지)
+    _supabaseStreamService?.startListening();
+  }
+
+  void _stopAllServices() {
+    // 저장된 인스턴스 사용
+    _supabaseStreamService?.stopListening();
+  }
+}
 ```
 
 **핵심 요소**:
-1. **타임스탬프 필터링**: `gt('updated_at', lastSync)` → 증분 업데이트만
-2. **RLS 자동 적용**: 서버에서 user_id 필터링
-3. **메타데이터 관리**: 마지막 동기화 시간 저장
-4. **에러 처리**: 재연결 + JWT 토큰 갱신
+1. **Singleton 패턴**: SupabaseStreamService는 Singleton (중복 생성 방지)
+2. **인스턴스 관리**: LifecycleService가 `_supabaseStreamService` 필드에 저장
+3. **타임스탬프 필터링**: `gt('updated_at', lastSync)` → 증분 업데이트만
+4. **RLS 자동 적용**: 서버에서 user_id 필터링
+5. **메타데이터 관리**: 마지막 동기화 시간 저장
+6. **에러 처리**: 재연결 + JWT 토큰 갱신
 
 ---
 

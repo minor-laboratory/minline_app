@@ -37,6 +37,9 @@ class LifecycleService with WidgetsBindingObserver {
   // Auth 상태 감지
   StreamSubscription<AuthState>? _authSubscription;
 
+  // 동기화 서비스 참조 (싱글톤 인스턴스 보관)
+  SupabaseStreamService? _supabaseStreamService;
+
   /// 동기화 가능 조건
   bool get _canSync => _isLoggedIn && _isInForeground && _hasNetwork;
 
@@ -96,6 +99,11 @@ class LifecycleService with WidgetsBindingObserver {
     logger.d(
         '[LifecycleService] Initial auth state: ${_isLoggedIn ? 'logged in' : 'logged out'}');
 
+    // 이미 로그인되어 있으면 초기화
+    if (_isLoggedIn) {
+      _onUserLoggedIn();
+    }
+
     // Auth 상태 변경 감지
     _authSubscription = supabase.auth.onAuthStateChange.listen((data) {
       final event = data.event;
@@ -115,6 +123,11 @@ class LifecycleService with WidgetsBindingObserver {
   void _onUserLoggedIn() {
     logger.i('[LifecycleService] User logged in - preparing sync services');
     _isLoggedIn = true;
+
+    // SupabaseStreamService 싱글톤 인스턴스 생성 및 저장
+    _supabaseStreamService = SupabaseStreamService();
+    logger.d('[LifecycleService] SupabaseStreamService instance created and stored');
+
     _updateSyncServices();
   }
 
@@ -122,7 +135,14 @@ class LifecycleService with WidgetsBindingObserver {
   void _onUserLoggedOut() {
     logger.i('[LifecycleService] User logged out - stopping sync services');
     _isLoggedIn = false;
+
+    // 모든 동기화 서비스 중지
     _stopAllServices();
+
+    // 서비스 인스턴스 정리
+    _supabaseStreamService?.dispose();
+    _supabaseStreamService = null;
+    logger.d('[LifecycleService] SupabaseStreamService instance disposed');
   }
 
   /// 앱 생명주기 상태 변경 처리
@@ -203,9 +223,8 @@ class LifecycleService with WidgetsBindingObserver {
           stack);
     });
 
-    // SupabaseStreamService 시작 (서버 → 로컬)
-    final supabaseStreamService = _ref!.read(supabaseStreamServiceProvider);
-    supabaseStreamService.startListening().then((_) {
+    // SupabaseStreamService 시작 (서버 → 로컬) - 저장된 인스턴스 사용
+    _supabaseStreamService?.startListening().then((_) {
       logger.d('[LifecycleService] SupabaseStreamService started');
     }).catchError((e, stack) {
       logger.e(
@@ -238,14 +257,9 @@ class LifecycleService with WidgetsBindingObserver {
           '[LifecycleService] Failed to stop IsarWatchSyncService', e, stack);
     });
 
-    // SupabaseStreamService 중지
-    final supabaseStreamService = _ref!.read(supabaseStreamServiceProvider);
-    supabaseStreamService.stopListening().then((_) {
-      logger.d('[LifecycleService] SupabaseStreamService stopped');
-    }).catchError((e, stack) {
-      logger.e(
-          '[LifecycleService] Failed to stop SupabaseStreamService', e, stack);
-    });
+    // SupabaseStreamService 중지 - 저장된 인스턴스 사용
+    _supabaseStreamService?.stopListening();
+    logger.d('[LifecycleService] SupabaseStreamService stopped');
   }
 
   /// 수동 동기화 트리거
@@ -280,8 +294,10 @@ class LifecycleService with WidgetsBindingObserver {
     _connectivitySubscription?.cancel();
     _authSubscription?.cancel();
 
-    // 서비스 중지
+    // 서비스 중지 및 정리
     _stopAllServices();
+    _supabaseStreamService?.dispose();
+    _supabaseStreamService = null;
 
     _isInitialized = false;
     _ref = null;

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -11,20 +10,15 @@ import '../../../models/post.dart';
 import '../../utils/logger.dart';
 import 'sync_metadata_service.dart';
 
-part 'supabase_stream_service.g.dart';
-
 /// Supabase Database Stream 기반 실시간 동기화 서비스
 ///
 /// Why: Database Stream 방식 (북랩 검증)
 /// - 초기 데이터 + 실시간 업데이트 통합
 /// - 서버 사이드 타임스탬프 필터링 (증분 업데이트)
 /// - 비용 효율적 (Realtime Channel 대비 50% 절감)
-@riverpod
-SupabaseStreamService supabaseStreamService(Ref ref) {
-  return SupabaseStreamService();
-}
-
 class SupabaseStreamService {
+  static SupabaseStreamService? _instance;
+
   final SupabaseClient _supabase = Supabase.instance.client;
 
   /// Stream subscriptions
@@ -38,7 +32,12 @@ class SupabaseStreamService {
   /// 서비스 활성화 상태
   bool _isListening = false;
 
-  SupabaseStreamService();
+  SupabaseStreamService._();
+
+  factory SupabaseStreamService() {
+    _instance ??= SupabaseStreamService._();
+    return _instance!;
+  }
 
   /// 현재 상태
   bool get isListening => _isListening;

@@ -108,16 +108,32 @@ class Fragment extends Base {
 let syncQueue = $state([]);
 ```
 
-**앱**: Riverpod + Background Isolate
+**앱**: Singleton + Riverpod (혼합)
 ```dart
+// miniline_app/lib/core/services/sync/supabase_stream_service.dart
+// SupabaseStreamService는 Singleton 패턴 사용 (Riverpod Provider 아님)
+// Why: LifecycleService가 인스턴스를 직접 관리 (중복 생성 방지)
+class SupabaseStreamService {
+  static SupabaseStreamService? _instance;
+  factory SupabaseStreamService() {
+    _instance ??= SupabaseStreamService._();
+    return _instance!;
+  }
+}
+
 // miniline_app/lib/core/services/sync/isar_watch_sync_service.dart
-final syncQueueProvider = StateNotifierProvider<SyncQueue, List<SyncItem>>(...);
+// IsarWatchSyncService는 Riverpod Provider 사용
+final isarWatchSyncServiceProvider = Provider<IsarWatchSyncService>(...);
 ```
 
 **공통점**:
 - 3-서비스 구조 동일 (IsarWatch, SupabaseStream, Lifecycle)
 - 1초 디바운스
 - 충돌 해결 (서버 우선)
+
+**중요한 차이**:
+- **SupabaseStreamService**: Singleton 필수 (LifecycleService가 인스턴스 저장/재사용)
+- **IsarWatchSyncService**: Riverpod Provider 사용 (상태 관리 필요)
 
 ### 테마 시스템
 
