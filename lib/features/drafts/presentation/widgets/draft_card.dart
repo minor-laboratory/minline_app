@@ -180,22 +180,43 @@ class _DraftCardState extends ConsumerState<DraftCard> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              leading: Icon(
-                _hasSubmittedFeedback ? AppIcons.checkCircle : AppIcons.flag,
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: _hasSubmittedFeedback
+                    ? null
+                    : () {
+                        Navigator.of(context).pop();
+                        _showFeedbackDialog();
+                      },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _hasSubmittedFeedback ? AppIcons.checkCircle : AppIcons.flag,
+                        size: 20,
+                        color: _hasSubmittedFeedback
+                            ? Theme.of(context).colorScheme.outline
+                            : Theme.of(context).colorScheme.onSurface,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _hasSubmittedFeedback
+                              ? 'feedback.submitted'.tr()
+                              : 'feedback.report_issue'.tr(),
+                          style: TextStyle(
+                            color: _hasSubmittedFeedback
+                                ? Theme.of(context).colorScheme.outline
+                                : Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              title: Text(
-                _hasSubmittedFeedback
-                    ? 'feedback.submitted'.tr()
-                    : 'feedback.report_issue'.tr(),
-              ),
-              enabled: !_hasSubmittedFeedback,
-              onTap: _hasSubmittedFeedback
-                  ? null
-                  : () {
-                      Navigator.of(context).pop();
-                      _showFeedbackDialog();
-                    },
             ),
           ],
         ),
@@ -374,6 +395,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                   ),
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: _fragments.map((fragment) {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 8),

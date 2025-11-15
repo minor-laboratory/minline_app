@@ -137,55 +137,59 @@ class _DraftsPageState extends ConsumerState<DraftsPage> {
               ),
             ),
 
-          // Shadcn Tabs
+          // Shadcn Tabs (탭 버튼만)
+          countsStream.when(
+            data: (counts) => ShadTabs<String>(
+              value: filter.status,
+              onChanged: (value) {
+                ref.read(draftFilterProvider.notifier).setStatus(value);
+              },
+              scrollable: true, // 다국어 텍스트 길이 차이 대응
+              tabs: [
+                ShadTab(
+                  value: 'all',
+                  child: Text(
+                    '${'draft.filter_all'.tr()} (${counts['all'] ?? 0})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                ShadTab(
+                  value: 'pending',
+                  child: Text(
+                    '${'draft.filter_pending'.tr()} (${counts['pending'] ?? 0})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                ShadTab(
+                  value: 'accepted',
+                  child: Text(
+                    '${'draft.filter_accepted'.tr()} (${counts['accepted'] ?? 0})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                ShadTab(
+                  value: 'rejected',
+                  child: Text(
+                    '${'draft.filter_rejected'.tr()} (${counts['rejected'] ?? 0})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+
+          // 탭 컨텐츠 (현재 선택된 탭에 따라 표시)
           Expanded(
-            child: countsStream.when(
-              data: (counts) => ShadTabs<String>(
-                value: filter.status,
-                onChanged: (value) {
-                  ref.read(draftFilterProvider.notifier).setStatus(value);
-                },
-                tabs: [
-                  ShadTab(
-                    value: 'all',
-                    content: _DraftTabContent(
-                      status: 'all',
-                      draftsStream: draftsStream,
-                      onRefresh: () => ref.invalidate(draftsStreamProvider),
-                    ),
-                    child: Text('${'draft.filter_all'.tr()} (${counts['all'] ?? 0})'),
-                  ),
-                  ShadTab(
-                    value: 'pending',
-                    content: _DraftTabContent(
-                      status: 'pending',
-                      draftsStream: draftsStream,
-                      onRefresh: () => ref.invalidate(draftsStreamProvider),
-                    ),
-                    child: Text('${'draft.filter_pending'.tr()} (${counts['pending'] ?? 0})'),
-                  ),
-                  ShadTab(
-                    value: 'accepted',
-                    content: _DraftTabContent(
-                      status: 'accepted',
-                      draftsStream: draftsStream,
-                      onRefresh: () => ref.invalidate(draftsStreamProvider),
-                    ),
-                    child: Text('${'draft.filter_accepted'.tr()} (${counts['accepted'] ?? 0})'),
-                  ),
-                  ShadTab(
-                    value: 'rejected',
-                    content: _DraftTabContent(
-                      status: 'rejected',
-                      draftsStream: draftsStream,
-                      onRefresh: () => ref.invalidate(draftsStreamProvider),
-                    ),
-                    child: Text('${'draft.filter_rejected'.tr()} (${counts['rejected'] ?? 0})'),
-                  ),
-                ],
-              ),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const Center(child: Text('Error loading counts')),
+            child: _DraftTabContent(
+              status: filter.status,
+              draftsStream: draftsStream,
+              onRefresh: () => ref.invalidate(draftsStreamProvider),
             ),
           ),
         ],

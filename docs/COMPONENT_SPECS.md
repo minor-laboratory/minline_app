@@ -552,11 +552,70 @@ Row(
 )
 ```
 
-**드롭다운 메뉴**:
-- 편집 (Edit 아이콘)
-- 임베딩 생성/재생성 (Sparkles 아이콘)
-- --- (구분선)
-- 삭제 (Trash 아이콘, 빨강)
+**드롭다운 메뉴** (ShadSheet 사용):
+```dart
+// ❌ 잘못: ListTile 직접 사용 (Material ancestor 없음)
+showShadSheet(
+  context: context,
+  builder: (context) => ShadSheet(
+    child: ListTile(onTap: () {}),  // 에러!
+  ),
+);
+
+// ✅ 올바름: Material + InkWell 또는 GestureDetector
+showShadSheet(
+  context: context,
+  builder: (context) => ShadSheet(
+    title: Text('common.more'.tr()),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).pop();
+              _handleEdit();
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Row(
+                children: [
+                  Icon(AppIcons.edit, size: 20),
+                  const SizedBox(width: 12),
+                  Text('common.edit'.tr()),
+                ],
+              ),
+            ),
+          ),
+        ),
+        // 구분선
+        const Divider(height: 1),
+        // 삭제 (빨강)
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).pop();
+              _showDeleteDialog();
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Row(
+                children: [
+                  Icon(AppIcons.delete, size: 20, color: colorScheme.error),
+                  const SizedBox(width: 12),
+                  Text('common.delete'.tr(), style: TextStyle(color: colorScheme.error)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+);
+```
 
 ---
 
@@ -1864,7 +1923,116 @@ else
 
 ---
 
-## 7. StandardBottomSheet (공통 바텀시트 패턴)
+## 7. ShadTabs (탭 버튼 패턴)
+
+> 북랩 앱과 동일한 탭 패턴 (ShadTabs 사용, 컨텐츠는 수동 관리)
+
+**언제 읽어야 하는가:**
+- Drafts/Posts 탭 구현 시
+- 필터링된 리스트 표시 시
+- 북랩 앱과 동일한 패턴 적용 시
+
+### 기본 정보
+
+**파일**: `lib/features/drafts/presentation/pages/drafts_page.dart`
+**참조**: 북랩 `minorlab_book/lib/features/library/presentation/pages/library_page.dart`
+
+### 패턴 설명
+
+**핵심**: ShadTabs는 **탭 버튼만** 제공. 컨텐츠는 직접 관리.
+
+**❌ 잘못된 패턴 (웹 방식):**
+```dart
+// 웹: ShadTabs가 컨텐츠도 관리
+ShadTabs(
+  value: currentTab,
+  tabs: [
+    ShadTab(value: 'all', child: Text('All')),
+    ShadTab(value: 'pending', child: Text('Pending')),
+  ],
+  tabContents: [
+    TabContent(value: 'all', child: AllDraftsList()),
+    TabContent(value: 'pending', child: PendingDraftsList()),
+  ],
+)
+```
+
+**✅ 올바른 패턴 (북랩 방식):**
+```dart
+// 앱: ShadTabs는 탭 버튼만, 컨텐츠는 수동 관리
+Column(
+  children: [
+    // 1. 탭 버튼만 표시
+    ShadTabs<String>(
+      value: filter.status,
+      onChanged: (value) {
+        ref.read(draftFilterProvider.notifier).setStatus(value);
+      },
+      scrollable: true,
+      tabs: [
+        ShadTab(value: 'all', child: Text('draft.filter_all'.tr())),
+        ShadTab(value: 'pending', child: Text('draft.filter_pending'.tr())),
+        ShadTab(value: 'accepted', child: Text('draft.filter_accepted'.tr())),
+        ShadTab(value: 'rejected', child: Text('draft.filter_rejected'.tr())),
+      ],
+    ),
+
+    // 2. 탭 컨텐츠는 별도 위젯으로 관리
+    Expanded(
+      child: _DraftTabContent(
+        status: filter.status,
+        draftsStream: draftsStream,
+      ),
+    ),
+  ],
+)
+```
+
+### 탭 컨텐츠 위젯
+
+```dart
+class _DraftTabContent extends StatelessWidget {
+  final String status;
+  final AsyncValue<List<Draft>> draftsStream;
+
+  @override
+  Widget build(BuildContext context) {
+    return draftsStream.when(
+      data: (allDrafts) {
+        // 필터링
+        final filteredDrafts = status == 'all'
+            ? allDrafts
+            : allDrafts.where((d) => d.status == status).toList();
+
+        if (filteredDrafts.isEmpty) {
+          return Center(child: Text('draft.empty_filter'.tr()));
+        }
+
+        return ListView.builder(
+          itemCount: filteredDrafts.length,
+          itemBuilder: (context, index) {
+            return DraftCard(draft: filteredDrafts[index]);
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text(error.toString())),
+    );
+  }
+}
+```
+
+### 주의사항
+
+1. **탭 버튼만**: ShadTabs는 UI만 제공, 컨텐츠는 직접 관리
+2. **scrollable**: 다국어 텍스트 길이 차이 대응
+3. **onChanged**: 필터 상태 업데이트
+4. **별도 위젯**: 탭 컨텐츠는 별도 위젯으로 분리
+5. **maxLines**: 탭 텍스트가 길어질 수 있으므로 ellipsis 처리
+
+---
+
+## 8. StandardBottomSheet (공통 바텀시트 패턴)
 
 > 북랩 앱과 동일한 바텀시트 패턴 (Wolt Modal Sheet 기반)
 
@@ -2170,7 +2338,7 @@ common.notifications_off: "알림 꺼짐"
 
 ---
 
-## 8. Isar Stream Provider 패턴 (watchLazy)
+## 9. Isar Stream Provider 패턴 (watchLazy)
 
 > Riverpod Stream Provider에서 Isar watchLazy() 사용 패턴
 
@@ -2178,6 +2346,61 @@ common.notifications_off: "알림 꺼짐"
 - Provider에서 Isar 데이터 스트림 구현 시
 - 빈 DB에서 무한 로딩 문제 해결 시
 - 실시간 UI 갱신 구현 시
+
+### 패턴 변경: Isar 직접 읽기 (2025-11-15)
+
+**이전 패턴** (Stream 의존):
+```dart
+@riverpod
+Stream<List<Draft>> filteredDrafts(Ref ref) async* {
+  final draftsAsync = ref.watch(draftsStreamProvider);
+  final filter = ref.watch(draftFilterProvider);
+
+  await for (final drafts in draftsAsync) {
+    final filtered = filterDrafts(drafts, filter);
+    yield filtered;
+  }
+}
+```
+
+**새 패턴** (Isar 직접 읽기):
+```dart
+@riverpod
+Stream<List<Draft>> filteredDrafts(Ref ref) async* {
+  final isar = DatabaseService.instance.isar;
+  final filter = ref.watch(draftFilterProvider);
+
+  // 초기값 먼저 방출
+  final initialDrafts = await isar.drafts
+      .filter()
+      .deletedEqualTo(false)
+      .findAll();
+
+  initialDrafts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  yield filterDrafts(initialDrafts, filter);
+
+  // watchLazy로 변경 이벤트만 감지
+  await for (final _ in isar.drafts.watchLazy()) {
+    final drafts = await isar.drafts
+        .filter()
+        .deletedEqualTo(false)
+        .findAll();
+
+    drafts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    yield filterDrafts(drafts, filter);
+  }
+}
+```
+
+**이유:**
+- ✅ **필터 변경 즉시 반영**: filter 변경 시 바로 Isar 쿼리 재실행
+- ✅ **불필요한 의존성 제거**: 다른 Stream Provider 의존 없음
+- ✅ **명확한 로직**: Isar 쿼리 → 정렬 → 필터링 한눈에 파악
+- ✅ **메모리 효율**: watchLazy로 변경 이벤트만 감지
+
+**참조:**
+- `lib/features/drafts/providers/drafts_provider.dart`
+- `lib/features/timeline/providers/fragments_provider.dart`
 
 ### 문제: watchLazy()는 초기값을 emit하지 않음
 
@@ -2371,7 +2594,7 @@ List<Fragment> filterAndSort(List<Fragment> fragments, FragmentFilterState filte
 
 ---
 
-## 9. Empty State (빈 상태 화면)
+## 10. Empty State (빈 상태 화면)
 
 > Fragment 목록이 비어있을 때 표시되는 화면
 

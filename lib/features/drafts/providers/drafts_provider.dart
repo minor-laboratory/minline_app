@@ -69,32 +69,64 @@ Stream<List<Draft>> draftsStream(Ref ref) async* {
 /// 필터링된 Draft 리스트
 @riverpod
 Stream<List<Draft>> filteredDrafts(Ref ref) async* {
+  final isar = DatabaseService.instance.isar;
   final filter = ref.watch(draftFilterProvider);
-  final draftsAsync = ref.watch(draftsStreamProvider);
 
-  await for (final drafts in draftsAsync.when(
-    data: (data) => Stream.value(data),
-    loading: () => const Stream<List<Draft>>.empty(),
-    error: (_, __) => const Stream<List<Draft>>.empty(),
-  )) {
+  // 필터링 로직을 함수로 추출
+  List<Draft> filterDrafts(List<Draft> drafts) {
     if (filter.status == 'all') {
-      yield drafts;
+      return drafts;
     } else {
-      yield drafts.where((d) => d.status == filter.status).toList();
+      return drafts.where((d) => d.status == filter.status).toList();
     }
+  }
+
+  // 초기값 먼저 방출
+  final initialDrafts = await isar.drafts
+      .filter()
+      .deletedEqualTo(false)
+      .findAll();
+
+  initialDrafts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  yield filterDrafts(initialDrafts);
+
+  // watchLazy로 변경 이벤트만 감지
+  await for (final _ in isar.drafts.watchLazy()) {
+    final drafts = await isar.drafts
+        .filter()
+        .deletedEqualTo(false)
+        .findAll();
+
+    drafts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    yield filterDrafts(drafts);
   }
 }
 
 /// 상태별 Draft 개수
 @riverpod
 Stream<Map<String, int>> draftCounts(Ref ref) async* {
-  final draftsAsync = ref.watch(draftsStreamProvider);
+  final isar = DatabaseService.instance.isar;
 
-  await for (final drafts in draftsAsync.when(
-    data: (data) => Stream.value(data),
-    loading: () => const Stream<List<Draft>>.empty(),
-    error: (_, __) => const Stream<List<Draft>>.empty(),
-  )) {
+  // 초기값 먼저 계산
+  final initialDrafts = await isar.drafts
+      .filter()
+      .deletedEqualTo(false)
+      .findAll();
+
+  yield {
+    'all': initialDrafts.length,
+    'pending': initialDrafts.where((d) => d.status == 'pending').length,
+    'accepted': initialDrafts.where((d) => d.status == 'accepted').length,
+    'rejected': initialDrafts.where((d) => d.status == 'rejected').length,
+  };
+
+  // watchLazy로 변경 이벤트만 감지
+  await for (final _ in isar.drafts.watchLazy()) {
+    final drafts = await isar.drafts
+        .filter()
+        .deletedEqualTo(false)
+        .findAll();
+
     yield {
       'all': drafts.length,
       'pending': drafts.where((d) => d.status == 'pending').length,

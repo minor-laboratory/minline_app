@@ -303,6 +303,88 @@ showShadSheet(
 );
 ```
 
+### Sheet 메뉴 패턴
+
+**⚠️ 중요**: ShadSheet 내부에서 Material 위젯 사용 시 주의
+
+```dart
+// ❌ 잘못: ListTile 직접 사용 (Material ancestor 없음)
+showShadSheet(
+  context: context,
+  builder: (context) => ShadSheet(
+    child: Column(
+      children: [
+        ListTile(
+          title: Text('Option 1'),
+          onTap: () {},
+        ),
+      ],
+    ),
+  ),
+);
+
+// ✅ 올바름: Material + InkWell 사용
+showShadSheet(
+  context: context,
+  builder: (context) => ShadSheet(
+    title: Text('common.more'.tr()),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).pop();
+              _handleOption1();
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Row(
+                children: [
+                  Icon(AppIcons.edit, size: 20),
+                  const SizedBox(width: 12),
+                  Text('Option 1'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+);
+
+// ✅ 대안: GestureDetector 사용 (더 간단)
+showShadSheet(
+  context: context,
+  builder: (context) => ShadSheet(
+    title: Text('common.more'.tr()),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: () {
+            Navigator.of(context).pop();
+            _handleOption1();
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Row(
+              children: [
+                Icon(AppIcons.edit, size: 20),
+                const SizedBox(width: 12),
+                Text('Option 1'),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+);
+```
+
 ---
 
 ## 📇 ShadCard
@@ -484,6 +566,28 @@ const ShadSeparator()  // unnamed constructor 없음
 
 // ✅ 올바름
 const ShadSeparator.horizontal()
+```
+
+### 5. Sheet 메뉴에 ListTile 직접 사용
+```dart
+// ❌ 잘못
+showShadSheet(
+  context: context,
+  builder: (context) => ShadSheet(
+    child: ListTile(onTap: () {}),  // Material ancestor 없음!
+  ),
+)
+
+// ✅ 올바름
+showShadSheet(
+  context: context,
+  builder: (context) => ShadSheet(
+    child: Material(
+      color: Colors.transparent,
+      child: InkWell(onTap: () {}, child: ...),
+    ),
+  ),
+)
 ```
 
 ---
