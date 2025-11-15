@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 
 import '../../../../core/utils/app_icons.dart';
 
@@ -51,14 +52,14 @@ class DraftCardActions extends StatelessWidget {
                   )
                 else
                   Icon(AppIcons.checkCircle, size: 16),
-                const SizedBox(width: 6),
+                const SizedBox(width: common.Spacing.xs + 2),
                 Text(
                   isLoading ? 'common.loading'.tr() : 'draft.accept_action'.tr(),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: common.Spacing.sm),
           // Reject 버튼 (오른쪽)
           ShadButton.outline(
             onPressed: isLoading ? null : onReject,
@@ -67,15 +68,15 @@ class DraftCardActions extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(AppIcons.error, size: 16),
-                const SizedBox(width: 6),
+                const SizedBox(width: common.Spacing.xs + 2),
                 Text('draft.reject_action'.tr()),
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: common.Spacing.sm),
           // More 버튼
           PopupMenuButton<String>(
-            padding: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(common.Spacing.xs),
             iconSize: 18,
             icon: Icon(
               AppIcons.moreVert,
@@ -104,7 +105,7 @@ class DraftCardActions extends StatelessWidget {
                               ? theme.colorScheme.border
                               : theme.colorScheme.foreground,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: common.Spacing.sm),
                         Text(
                           hasSubmittedFeedback
                               ? 'feedback.submitted'.tr()
@@ -124,7 +125,7 @@ class DraftCardActions extends StatelessWidget {
                     child: Row(
                       children: [
                         Icon(AppIcons.delete, size: 16, color: theme.colorScheme.destructive),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: common.Spacing.sm),
                         Text(
                           'common.delete'.tr(),
                           style: TextStyle(color: theme.colorScheme.destructive),
@@ -150,12 +151,12 @@ class DraftCardActions extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(AppIcons.fileText, size: 16),
-                const SizedBox(width: 6),
+                const SizedBox(width: common.Spacing.xs + 2),
                 Text('draft.create_post'.tr()),
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: common.Spacing.sm),
           // Reject 버튼 (오른쪽)
           ShadButton.outline(
             onPressed: isLoading ? null : onReject,
@@ -164,15 +165,15 @@ class DraftCardActions extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(AppIcons.error, size: 16),
-                const SizedBox(width: 6),
+                const SizedBox(width: common.Spacing.xs + 2),
                 Text('draft.reject_action'.tr()),
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: common.Spacing.sm),
           // More 버튼
           PopupMenuButton<String>(
-            padding: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(common.Spacing.xs),
             iconSize: 18,
             icon: Icon(
               AppIcons.moreVert,
@@ -201,7 +202,7 @@ class DraftCardActions extends StatelessWidget {
                               ? theme.colorScheme.border
                               : theme.colorScheme.foreground,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: common.Spacing.sm),
                         Text(
                           hasSubmittedFeedback
                               ? 'feedback.submitted'.tr()
@@ -221,7 +222,7 @@ class DraftCardActions extends StatelessWidget {
                     child: Row(
                       children: [
                         Icon(AppIcons.delete, size: 16, color: theme.colorScheme.destructive),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: common.Spacing.sm),
                         Text(
                           'common.delete'.tr(),
                           style: TextStyle(color: theme.colorScheme.destructive),
@@ -245,15 +246,15 @@ class DraftCardActions extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(AppIcons.checkCircle, size: 16),
-                const SizedBox(width: 6),
+                const SizedBox(width: common.Spacing.xs + 2),
                 Text('draft.reaccept_action'.tr()),
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: common.Spacing.sm),
           // More 버튼
           PopupMenuButton<String>(
-            padding: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(common.Spacing.xs),
             iconSize: 18,
             icon: Icon(
               AppIcons.moreVert,
@@ -282,7 +283,7 @@ class DraftCardActions extends StatelessWidget {
                               ? theme.colorScheme.border
                               : theme.colorScheme.foreground,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: common.Spacing.sm),
                         Text(
                           hasSubmittedFeedback
                               ? 'feedback.submitted'.tr()
@@ -302,7 +303,7 @@ class DraftCardActions extends StatelessWidget {
                     child: Row(
                       children: [
                         Icon(AppIcons.delete, size: 16, color: theme.colorScheme.destructive),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: common.Spacing.sm),
                         Text(
                           'common.delete'.tr(),
                           style: TextStyle(color: theme.colorScheme.destructive),

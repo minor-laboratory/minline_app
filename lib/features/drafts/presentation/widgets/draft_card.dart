@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/database/database_service.dart';
@@ -9,6 +10,7 @@ import '../../../../core/services/feedback_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../models/draft.dart';
 import '../../../../models/fragment.dart';
+import '../../../../shared/widgets/standard_bottom_sheet.dart';
 import 'draft_card_actions.dart';
 
 /// Draft 카드 위젯
@@ -113,22 +115,12 @@ class _DraftCardState extends ConsumerState<DraftCard> {
   }
 
   Future<void> _showDeleteDialog() async {
-    final confirmed = await showShadDialog<bool>(
+    final confirmed = await StandardBottomSheet.showConfirmation(
       context: context,
-      builder: (context) => ShadDialog(
-        title: Text('draft.delete_title'.tr()),
-        description: Text('draft.delete_confirm'.tr()),
-        actions: [
-          ShadButton.outline(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('common.cancel'.tr()),
-          ),
-          ShadButton.destructive(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text('common.delete'.tr()),
-          ),
-        ],
-      ),
+      title: 'draft.delete_title'.tr(),
+      message: 'draft.delete_confirm'.tr(),
+      confirmText: 'common.delete'.tr(),
+      isDestructive: true,
     );
 
     if (confirmed == true) {
@@ -213,7 +205,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
     return ShadCard(
       padding: EdgeInsets.zero,
       footer: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+        padding: EdgeInsets.fromLTRB(common.Spacing.md, common.Spacing.sm, 0, common.Spacing.sm),
         child: DraftCardActions(
           status: widget.draft.status,
           isLoading: _isLoading,
@@ -226,7 +218,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(common.Spacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -243,7 +235,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         if (widget.draft.reason != null) ...[
-                          const SizedBox(height: 4),
+                          SizedBox(height: common.Spacing.xs),
                           Text(
                             widget.draft.reason!,
                             style: Theme.of(context).textTheme.bodySmall
@@ -255,15 +247,15 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: common.Spacing.sm),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: common.Spacing.sm,
+                      vertical: common.Spacing.xs,
                     ),
                     decoration: BoxDecoration(
                       color: _getStatusColor(),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(common.Spacing.xs),
                     ),
                     child: Text(
                       'draft.status_${widget.draft.status}'.tr(),
@@ -276,7 +268,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                 ],
               ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: common.Spacing.sm + common.Spacing.xs),
 
               // Fragment 개수 & 유사도
               Row(
@@ -286,7 +278,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                     size: 14,
                     color: theme.colorScheme.mutedForeground,
                   ),
-                  const SizedBox(width: 4),
+                  SizedBox(width: common.Spacing.xs),
                   Text(
                     'draft.snap_count'.tr(
                       namedArgs: {'count': _fragments.length.toString()},
@@ -296,14 +288,14 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                     ),
                   ),
                   if (widget.draft.similarityScore != null) ...[
-                    const SizedBox(width: 8),
+                    SizedBox(width: common.Spacing.sm),
                     Text(
                       '•',
                       style: TextStyle(
                         color: theme.colorScheme.mutedForeground,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: common.Spacing.sm),
                     Text(
                       '${'draft.similarity'.tr()} ${(widget.draft.similarityScore! * 100).round()}%',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -314,7 +306,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                 ],
               ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: common.Spacing.sm + common.Spacing.xs),
 
               // Fragment 목록 토글
               ShadButton.ghost(
@@ -330,7 +322,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                           : AppIcons.chevronRight,
                       size: 16,
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: common.Spacing.xs + 2),
                     Text(
                       _showFragments
                           ? 'draft.toggle_snaps_hide'.tr()
@@ -341,9 +333,9 @@ class _DraftCardState extends ConsumerState<DraftCard> {
               ),
 
               if (_showFragments) ...[
-                const SizedBox(height: 12),
+                SizedBox(height: common.Spacing.sm + common.Spacing.xs),
                 Container(
-                  padding: const EdgeInsets.only(left: 12),
+                  padding: EdgeInsets.only(left: common.Spacing.sm + common.Spacing.xs),
                   decoration: BoxDecoration(
                     border: Border(
                       left: BorderSide(
@@ -356,11 +348,11 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: _fragments.map((fragment) {
                       return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.all(12),
+                        margin: EdgeInsets.only(bottom: common.Spacing.sm),
+                        padding: EdgeInsets.all(common.Spacing.sm + common.Spacing.xs),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.muted,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(common.Spacing.sm),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -371,7 +363,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: common.Spacing.xs),
                             Text(
                               DateFormat(
                                 'MMM d, HH:mm',

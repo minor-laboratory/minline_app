@@ -2138,7 +2138,8 @@ else
 
 ### 기본 정보
 
-**파일**: `lib/features/drafts/presentation/pages/drafts_page.dart`
+**파일**: `lib/features/drafts/presentation/widgets/drafts_view.dart` (PageView 통합)
+**호출**: `lib/features/main/presentation/pages/main_page.dart` (Timeline/Drafts/Posts 통합)
 **참조**: 북랩 `minorlab_book/lib/features/library/presentation/pages/library_page.dart`
 
 ### 패턴 설명

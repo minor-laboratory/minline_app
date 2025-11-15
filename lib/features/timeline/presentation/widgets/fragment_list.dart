@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 
 import '../../../../core/utils/app_icons.dart';
 import '../../../../models/draft.dart';
@@ -94,15 +95,17 @@ class _FragmentListState extends ConsumerState<FragmentList> {
 
         return ListView.separated(
           controller: _scrollController,
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+          padding: const EdgeInsets.all(common.Spacing.md),
           itemCount: displayedFragments.length + (hasMore ? 1 : 0),
-          separatorBuilder: (context, index) => const SizedBox(height: 12),
+          separatorBuilder: (context, index) => SizedBox(
+            height: common.Spacing.sm + common.Spacing.xs,
+          ),
           itemBuilder: (context, index) {
             // 마지막 항목 + 더 많은 항목이 있으면 로딩 인디케이터
             if (index == displayedFragments.length && hasMore) {
               return Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(common.Spacing.md),
                   child: _isLoadingMore
                       ? const CircularProgressIndicator()
                       : const SizedBox.shrink(),
@@ -135,12 +138,12 @@ class _FragmentListState extends ConsumerState<FragmentList> {
               size: 48,
               color: Theme.of(context).colorScheme.error,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: common.Spacing.md),
             Text(
               'timeline.error_loading'.tr(),
               style: Theme.of(context).textTheme.bodyLarge,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: common.Spacing.sm),
             Text(
               error.toString(),
               style: Theme.of(context).textTheme.bodySmall,
@@ -163,10 +166,10 @@ class _FragmentListState extends ConsumerState<FragmentList> {
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: Center(
               child: Container(
-                margin: const EdgeInsets.all(16),
+                margin: const EdgeInsets.all(common.Spacing.md),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
+                  horizontal: common.Spacing.lg,
+                  vertical: common.Spacing.md,
                 ),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -198,7 +201,7 @@ class _FragmentListState extends ConsumerState<FragmentList> {
                         color: colorScheme.onSurface,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: common.Spacing.md),
                     // 제목
                     Text(
                       'snap.empty'.tr(),
@@ -207,7 +210,7 @@ class _FragmentListState extends ConsumerState<FragmentList> {
                         color: colorScheme.onSurface,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: common.Spacing.sm),
                     // 설명
                     Text(
                       'snap.empty_hint'.tr(),
@@ -215,12 +218,12 @@ class _FragmentListState extends ConsumerState<FragmentList> {
                         color: colorScheme.onSurfaceVariant,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: common.Spacing.md),
                     // 입력 힌트
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                        horizontal: common.Spacing.sm + common.Spacing.xs,
+                        vertical: common.Spacing.sm,
                       ),
                       decoration: BoxDecoration(
                         color: colorScheme.surface.withValues(alpha: 0.5),
@@ -231,10 +234,10 @@ class _FragmentListState extends ConsumerState<FragmentList> {
                         children: [
                           Icon(
                             AppIcons.arrowUp,
-                            size: 12,
+                            size: common.Spacing.sm + common.Spacing.xs,
                             color: colorScheme.onSurfaceVariant,
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: common.Spacing.sm),
                           Text(
                             'snap.input_placeholder'.tr(),
                             style: theme.textTheme.bodySmall?.copyWith(

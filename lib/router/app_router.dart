@@ -34,7 +34,11 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/',
       name: 'main',
-      builder: (context, state) => const MainPage(),
+      builder: (context, state) {
+        final tabParam = state.uri.queryParameters['tab'];
+        final initialTab = int.tryParse(tabParam ?? '0') ?? 0;
+        return MainPage(initialTab: initialTab);
+      },
       routes: [
         // 태그 추가
         GoRoute(

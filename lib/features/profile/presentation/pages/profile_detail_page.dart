@@ -274,7 +274,7 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
                       color: theme.colorScheme.destructive,
                       size: 16,
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: common.Spacing.sm),
                     Text(
                       'withdrawal_title'.tr(),
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -384,7 +384,7 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
                 ),
               ),
 
-            const SizedBox(height: common.Spacing.xl),
+            SizedBox(height: common.Spacing.xl),
 
             // 이름 입력 (자동 저장)
             ShadInputFormField(
@@ -413,14 +413,14 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
               textInputAction: TextInputAction.done,
             ),
 
-            const SizedBox(height: common.Spacing.md),
+            SizedBox(height: common.Spacing.md),
 
             // 로그인 Provider 정보 표시
             _buildProviderInfoSection(theme),
 
-            const SizedBox(height: common.Spacing.lg),
+            SizedBox(height: common.Spacing.lg),
             const ShadSeparator.horizontal(),
-            const SizedBox(height: common.Spacing.lg),
+            SizedBox(height: common.Spacing.lg),
 
             // 계정 관리 섹션
             _buildAccountManagementSection(theme),
@@ -470,11 +470,11 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
               color: theme.colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: common.Spacing.md),
+          SizedBox(height: common.Spacing.md),
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(common.Spacing.sm),
                 decoration: BoxDecoration(
                   color: providerColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
@@ -490,7 +490,7 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
                   color: providerColor,
                 ),
               ),
-              const SizedBox(width: common.Spacing.md),
+              SizedBox(width: common.Spacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -499,7 +499,7 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
                       currentUser?.email ?? 'unknown_email'.tr(),
                       style: theme.textTheme.bodyLarge,
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2),
                     Text(
                       'settings.${providerType}_login'.tr(),
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -527,12 +527,12 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: common.Spacing.md),
+        SizedBox(height: common.Spacing.md),
 
         // 비밀번호 설정/변경
         _buildPasswordManagementTile(theme),
 
-        const SizedBox(height: common.Spacing.sm),
+        SizedBox(height: common.Spacing.sm),
 
         // 로그아웃
         _buildLogoutTile(theme),

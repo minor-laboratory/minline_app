@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -218,7 +219,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
 
     return SafeArea(
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(common.Spacing.md),
         decoration: BoxDecoration(
           color: theme.colorScheme.background,
           border: Border(
@@ -231,7 +232,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
             // 이미지 프리뷰
             if (_selectedImages.isNotEmpty) ...[
               _buildImagePreview(theme),
-              const SizedBox(height: 12),
+              SizedBox(height: common.Spacing.sm + common.Spacing.xs),
             ],
 
             // 텍스트 입력
@@ -254,14 +255,14 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
               },
             ),
 
-            const SizedBox(height: 12),
+            SizedBox(height: common.Spacing.sm + common.Spacing.xs),
 
             // 액션 영역
             Row(
               children: [
                 // 이미지 추가 버튼
                 _buildImageButton(theme),
-                const SizedBox(width: 8),
+                SizedBox(width: common.Spacing.sm),
 
                 // 글자수 표시
                 _buildCharCounter(theme),
@@ -287,7 +288,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
         itemCount: _selectedImages.length,
         itemBuilder: (context, index) {
           return Padding(
-            padding: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.only(right: common.Spacing.sm),
             child: Stack(
               children: [
                 // 이미지
@@ -302,22 +303,22 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
                 ),
                 // 삭제 버튼
                 Positioned(
-                  top: -8,
-                  right: -8,
+                  top: -common.Spacing.sm,
+                  right: -common.Spacing.sm,
                   child: ShadButton.ghost(
                     width: 24,
                     height: 24,
                     padding: EdgeInsets.zero,
                     onPressed: () => _removeImage(index),
                     child: Container(
-                      padding: const EdgeInsets.all(4),
+                      padding: const EdgeInsets.all(common.Spacing.xs),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.destructive,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         AppIcons.close,
-                        size: 12,
+                        size: common.Spacing.sm + common.Spacing.xs,
                         color: theme.colorScheme.destructiveForeground,
                       ),
                     ),
@@ -355,11 +356,11 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
                   : theme.colorScheme.secondaryForeground,
             ),
             if (_selectedImages.isNotEmpty) ...[
-              const SizedBox(width: 6),
+              SizedBox(width: common.Spacing.sm - 2),
               Text(
                 '${_selectedImages.length}/$_maxImages',
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: common.Spacing.sm + common.Spacing.xs,
                   color: _isLoading
                       ? theme.colorScheme.mutedForeground
                       : theme.colorScheme.secondaryForeground,
@@ -387,7 +388,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
         child: Text(
           '$charCount / $_maxLength',
           style: TextStyle(
-            fontSize: 14,
+            fontSize: common.Spacing.md - 2,
             color: theme.colorScheme.mutedForeground,
             fontFeatures: const [FontFeature.tabularFigures()],
           ),
@@ -408,14 +409,14 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
-                  width: 16,
-                  height: 16,
+                  width: common.Spacing.md,
+                  height: common.Spacing.md,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     color: theme.colorScheme.primaryForeground,
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: common.Spacing.sm),
                 Text('common.saving'.tr()),
               ],
             )

@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
@@ -164,12 +165,12 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
       children: [
         // 월 선택 헤더
         Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(common.Spacing.md),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ShadIconButton.ghost(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(common.Spacing.sm),
                 icon: Icon(AppIcons.chevronLeft, size: 20),
                 onPressed: _previousMonth,
               ),
@@ -187,7 +188,7 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
                     child: Text('calendar.today'.tr()),
                   ),
                   ShadIconButton.ghost(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(common.Spacing.sm),
                     icon: Icon(AppIcons.chevronRight, size: 20),
                     onPressed: _nextMonth,
                   ),
@@ -199,7 +200,7 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
 
         // 요일 헤더
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: common.Spacing.md),
           child: Row(
             children:
                 [
@@ -229,19 +230,19 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
           ),
         ),
 
-        const SizedBox(height: 8),
+        SizedBox(height: common.Spacing.sm),
 
         // 캘린더 그리드
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: common.Spacing.md),
           child: GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
               childAspectRatio: 1,
-              crossAxisSpacing: 4,
-              mainAxisSpacing: 4,
+              crossAxisSpacing: common.Spacing.xs,
+              mainAxisSpacing: common.Spacing.xs,
             ),
             itemCount: _generateCalendarDays().length,
             itemBuilder: (context, index) {
@@ -283,7 +284,7 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
                         Text(
                           _getFragmentDots(fragmentCount),
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: common.Spacing.sm + 2,
                             color: isSelected
                                 ? theme.colorScheme.primaryForeground
                                 : theme.colorScheme.primary,
@@ -298,7 +299,7 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
         ),
 
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: common.Spacing.md),
           child: const ShadSeparator.horizontal(),
         ),
 
@@ -307,7 +308,7 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
           child: selectedFragments.isEmpty
               ? Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(common.Spacing.lg),
                     child: Text(
                       'calendar.no_fragments'.tr(),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -317,7 +318,9 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
                   ),
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: common.Spacing.md,
+                  ),
                   itemCount: selectedFragments.length,
                   itemBuilder: (context, index) {
                     return FragmentCard(fragment: selectedFragments[index]);

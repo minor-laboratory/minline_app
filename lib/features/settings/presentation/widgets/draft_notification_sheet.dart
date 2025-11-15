@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 
 /// Draft 완성 알림 설정 바텀 시트
 class DraftNotificationSheet extends ConsumerStatefulWidget {
@@ -49,7 +50,7 @@ class _DraftNotificationSheetState
       children: [
         // 설명
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(common.Spacing.md),
             child: Text(
               'settings.draft_notifications_description'.tr(),
               style: textTheme.bodyMedium?.copyWith(
@@ -75,7 +76,7 @@ class _DraftNotificationSheetState
             },
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: common.Spacing.md),
       ],
     );
   }

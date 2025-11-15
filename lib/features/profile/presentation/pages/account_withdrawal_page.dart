@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:minorlab_common/minorlab_common.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -51,13 +51,13 @@ class _AccountWithdrawalPageState extends ConsumerState<AccountWithdrawalPage> {
         title: Text('withdrawal_title'.tr(), style: textTheme.titleLarge),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(common.Spacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // 경고 아이콘과 제목
             Icon(AppIcons.warning, size: 64, color: colorScheme.destructive),
-            const SizedBox(height: 16),
+            const SizedBox(height: common.Spacing.md),
 
             Text(
               'withdrawal_warning_title'.tr(),
@@ -67,11 +67,11 @@ class _AccountWithdrawalPageState extends ConsumerState<AccountWithdrawalPage> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: common.Spacing.lg),
 
             // 탈퇴 안내사항
             Text('withdrawal_notice'.tr(), style: textTheme.bodyLarge),
-            const SizedBox(height: 16),
+            const SizedBox(height: common.Spacing.md),
 
             // 탈퇴 확인 체크박스
             CheckboxListTile(
@@ -87,7 +87,7 @@ class _AccountWithdrawalPageState extends ConsumerState<AccountWithdrawalPage> {
               ),
               controlAffinity: ListTileControlAffinity.leading,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: common.Spacing.md),
 
             // "탈퇴" 입력 필드
             ShadInput(
@@ -95,7 +95,7 @@ class _AccountWithdrawalPageState extends ConsumerState<AccountWithdrawalPage> {
               placeholder: Text('withdrawal_confirmation_hint'.tr()),
               onChanged: (_) => setState(() {}),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: common.Spacing.lg),
 
             // 버튼들
             Row(
@@ -111,7 +111,7 @@ class _AccountWithdrawalPageState extends ConsumerState<AccountWithdrawalPage> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: common.Spacing.sm),
                 Expanded(
                   child: ShadButton(
                     onPressed: (_isLoading || !canWithdraw)

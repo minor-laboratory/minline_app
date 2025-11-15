@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
@@ -38,35 +39,35 @@ class _PostCardState extends ConsumerState<PostCard> {
     final theme = ShadTheme.of(context);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: common.Spacing.sm + common.Spacing.xs),
       child: ShadCard(
         child: InkWell(
           onTap: widget.onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(common.Spacing.sm + common.Spacing.xs),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 제목
               Text(
                 widget.post.title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
               ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: common.Spacing.sm + common.Spacing.xs),
 
               // 내용 미리보기
               Text(
                 _getContentPreview(),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.mutedForeground,
                     ),
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: common.Spacing.sm + common.Spacing.xs),
 
               // Fragment 개수, 날짜, 템플릿
               Row(
@@ -76,57 +77,57 @@ class _PostCardState extends ConsumerState<PostCard> {
                     size: 14,
                     color: theme.colorScheme.mutedForeground,
                   ),
-                  const SizedBox(width: 4),
+                  SizedBox(width: common.Spacing.xs),
                   Text(
                     'post.snap_count'.tr(namedArgs: {
                       'count': widget.post.fragmentIds.length.toString(),
                     }),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.mutedForeground,
                         ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: common.Spacing.sm),
                   Text(
                     '•',
                     style: TextStyle(color: theme.colorScheme.mutedForeground),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: common.Spacing.sm),
                   Text(
                     DateFormat.yMMMd(context.locale.languageCode).format(widget.post.createdAt),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.mutedForeground,
                         ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: common.Spacing.sm),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: EdgeInsets.symmetric(horizontal: common.Spacing.xs + 2, vertical: 2),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.muted,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(common.Spacing.xs),
                     ),
                     child: Text(
                       'posts.template_${widget.post.template}'.tr(),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.mutedForeground,
                           ),
                     ),
                   ),
                   if (widget.post.exportedTo.isNotEmpty) ...[
-                    const SizedBox(width: 8),
+                    SizedBox(width: common.Spacing.sm),
                     Text(
                       '•',
                       style: TextStyle(color: theme.colorScheme.mutedForeground),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: common.Spacing.sm),
                     Icon(
                       AppIcons.share,
                       size: 14,
                       color: theme.colorScheme.primary,
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: common.Spacing.xs),
                     Text(
                       'post.exported'.tr(),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.primary,
                           ),
                     ),

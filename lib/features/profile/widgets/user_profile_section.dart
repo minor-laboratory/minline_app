@@ -138,7 +138,7 @@ class UserProfileSection extends ConsumerWidget {
         // Fragment
         Expanded(
           child: GestureDetector(
-            onTap: () => context.go('/timeline'),
+            onTap: () => context.go('/?tab=0'),
             child: Container(
               padding: const EdgeInsets.symmetric(
                 vertical: common.Spacing.md,
@@ -193,7 +193,7 @@ class UserProfileSection extends ConsumerWidget {
         // Draft
         Expanded(
           child: GestureDetector(
-            onTap: () => context.go('/drafts'),
+            onTap: () => context.go('/?tab=1'),
             child: Container(
               padding: const EdgeInsets.symmetric(
                 vertical: common.Spacing.md,
@@ -248,7 +248,7 @@ class UserProfileSection extends ConsumerWidget {
         // Post
         Expanded(
           child: GestureDetector(
-            onTap: () => context.go('/posts'),
+            onTap: () => context.go('/?tab=2'),
             child: Container(
               padding: const EdgeInsets.symmetric(
                 vertical: common.Spacing.md,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 
 /// Wolt Modal Sheet를 활용한 반응형 모달 시트 헬퍼 유틸리티
 ///
@@ -78,7 +79,7 @@ class ResponsiveModalSheet {
     return createPage(
       topBarTitle: title,
       backgroundColor: backgroundColor,
-      child: Padding(padding: const EdgeInsets.all(16.0), child: content),
+      child: Padding(padding: const EdgeInsets.all(common.Spacing.md), child: content),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 
 import '../../../../core/constants/feedback_templates.dart';
 import '../../../../core/services/feedback_service.dart';
@@ -88,7 +89,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
         title: Text('feedback.what_went_wrong'.tr()),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.only(right: common.Spacing.sm),
             child: ShadButton(
               onPressed: _isSubmitting ? null : _handleSubmit,
               child: _isSubmitting
@@ -103,7 +104,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(common.Spacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -114,13 +115,13 @@ class _FeedbackPageState extends State<FeedbackPage> {
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: common.Spacing.lg),
 
             // 사유 선택 (체크박스)
             ..._reasons.map((reason) {
               final isSelected = _selectedReasons.contains(reason.id);
               return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: common.Spacing.sm),
                 child: Row(
                   children: [
                     ShadCheckbox(
@@ -138,7 +139,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                               });
                             },
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: common.Spacing.sm + common.Spacing.xs),
                     Expanded(
                       child: GestureDetector(
                         onTap: _isSubmitting
@@ -161,7 +162,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               );
             }),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: common.Spacing.lg),
 
             // 자유 입력
             ShadTextarea(
@@ -175,15 +176,15 @@ class _FeedbackPageState extends State<FeedbackPage> {
               },
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: common.Spacing.md),
 
             // 에러 메시지
             if (_errorMessage != null) ...[
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(common.Spacing.sm + common.Spacing.xs),
                 decoration: BoxDecoration(
                   color: ShadTheme.of(context).colorScheme.destructive.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(common.Spacing.sm),
                 ),
                 child: Text(
                   _errorMessage!,

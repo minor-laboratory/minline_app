@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 
 import '../../core/utils/app_icons.dart';
 import 'responsive_modal_sheet.dart';
@@ -59,7 +60,7 @@ class StandardBottomSheet {
             actionLayout: actionLayout,
             titleStyle: titleStyle,
             showCloseButton: showCloseButton,
-            contentPadding: contentPadding ?? const EdgeInsets.all(16),
+            contentPadding: contentPadding ?? const EdgeInsets.all(common.Spacing.md),
           ),
         ),
       ],
@@ -80,7 +81,7 @@ class StandardBottomSheet {
       titleStyle: BottomSheetTitleStyle.medium,
       isDraggable: isDraggable,
       isDismissible: true,
-      contentPadding: EdgeInsets.zero,
+      contentPadding: const EdgeInsets.all(0),
       content: _SelectionListContent<T>(
         options: options,
         selectedValue: selectedValue,
@@ -101,7 +102,7 @@ class StandardBottomSheet {
       titleStyle: BottomSheetTitleStyle.medium,
       isDraggable: isDraggable,
       isDismissible: true,
-      contentPadding: const EdgeInsets.symmetric(vertical: 8),
+      contentPadding: const EdgeInsets.symmetric(vertical: common.Spacing.sm),
       content: _ActionListContent<T>(actions: actions),
     );
   }
@@ -122,7 +123,7 @@ class StandardBottomSheet {
       isDraggable: false,
       isDismissible: true,
       content: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: common.Spacing.sm),
         child: Text(
           message,
           style: Theme.of(context).textTheme.bodyMedium,
@@ -178,9 +179,9 @@ class _StandardBottomSheetContent extends StatelessWidget {
 
         // 액션 버튼 영역
         if (actions != null && actions!.isNotEmpty) ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: common.Spacing.md),
           _buildActionButtons(context),
-          const SizedBox(height: 16),
+          const SizedBox(height: common.Spacing.md),
         ],
       ],
     );
@@ -191,7 +192,7 @@ class _StandardBottomSheetContent extends StatelessWidget {
     if (actions == null || actions!.isEmpty) return const SizedBox.shrink();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: common.Spacing.md),
       child: actionLayout == BottomSheetActionLayout.horizontal
         ? _buildHorizontalActions(context)
         : _buildVerticalActions(context),
@@ -205,7 +206,7 @@ class _StandardBottomSheetContent extends StatelessWidget {
         final action = entry.value;
 
         return [
-          if (index > 0) const SizedBox(width: 8),
+          if (index > 0) const SizedBox(width: common.Spacing.sm),
           Expanded(child: _buildActionButton(context, action)),
         ];
       }).expand((widgets) => widgets).toList(),
@@ -220,7 +221,7 @@ class _StandardBottomSheetContent extends StatelessWidget {
         final action = entry.value;
 
         return [
-          if (index > 0) const SizedBox(height: 8),
+          if (index > 0) const SizedBox(height: common.Spacing.sm),
           _buildActionButton(context, action),
         ];
       }).expand((widgets) => widgets).toList(),

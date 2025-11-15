@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
@@ -37,7 +38,10 @@ class _FilterBarState extends ConsumerState<FilterBar> {
     final filter = filterAsync.asData?.value ?? const FragmentFilterState();
 
     return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: common.Spacing.md,
+          vertical: common.Spacing.sm,
+        ),
         child: Row(
           children: [
             // 검색 입력 (태그 Pills 포함)
@@ -68,18 +72,18 @@ class _FilterBarState extends ConsumerState<FilterBar> {
                         .read(fragmentFilterProvider.notifier)
                         .setQuery(value);
                   },
-                  style: const TextStyle(fontSize: 14),
+                  style: theme.textTheme.bodyMedium,
                   leading: filter.selectedTags.isNotEmpty
                       ? SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: filter.selectedTags.map((tag) {
                               return Padding(
-                                padding: const EdgeInsets.only(right: 4),
+                                padding: EdgeInsets.only(right: common.Spacing.xs),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 2,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: common.Spacing.xs + 2,
+                                    vertical: common.Spacing.xs / 2,
                                   ),
                                   decoration: BoxDecoration(
                                     color: theme.colorScheme.primary.withValues(alpha: 0.1),
@@ -90,12 +94,11 @@ class _FilterBarState extends ConsumerState<FilterBar> {
                                     children: [
                                       Text(
                                         tag,
-                                        style: TextStyle(
-                                          fontSize: 12,
+                                        style: theme.textTheme.labelMedium?.copyWith(
                                           color: theme.colorScheme.primary,
                                         ),
                                       ),
-                                      const SizedBox(width: 2),
+                                      SizedBox(width: common.Spacing.xs / 2),
                                       GestureDetector(
                                         onTap: () {
                                           ref
@@ -137,7 +140,7 @@ class _FilterBarState extends ConsumerState<FilterBar> {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: common.Spacing.sm),
 
             // 정렬 버튼
             PopupMenuButton<String>(
@@ -170,7 +173,7 @@ class _FilterBarState extends ConsumerState<FilterBar> {
 
             // 정렬 방향 토글
             ShadIconButton.ghost(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(common.Spacing.sm),
               icon: Icon(
                 filter.sortOrder == 'desc'
                     ? AppIcons.arrowDown

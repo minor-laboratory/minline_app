@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -13,6 +14,7 @@ import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../models/draft.dart';
 import '../../../../models/fragment.dart';
+import '../../../../shared/widgets/standard_bottom_sheet.dart';
 
 /// Fragment 카드 위젯 (웹 UX 완전 맞춤)
 ///
@@ -114,27 +116,18 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
   }
 
   /// 삭제 확인 Dialog
-  void _showDeleteDialog() {
-    showShadDialog(
+  Future<void> _showDeleteDialog() async {
+    final confirmed = await StandardBottomSheet.showConfirmation(
       context: context,
-      builder: (context) => ShadDialog(
-        title: Text('snap.delete_title'.tr()),
-        description: Text('snap.delete_confirm'.tr()),
-        actions: [
-          ShadButton.outline(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('common.cancel'.tr()),
-          ),
-          ShadButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await _handleDelete();
-            },
-            child: Text('common.delete'.tr()),
-          ),
-        ],
-      ),
+      title: 'snap.delete_title'.tr(),
+      message: 'snap.delete_confirm'.tr(),
+      confirmText: 'common.delete'.tr(),
+      isDestructive: true,
     );
+
+    if (confirmed == true) {
+      await _handleDelete();
+    }
   }
 
   /// 이미지 뷰어 표시
@@ -251,15 +244,21 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
     }
   }
 
-  /// 이벤트 시간 Picker 표시 (Material BottomSheet)
+  /// 이벤트 시간 Picker 표시 (StandardBottomSheet)
   void _showEventTimePicker() {
-    showModalBottomSheet(
+    final navigator = Navigator.of(context);
+    StandardBottomSheet.show(
       context: context,
-      isScrollControlled: true,
-      builder: (context) => _EventTimePickerSheet(
+      contentPadding: EdgeInsets.zero,
+      isDraggable: true,
+      isDismissible: true,
+      content: _EventTimePickerSheet(
         fragment: widget.fragment,
         onUpdate: (eventTime, eventTimeSource) async {
           await _handleEventTimeUpdate(eventTime, eventTimeSource);
+          if (mounted) {
+            navigator.pop();
+          }
         },
       ),
     );
@@ -347,7 +346,12 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
         footer: _isEditing
             ? null
             : Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+                padding: const EdgeInsets.fromLTRB(
+                  common.Spacing.md,
+                  common.Spacing.sm,
+                  0,
+                  common.Spacing.sm,
+                ),
                 child: Row(
                   children: [
                     // 작성 시간
@@ -356,17 +360,16 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                       size: 12,
                       color: theme.colorScheme.mutedForeground,
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: common.Spacing.xs),
                     Text(
                       _formatTimestamp(context, widget.fragment.timestamp),
-                      style: TextStyle(
-                        fontSize: 12,
+                      style: theme.textTheme.labelMedium?.copyWith(
                         color: theme.colorScheme.mutedForeground,
                       ),
                     ),
                     // 동기화 대기
                     if (!widget.fragment.synced) ...[
-                      const SizedBox(width: 8),
+                      const SizedBox(width: common.Spacing.sm),
                       Icon(
                         AppIcons.clock,
                         size: 12,
@@ -376,7 +379,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                     const Spacer(),
                     // 더보기 메뉴 (PopupMenuButton)
                     PopupMenuButton<String>(
-                      padding: const EdgeInsets.all(4),
+                      padding: const EdgeInsets.all(common.Spacing.xs),
                       iconSize: 18,
                       icon: Icon(
                         AppIcons.moreVert,
@@ -401,7 +404,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                           child: Row(
                             children: [
                               Icon(AppIcons.edit, size: 16),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: common.Spacing.sm),
                               Text('common.edit'.tr()),
                             ],
                           ),
@@ -412,7 +415,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                           child: Row(
                             children: [
                               Icon(AppIcons.sparkles, size: 16),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: common.Spacing.sm),
                               Text(
                                 _isGeneratingEmbedding
                                     ? 'common.generating'.tr()
@@ -431,7 +434,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                                 size: 16,
                                 color: theme.colorScheme.destructive,
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: common.Spacing.sm),
                               Text(
                                 'common.delete'.tr(),
                                 style: TextStyle(
@@ -817,43 +820,19 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
     );
   }
 
-  /// AI 태그 숨기기 BottomSheet
-  void _showHideAiTagSheet(String tag) {
-    showModalBottomSheet(
+  /// AI 태그 숨기기 확인
+  Future<void> _showHideAiTagSheet(String tag) async {
+    final confirmed = await StandardBottomSheet.showConfirmation(
       context: context,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'tag.confirm_hide'.tr(namedArgs: {'tag': tag}),
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ShadButton.outline(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('common.cancel'.tr()),
-                ),
-                const SizedBox(width: 8),
-                ShadButton.destructive(
-                  onPressed: () {
-                    _handleHideAiTag(tag);
-                    Navigator.pop(context);
-                  },
-                  child: Text('tag.hide'.tr()),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
+      title: 'tag.confirm_hide_title'.tr(),
+      message: 'tag.confirm_hide'.tr(namedArgs: {'tag': tag}),
+      confirmText: 'tag.hide'.tr(),
+      isDestructive: true,
     );
+
+    if (confirmed == true) {
+      await _handleHideAiTag(tag);
+    }
   }
 
   /// 사용자 태그 위젯 (웹 스타일)
@@ -899,43 +878,19 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
     );
   }
 
-  /// 사용자 태그 삭제 BottomSheet
-  void _showRemoveUserTagSheet(String tag) {
-    showModalBottomSheet(
+  /// 사용자 태그 삭제 확인
+  Future<void> _showRemoveUserTagSheet(String tag) async {
+    final confirmed = await StandardBottomSheet.showConfirmation(
       context: context,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'tag.confirm_remove'.tr(namedArgs: {'tag': tag}),
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ShadButton.outline(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('common.cancel'.tr()),
-                ),
-                const SizedBox(width: 8),
-                ShadButton.destructive(
-                  onPressed: () {
-                    _handleRemoveUserTag(tag);
-                    Navigator.pop(context);
-                  },
-                  child: Text('common.delete'.tr()),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
+      title: 'tag.confirm_remove_title'.tr(),
+      message: 'tag.confirm_remove'.tr(namedArgs: {'tag': tag}),
+      confirmText: 'common.delete'.tr(),
+      isDestructive: true,
     );
+
+    if (confirmed == true) {
+      await _handleRemoveUserTag(tag);
+    }
   }
 
   /// 태그 추가 버튼 (웹 스타일)
@@ -1047,10 +1002,7 @@ class _EventTimePickerSheetState extends State<_EventTimePickerSheet> {
       final eventTimeSource = _includeTime ? 'user_time' : 'user_date';
 
       await widget.onUpdate(eventTime, eventTimeSource);
-
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
+      // Navigator.pop은 부모 (_showEventTimePicker)에서 처리
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

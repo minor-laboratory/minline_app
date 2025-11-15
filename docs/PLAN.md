@@ -83,7 +83,8 @@ lib/features/timeline/
 ├── providers/fragments_provider.dart ✅
 ├── presentation/widgets/filter_bar.dart ✅
 ├── presentation/widgets/fragment_list.dart ✅
-├── presentation/pages/timeline_page.dart ✅
+├── presentation/widgets/timeline_view.dart ✅ (PageView 통합으로 이동)
+lib/features/main/presentation/pages/main_page.dart ✅ (Timeline/Drafts/Posts 통합)
 lib/core/utils/app_icons.dart ✅
 assets/translations/ko.json, en.json ✅
 ```
@@ -114,7 +115,8 @@ assets/translations/ko.json, en.json ✅
 ```
 lib/features/drafts/
 ├── providers/drafts_provider.dart ✅
-├── presentation/pages/drafts_page.dart ✅
+├── presentation/widgets/drafts_view.dart ✅ (PageView 통합으로 이동)
+lib/features/main/presentation/pages/main_page.dart ✅ (Timeline/Drafts/Posts 통합)
 assets/translations/ko.json, en.json ✅
 ```
 
@@ -242,7 +244,7 @@ lib/core/services/sync/
 **우선순위:** 최상
 
 **작업:**
-- [x] Timeline 페이지 (`timeline_page.dart`)
+- [x] Timeline 뷰 (`timeline_view.dart` - MainPage에서 호출)
 - [x] Fragment 리스트 위젯
 - [x] Fragment 카드 위젯
 - [x] Empty State
@@ -252,12 +254,14 @@ lib/core/services/sync/
 ```
 lib/features/timeline/
 ├── presentation/
-│   ├── pages/timeline_page.dart
-│   └── widgets/
-│       ├── fragment_card.dart
-│       └── fragment_list.dart
+│   ├── widgets/
+│   │   ├── timeline_view.dart (PageView 통합)
+│   │   ├── fragment_card.dart
+│   │   └── fragment_list.dart
+│   └── pages/tag_edit_page.dart
 └── providers/
     └── fragments_provider.dart
+lib/features/main/presentation/pages/main_page.dart (Timeline/Drafts/Posts 통합)
 ```
 
 **참조:**
@@ -309,13 +313,12 @@ lib/features/timeline/presentation/widgets/
 ```
 lib/features/drafts/
 ├── presentation/
-│   ├── pages/
-│   │   ├── drafts_page.dart
-│   │   └── draft_detail_page.dart
 │   └── widgets/
+│       ├── drafts_view.dart (PageView 통합으로 이동)
 │       ├── draft_card.dart
 │       └── draft_card_actions.dart
 └── providers/drafts_provider.dart
+lib/features/main/presentation/pages/main_page.dart (Timeline/Drafts/Posts 통합)
 ```
 
 **검증:**
@@ -342,10 +345,13 @@ lib/features/drafts/
 lib/features/posts/
 ├── presentation/
 │   ├── pages/
-│   │   ├── posts_page.dart ✅
+│   │   ├── post_create_page.dart ✅
 │   │   └── post_detail_page.dart ✅
-│   └── widgets/post_card.dart
+│   └── widgets/
+│       ├── posts_view.dart ✅ (PageView 통합으로 이동)
+│       └── post_card.dart
 └── providers/posts_provider.dart ✅
+lib/features/main/presentation/pages/main_page.dart ✅ (Timeline/Drafts/Posts 통합)
 lib/router/app_router.dart (라우트 추가) ✅
 pubspec.yaml (flutter_markdown: ^0.7.4+1) ✅
 ```
@@ -436,7 +442,7 @@ lib/router/app_router.dart
 lib/features/timeline/presentation/widgets/
 └── calendar_view.dart
 lib/features/timeline/presentation/pages/
-└── timeline_page.dart (뷰 토글 추가)
+└── timeline_view.dart (뷰 토글 추가, main_page.dart에서 호출)
 ```
 
 **참조:**

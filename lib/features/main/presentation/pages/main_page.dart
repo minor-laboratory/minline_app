@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -18,15 +19,17 @@ import '../../../timeline/providers/fragments_provider.dart';
 ///
 /// Timeline/Drafts/Posts 페이지를 PageView로 관리
 class MainPage extends ConsumerStatefulWidget {
-  const MainPage({super.key});
+  final int initialTab;
+
+  const MainPage({super.key, this.initialTab = 0});
 
   @override
   ConsumerState<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends ConsumerState<MainPage> {
-  final PageController _pageController = PageController();
-  int _currentPageIndex = 0;
+  late final PageController _pageController;
+  late int _currentPageIndex;
 
   // Timeline 상태
   String _viewMode = 'timeline'; // 'timeline' | 'calendar'
@@ -37,6 +40,26 @@ class _MainPageState extends ConsumerState<MainPage> {
   // Draft 상태
   bool _isAnalyzing = false;
   String _analyzeMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPageIndex = widget.initialTab;
+    _pageController = PageController(initialPage: widget.initialTab);
+    logger.i('MainPage initialized with tab: ${widget.initialTab}');
+  }
+
+  @override
+  void didUpdateWidget(MainPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialTab != widget.initialTab) {
+      logger.i('MainPage tab changed: ${oldWidget.initialTab} -> ${widget.initialTab}');
+      setState(() {
+        _currentPageIndex = widget.initialTab;
+      });
+      _pageController.jumpToPage(widget.initialTab);
+    }
+  }
 
   @override
   void dispose() {
@@ -170,7 +193,7 @@ class _MainPageState extends ConsumerState<MainPage> {
       leading: _buildLeading(),
 
       title: Padding(
-        padding: const EdgeInsets.only(top: 8),
+        padding: const EdgeInsets.only(top: common.Spacing.sm),
 
         child: ShadTabs<int>(
           value: _currentPageIndex,
@@ -188,7 +211,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                         ? 'timeline.title'.tr()
                         : 'timeline.calendar'.tr(),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: common.Spacing.sm - common.Spacing.xs),
                   GestureDetector(
                     onTap: _currentPageIndex == 0 ? _toggleViewMode : null,
                     child: Icon(
@@ -221,7 +244,7 @@ class _MainPageState extends ConsumerState<MainPage> {
       centerTitle: true,
       actions: const [
         Padding(
-          padding: EdgeInsets.only(right: 12),
+          padding: EdgeInsets.only(right: common.Spacing.sm + common.Spacing.xs),
           child: Center(child: UserAvatarButton()),
         ),
       ],
@@ -259,18 +282,17 @@ class _MainPageState extends ConsumerState<MainPage> {
           onChanged: (value) {
             ref.read(fragmentFilterProvider.notifier).setQuery(value);
           },
-          style: const TextStyle(fontSize: 14),
           leading: filter.selectedTags.isNotEmpty
               ? SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: filter.selectedTags.map((tag) {
                       return Padding(
-                        padding: const EdgeInsets.only(right: 4),
+                        padding: const EdgeInsets.only(right: common.Spacing.xs),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
+                            horizontal: common.Spacing.sm - common.Spacing.xs,
+                            vertical: common.Spacing.xs / 2,
                           ),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.primary.withValues(alpha: 0.1),
@@ -281,12 +303,11 @@ class _MainPageState extends ConsumerState<MainPage> {
                             children: [
                               Text(
                                 tag,
-                                style: TextStyle(
-                                  fontSize: 12,
+                                style: theme.textTheme.small.copyWith(
                                   color: theme.colorScheme.primary,
                                 ),
                               ),
-                              const SizedBox(width: 2),
+                              const SizedBox(width: common.Spacing.xs / 2),
                               GestureDetector(
                                 onTap: () {
                                   ref
@@ -295,7 +316,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                                 },
                                 child: Icon(
                                   AppIcons.close,
-                                  size: 12,
+                                  size: common.Spacing.sm + common.Spacing.xs,
                                   color: theme.colorScheme.primary,
                                 ),
                               ),
@@ -309,8 +330,8 @@ class _MainPageState extends ConsumerState<MainPage> {
               : null,
           trailing: (filter.query.isNotEmpty || filter.selectedTags.isNotEmpty)
               ? ShadButton.ghost(
-                  width: 24,
-                  height: 24,
+                  width: common.Spacing.lg,
+                  height: common.Spacing.lg,
                   padding: EdgeInsets.zero,
                   onPressed: () {
                     _searchController.clear();
@@ -318,7 +339,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                   },
                   child: Icon(
                     AppIcons.close,
-                    size: 16,
+                    size: common.Spacing.md,
                     color: theme.colorScheme.mutedForeground,
                   ),
                 )
@@ -351,7 +372,7 @@ class _MainPageState extends ConsumerState<MainPage> {
           ],
         ),
         ShadIconButton.ghost(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(common.Spacing.sm),
           icon: Icon(
             filter.sortOrder == 'desc' ? AppIcons.arrowDown : AppIcons.arrowUp,
             size: 20,
@@ -361,7 +382,7 @@ class _MainPageState extends ConsumerState<MainPage> {
             ref.read(fragmentFilterProvider.notifier).toggleSortOrder();
           },
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: common.Spacing.xs),
       ],
     );
   }
@@ -380,7 +401,7 @@ class _MainPageState extends ConsumerState<MainPage> {
             const Spacer(),
             Icon(
               AppIcons.checkCircle,
-              size: 16,
+              size: common.Spacing.md,
               color: ShadTheme.of(context).colorScheme.primary,
             ),
           ],

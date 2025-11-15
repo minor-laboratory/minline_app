@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 
 import '../../../../core/services/local_notification_service.dart';
 import '../../../../core/utils/app_icons.dart';
@@ -82,7 +83,7 @@ class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
       children: [
         // 설명
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(common.Spacing.md),
             child: Text(
               'settings.daily_reminder_description'.tr(),
               style: textTheme.bodyMedium?.copyWith(
@@ -117,7 +118,7 @@ class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
                       color: theme.colorScheme.primary,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: common.Spacing.sm),
                   Icon(AppIcons.chevronRight, size: 20),
                 ],
               ),
@@ -125,7 +126,7 @@ class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
             ),
         ],
 
-        const SizedBox(height: 16),
+        const SizedBox(height: common.Spacing.md),
       ],
     );
   }

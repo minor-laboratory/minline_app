@@ -322,17 +322,23 @@ class _ColorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+
+    // HSL 보색 계산 (색상환에서 정확히 반대편)
+    final hslColor = HSLColor.fromColor(color);
+    final checkColor = hslColor.withHue((hslColor.hue + 180) % 360).toColor();
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: isSelected
-              ? ShadTheme.of(context).colorScheme.accent.withValues(alpha: 0.3)
+              ? theme.colorScheme.accent.withValues(alpha: 0.3)
               : Colors.transparent,
           border: Border.all(
             color: isSelected
-                ? ShadTheme.of(context).colorScheme.ring
-                : ShadTheme.of(context).colorScheme.border,
+                ? theme.colorScheme.ring
+                : theme.colorScheme.border,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(8),
@@ -356,9 +362,7 @@ class _ColorCard extends StatelessWidget {
               child: isSelected
                   ? Icon(
                       AppIcons.check,
-                      color: color.computeLuminance() > 0.5
-                          ? Colors.black
-                          : Colors.white,
+                      color: checkColor,
                       size: 20,
                     )
                   : null,
@@ -366,7 +370,7 @@ class _ColorCard extends StatelessWidget {
             const SizedBox(height: common.Spacing.sm),
             Text(
               label,
-              style: ShadTheme.of(context).textTheme.small.copyWith(
+              style: theme.textTheme.small.copyWith(
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),
             ),

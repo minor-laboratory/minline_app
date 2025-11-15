@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
@@ -34,7 +35,7 @@ class _PostsViewState extends ConsumerState<PostsView>
           final theme = ShadTheme.of(context);
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(common.Spacing.lg),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -43,17 +44,15 @@ class _PostsViewState extends ConsumerState<PostsView>
                     size: 64,
                     color: theme.colorScheme.border,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: common.Spacing.md),
                   Text(
                     'posts.empty_title'.tr(),
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: theme.textTheme.h3,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: common.Spacing.sm),
                   Text(
                     'posts.empty_message'.tr(),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.mutedForeground,
-                        ),
+                    style: theme.textTheme.muted,
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -67,7 +66,7 @@ class _PostsViewState extends ConsumerState<PostsView>
             ref.invalidate(postsStreamProvider);
           },
           child: ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(common.Spacing.md),
             itemCount: posts.length,
             itemBuilder: (context, index) {
               final post = posts[index];
@@ -91,7 +90,7 @@ class _PostsViewState extends ConsumerState<PostsView>
         final theme = ShadTheme.of(context);
         return Center(
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(common.Spacing.lg),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -100,17 +99,15 @@ class _PostsViewState extends ConsumerState<PostsView>
                   size: 64,
                   color: theme.colorScheme.destructive,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: common.Spacing.md),
                 Text(
                   'timeline.error_title'.tr(),
-                  style: Theme.of(context).textTheme.titleLarge,
+                  style: theme.textTheme.h3,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: common.Spacing.sm),
                 Text(
                   error.toString(),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.mutedForeground,
-                      ),
+                  style: theme.textTheme.muted,
                   textAlign: TextAlign.center,
                 ),
               ],

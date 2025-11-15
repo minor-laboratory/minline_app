@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -202,7 +203,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                 size: 64,
                 color: ShadTheme.of(context).colorScheme.destructive,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: common.Spacing.md),
               Text(
                 'post.draft_not_found'.tr(),
                 style: Theme.of(context).textTheme.titleLarge,
@@ -218,7 +219,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
         title: Text('post.create_title'.tr()),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.only(right: common.Spacing.sm),
             child: ShadButton(
               onPressed: _isGenerating ? null : _handleGenerate,
               child: Row(
@@ -232,7 +233,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                     )
                   else
                     Icon(AppIcons.sparkles, size: 16),
-                  const SizedBox(width: 8),
+                  SizedBox(width: common.Spacing.sm),
                   Text(
                     _isGenerating
                         ? 'post.generating'.tr()
@@ -245,14 +246,14 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(common.Spacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Draft 정보
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(common.Spacing.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -263,20 +264,20 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                           size: 20,
                           color: Theme.of(context).colorScheme.primary,
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: common.Spacing.sm),
                         Text(
                           'draft.title'.tr(),
                           style: Theme.of(context).textTheme.labelLarge,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: common.Spacing.sm + common.Spacing.xs),
                     Text(
                       _draft!.title,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     if (_draft!.reason != null) ...[
-                      const SizedBox(height: 8),
+                      SizedBox(height: common.Spacing.sm),
                       Text(
                         _draft!.reason!,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -289,14 +290,14 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: common.Spacing.lg),
 
             // 템플릿 선택
             Text(
               'post.select_template'.tr(),
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: common.Spacing.sm + common.Spacing.xs),
 
             // 템플릿 그리드
             GridView.builder(
@@ -305,8 +306,8 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: MediaQuery.of(context).size.width > 600 ? 2 : 1,
                 childAspectRatio: 3.5,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+                crossAxisSpacing: common.Spacing.sm + common.Spacing.xs,
+                mainAxisSpacing: common.Spacing.sm + common.Spacing.xs,
               ),
               itemCount: PostTemplates.all.length,
               itemBuilder: (context, index) {
@@ -315,23 +316,23 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
               },
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: common.Spacing.lg),
 
             // 미리보기 영역
             Text(
               'post.preview'.tr(),
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: common.Spacing.sm + common.Spacing.xs),
 
             // 에러 메시지
             if (_errorMessage != null)
               Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(bottom: common.Spacing.sm + common.Spacing.xs),
+                padding: const EdgeInsets.all(common.Spacing.md),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.errorContainer,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(common.Spacing.sm + common.Spacing.xs),
                 ),
                 child: Row(
                   children: [
@@ -340,7 +341,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                       color: Theme.of(context).colorScheme.error,
                       size: 20,
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: common.Spacing.sm + common.Spacing.xs),
                     Expanded(
                       child: Text(
                         _errorMessage!,
@@ -357,7 +358,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
             if (_isGenerating || _generatingContent.isNotEmpty)
               Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(common.Spacing.md),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -368,9 +369,9 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                           style: Theme.of(context).textTheme.headlineSmall
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: common.Spacing.md),
                         const Divider(),
-                        const SizedBox(height: 16),
+                        SizedBox(height: common.Spacing.md),
                       ],
 
                       // 내용
@@ -394,15 +395,15 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
 
                       // 프로그레스바
                       if (_progress > 0 && _progress < 100) ...[
-                        const SizedBox(height: 16),
+                        SizedBox(height: common.Spacing.md),
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(common.Spacing.xs),
                           child: LinearProgressIndicator(
                             value: _progress / 100,
                             minHeight: 6,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: common.Spacing.sm),
                         Text(
                           '${_progress.toInt()}%',
                           style: Theme.of(context).textTheme.bodySmall
@@ -416,7 +417,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
 
                       // 완료 메시지
                       if (_progress >= 100) ...[
-                        const SizedBox(height: 16),
+                        SizedBox(height: common.Spacing.md),
                         Row(
                           children: [
                             Icon(
@@ -424,7 +425,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                               color: Theme.of(context).colorScheme.primary,
                               size: 20,
                             ),
-                            const SizedBox(width: 8),
+                            SizedBox(width: common.Spacing.sm),
                             Text(
                               'post.generation_complete'.tr(),
                               style: Theme.of(context).textTheme.bodyMedium
@@ -446,7 +447,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
               // 플레이스홀더
               Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(common.Spacing.md),
                   child: Center(
                     child: Text(
                       'post.preview_placeholder'.tr(),
@@ -474,13 +475,13 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
       child: Card(
         color: isSelected ? theme.colorScheme.accent : null,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(common.Spacing.sm + common.Spacing.xs),
           side: isSelected
               ? BorderSide(color: theme.colorScheme.primary, width: 2)
               : BorderSide.none,
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(common.Spacing.md),
           child: Row(
             children: [
               // 아이콘
@@ -491,7 +492,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                   color: isSelected
                       ? theme.colorScheme.primary
                       : theme.colorScheme.muted,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(common.Spacing.sm),
                 ),
                 child: Icon(
                   template.icon,
@@ -501,7 +502,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                       : theme.colorScheme.mutedForeground,
                 ),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: common.Spacing.md),
               // 텍스트
               Expanded(
                 child: Column(
@@ -517,7 +518,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: common.Spacing.xs),
                     Text(
                       template.descKey.tr(),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -535,7 +536,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
               ),
               // 체크 마크
               if (isSelected) ...[
-                const SizedBox(width: 8),
+                SizedBox(width: common.Spacing.sm),
                 Icon(
                   AppIcons.checkCircle,
                   size: 20,

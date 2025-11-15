@@ -349,15 +349,22 @@ Scaffold(
 <!-- 모바일: 하단 탭 바 -->
 ```
 
-**앱**: AppBar + 메뉴
+**앱**: MainPage + PageView + ShadTabs
 ```dart
-// miniline_app/lib/features/timeline/pages/timeline_page.dart
-AppBar(
-  actions: [
-    IconButton(icon: Icon(AppIcons.drafts)),  // Drafts
-    IconButton(icon: Icon(AppIcons.posts)),   // Posts
-    PopupMenuButton(...),                      // Settings
-  ],
+// miniline_app/lib/features/main/presentation/pages/main_page.dart
+// Timeline/Drafts/Posts를 PageView로 통합, ShadTabs로 탭 전환
+MainPage(
+  appBar: AppBar(
+    title: ShadTabs(...), // Timeline/Drafts/Posts 탭
+    actions: [UserAvatarButton()],
+  ),
+  body: PageView(
+    children: [
+      TimelineView(),  // lib/features/timeline/presentation/widgets/timeline_view.dart
+      DraftsView(),    // lib/features/drafts/presentation/widgets/drafts_view.dart
+      PostsView(),     // lib/features/posts/presentation/widgets/posts_view.dart
+    ],
+  ),
 )
 ```
 

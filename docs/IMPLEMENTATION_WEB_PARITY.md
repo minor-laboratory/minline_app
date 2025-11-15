@@ -391,9 +391,10 @@ final fragmentsAsync = ref.watch(fragmentsStreamProvider);
 final fragmentsAsync = ref.watch(filteredFragmentsProvider);
 ```
 
-#### 4. TimelinePage에 FilterBar 추가
+#### 4. MainPage의 TimelineView에 FilterBar 추가
 
-**파일**: `lib/features/timeline/presentation/pages/timeline_page.dart`
+**파일**: `lib/features/main/presentation/pages/main_page.dart` (Timeline/Drafts/Posts 통합)
+**참조**: `lib/features/timeline/presentation/widgets/timeline_view.dart`
 
 ```dart
 body: Column(
@@ -436,7 +437,8 @@ body: Column(
 
 **파일**:
 - `lib/features/drafts/providers/drafts_provider.dart` ✅
-- `lib/features/drafts/presentation/pages/drafts_page.dart` ✅
+- `lib/features/drafts/presentation/widgets/drafts_view.dart` ✅ (PageView 통합으로 이동)
+- `lib/features/main/presentation/pages/main_page.dart` ✅ (Timeline/Drafts/Posts 통합)
 - `assets/translations/ko.json`, `en.json` ✅
 
 **웹 참조**: `miniline/src/lib/components/DraftList.svelte` (120-172, 196-225라인)
@@ -515,9 +517,10 @@ Stream<Map<String, int>> draftCounts(Ref ref) async* {
 }
 ```
 
-#### 2. DraftsPage UI 수정
+#### 2. DraftsView UI 수정
 
-**파일**: `lib/features/drafts/presentation/pages/drafts_page.dart`
+**파일**: `lib/features/drafts/presentation/widgets/drafts_view.dart` (PageView 통합)
+**호출**: `lib/features/main/presentation/pages/main_page.dart`
 
 **완료된 구현**:
 
@@ -630,7 +633,7 @@ class _FilterChip extends StatelessWidget {
 
 #### 3. AI 분석 함수 추가
 
-**파일**: `lib/features/drafts/presentation/pages/drafts_page.dart`
+**파일**: `lib/features/main/presentation/pages/main_page.dart` (Drafts 탭 로직)
 
 **완료된 구현**:
 ```dart
@@ -800,8 +803,10 @@ Future<void> _handleAnalyzeNow() async {
 
 ### 미니라인 앱 (현재)
 
-- Timeline: `lib/features/timeline/presentation/pages/timeline_page.dart`
-- Drafts: `lib/features/drafts/presentation/pages/drafts_page.dart`
+- Timeline: `lib/features/timeline/presentation/widgets/timeline_view.dart` (MainPage에서 호출)
+- Drafts: `lib/features/drafts/presentation/widgets/drafts_view.dart` (MainPage에서 호출)
+- Posts: `lib/features/posts/presentation/widgets/posts_view.dart` (MainPage에서 호출)
+- **통합 페이지**: `lib/features/main/presentation/pages/main_page.dart` (PageView + Tabs)
 - Settings: `lib/features/settings/presentation/pages/settings_page.dart`
 
 ---

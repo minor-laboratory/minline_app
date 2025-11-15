@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -41,22 +42,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Future<void> _handleLogout() async {
-    final confirmed = await showShadDialog<bool>(
+    final confirmed = await StandardBottomSheet.showConfirmation(
       context: context,
-      builder: (context) => ShadDialog(
-        title: Text('settings.logout'.tr()),
-        description: Text('settings.logout_confirm'.tr()),
-        actions: [
-          ShadButton.outline(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('common.cancel'.tr()),
-          ),
-          ShadButton.destructive(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text('settings.logout'.tr()),
-          ),
-        ],
-      ),
+      title: 'settings.logout'.tr(),
+      message: 'settings.logout_confirm'.tr(),
+      confirmText: 'settings.logout'.tr(),
+      isDestructive: true,
     );
 
     if (confirmed == true && mounted) {
@@ -124,9 +115,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
     final user = Supabase.instance.client.auth.currentUser;
     final isLoggedIn = user != null && !(user.isAnonymous);
 
@@ -138,10 +126,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         children: [
           // 프로필 섹션
           const UserProfileSection(),
-          const SizedBox(height: 16),
+          const SizedBox(height: common.Spacing.md),
 
           const ShadSeparator.horizontal(
-            margin: EdgeInsets.symmetric(horizontal: 16),
+            margin: EdgeInsets.symmetric(horizontal: common.Spacing.md),
           ),
 
           // UX 설정 섹션
@@ -205,7 +193,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ),
 
           ShadSeparator.horizontal(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.symmetric(horizontal: common.Spacing.md),
           ),
 
           // 알림 설정 섹션
@@ -228,7 +216,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ),
 
           ShadSeparator.horizontal(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.symmetric(horizontal: common.Spacing.md),
           ),
 
           // 앱 정보 섹션
@@ -241,7 +229,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ),
 
           ShadSeparator.horizontal(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.symmetric(horizontal: common.Spacing.md),
           ),
 
           // 법적 정보 섹션
@@ -263,19 +251,28 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
           // 로그아웃 (로그인 상태일 때만)
           if (isLoggedIn) ...[
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: ShadSeparator.horizontal(),
-            ),
-            ListTile(
-              leading: Icon(AppIcons.logout, color: colorScheme.error),
-              title: Text(
-                'settings.logout'.tr(),
-                style: textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.error,
-                ),
-              ),
-              onTap: _handleLogout,
+            Builder(
+              builder: (context) {
+                final theme = ShadTheme.of(context);
+                return Column(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: common.Spacing.md),
+                      child: ShadSeparator.horizontal(),
+                    ),
+                    ListTile(
+                      leading: Icon(AppIcons.logout, color: theme.colorScheme.destructive),
+                      title: Text(
+                        'settings.logout'.tr(),
+                        style: theme.textTheme.large.copyWith(
+                          color: theme.colorScheme.destructive,
+                        ),
+                      ),
+                      onTap: _handleLogout,
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ],
@@ -284,13 +281,18 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Widget _buildSectionHeader(BuildContext context, String title) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = ShadTheme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      padding: const EdgeInsets.fromLTRB(
+        common.Spacing.md,
+        common.Spacing.md,
+        common.Spacing.md,
+        common.Spacing.sm,
+      ),
       child: Text(
         title,
-        style: textTheme.titleSmall?.copyWith(
+        style: theme.textTheme.small.copyWith(
           fontWeight: FontWeight.w600,
         ),
       ),

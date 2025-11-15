@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
@@ -64,11 +65,11 @@ class _TagEditPageState extends State<TagEditPage> {
             onPressed: _save,
             child: Text('common.save'.tr()),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: common.Spacing.sm),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(common.Spacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -79,7 +80,7 @@ class _TagEditPageState extends State<TagEditPage> {
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: common.Spacing.md),
 
             // 태그 입력
             ShadInput(
@@ -90,16 +91,16 @@ class _TagEditPageState extends State<TagEditPage> {
               onSubmitted: (value) => _save(),
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: common.Spacing.lg),
 
             // 힌트
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(common.Spacing.sm + common.Spacing.xs),
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainerHighest.withValues(
                   alpha: 0.5,
                 ),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(common.Spacing.sm),
               ),
               child: Row(
                 children: [
@@ -108,7 +109,7 @@ class _TagEditPageState extends State<TagEditPage> {
                     size: 16,
                     color: colorScheme.onSurfaceVariant,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: common.Spacing.sm),
                   Expanded(
                     child: Text(
                       'tag.hint'.tr(),

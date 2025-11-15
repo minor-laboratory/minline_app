@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
@@ -36,8 +37,8 @@ class _DraftsViewState extends ConsumerState<DraftsView>
         // 분석 결과 메시지
         if (widget.analyzeMessage.isNotEmpty)
           Container(
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.all(common.Spacing.md),
+            padding: const EdgeInsets.all(common.Spacing.md),
             decoration: BoxDecoration(
               color: ShadTheme.of(context).colorScheme.muted,
               borderRadius: BorderRadius.circular(12),
@@ -189,7 +190,7 @@ class _DraftTabContentState extends State<_DraftTabContent> {
           final theme = ShadTheme.of(context);
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(common.Spacing.lg),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -198,7 +199,7 @@ class _DraftTabContentState extends State<_DraftTabContent> {
                     size: 64,
                     color: theme.colorScheme.border,
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: common.Spacing.md),
                   Text(
                     widget.status == 'all'
                         ? 'draft.empty_message'.tr()
@@ -206,7 +207,7 @@ class _DraftTabContentState extends State<_DraftTabContent> {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   if (widget.status == 'all') ...[
-                    const SizedBox(height: 8),
+                    SizedBox(height: common.Spacing.sm),
                     Text(
                       'draft.empty_hint'.tr(),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -230,16 +231,18 @@ class _DraftTabContentState extends State<_DraftTabContent> {
           },
           child: ListView.separated(
             controller: _scrollController,
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            padding: const EdgeInsets.all(common.Spacing.md),
             itemCount: displayedDrafts.length + (hasMore ? 1 : 0),
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
+            separatorBuilder: (context, index) => SizedBox(
+              height: common.Spacing.sm + common.Spacing.xs,
+            ),
             itemBuilder: (context, index) {
               if (index < displayedDrafts.length) {
                 final draft = displayedDrafts[index];
                 return DraftCard(draft: draft, onUpdate: widget.onRefresh);
               } else {
                 return const Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: EdgeInsets.all(common.Spacing.md),
                   child: Center(child: CircularProgressIndicator()),
                 );
               }
@@ -252,7 +255,7 @@ class _DraftTabContentState extends State<_DraftTabContent> {
         final theme = ShadTheme.of(context);
         return Center(
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(common.Spacing.lg),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -261,12 +264,12 @@ class _DraftTabContentState extends State<_DraftTabContent> {
                   size: 64,
                   color: theme.colorScheme.destructive,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: common.Spacing.md),
                 Text(
                   'timeline.error_title'.tr(),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: common.Spacing.sm),
                 Text(
                   error.toString(),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(

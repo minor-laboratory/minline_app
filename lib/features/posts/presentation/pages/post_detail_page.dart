@@ -6,6 +6,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:isar_community/isar.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:path_provider/path_provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:share_plus/share_plus.dart';
@@ -16,6 +17,7 @@ import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../models/fragment.dart';
 import '../../../../models/post.dart';
+import '../../../../shared/widgets/standard_bottom_sheet.dart';
 import '../../../timeline/presentation/widgets/fragment_card.dart';
 
 /// Post 상세 화면
@@ -83,22 +85,12 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
   }
 
   Future<void> _deletePost() async {
-    final confirmed = await showShadDialog<bool>(
+    final confirmed = await StandardBottomSheet.showConfirmation(
       context: context,
-      builder: (context) => ShadDialog(
-        title: Text('posts.delete_confirm_title'.tr()),
-        description: Text('posts.delete_confirm_message'.tr()),
-        actions: [
-          ShadButton.outline(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('common.cancel'.tr()),
-          ),
-          ShadButton.destructive(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text('common.delete'.tr()),
-          ),
-        ],
-      ),
+      title: 'posts.delete_confirm_title'.tr(),
+      message: 'posts.delete_confirm_message'.tr(),
+      confirmText: 'common.delete'.tr(),
+      isDestructive: true,
     );
 
     if (confirmed == true && mounted) {
@@ -163,22 +155,12 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     if (_post == null || _post!.draftId == null) return;
 
     // 확인 다이얼로그
-    final confirmed = await showShadDialog<bool>(
+    final confirmed = await StandardBottomSheet.showConfirmation(
       context: context,
-      builder: (context) => ShadDialog(
-        title: Text('post.regenerate'.tr()),
-        description: Text('post.regenerate_confirm'.tr()),
-        actions: [
-          ShadButton.outline(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('common.cancel'.tr()),
-          ),
-          ShadButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text('post.regenerate'.tr()),
-          ),
-        ],
-      ),
+      title: 'post.regenerate'.tr(),
+      message: 'post.regenerate_confirm'.tr(),
+      confirmText: 'post.regenerate'.tr(),
+      isDestructive: false,
     );
 
     if (confirmed == true && mounted) {
@@ -276,7 +258,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                       child: Row(
                         children: [
                           Icon(AppIcons.refresh, size: 16),
-                          const SizedBox(width: 8),
+                          SizedBox(width: common.Spacing.sm),
                           Text('post.regenerate'.tr()),
                         ],
                       ),
@@ -287,7 +269,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                     child: Row(
                       children: [
                         Icon(AppIcons.flag, size: 16),
-                        const SizedBox(width: 8),
+                        SizedBox(width: common.Spacing.sm),
                         Text('feedback.report_issue'.tr()),
                       ],
                     ),
@@ -299,7 +281,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                     child: Row(
                       children: [
                         Icon(AppIcons.delete, size: 16, color: colorScheme.error),
-                        const SizedBox(width: 8),
+                        SizedBox(width: common.Spacing.sm),
                         Text(
                           'common.delete'.tr(),
                           style: TextStyle(color: colorScheme.error),
@@ -312,7 +294,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(common.Spacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -324,7 +306,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
               ),
             ),
 
-            const SizedBox(height: 8),
+            SizedBox(height: common.Spacing.sm),
 
             // 메타 정보
             Row(
@@ -332,12 +314,12 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                 // 템플릿 타입
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                    horizontal: common.Spacing.sm,
+                    vertical: common.Spacing.xs,
                   ),
                   decoration: BoxDecoration(
                     color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(common.Spacing.xs),
                   ),
                   child: Text(
                     _getTemplateLabel(_post!.template),
@@ -347,7 +329,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                   ),
                 ),
 
-                const SizedBox(width: 8),
+                SizedBox(width: common.Spacing.sm),
 
                 // 작성일
                 Text(
@@ -359,9 +341,9 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
               ],
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: common.Spacing.md),
             const Divider(),
-            const SizedBox(height: 16),
+            SizedBox(height: common.Spacing.md),
 
             // Preview/Source 토글 버튼
             Align(
@@ -376,8 +358,8 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                           decoration: ShadDecoration(
                             border: ShadBorder(
                               radius: BorderRadius.only(
-                                topLeft: Radius.circular(8),
-                                bottomLeft: Radius.circular(8),
+                                topLeft: Radius.circular(common.Spacing.sm),
+                                bottomLeft: Radius.circular(common.Spacing.sm),
                               ),
                             ),
                           ),
@@ -389,8 +371,8 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                           decoration: ShadDecoration(
                             border: ShadBorder(
                               radius: BorderRadius.only(
-                                topLeft: Radius.circular(8),
-                                bottomLeft: Radius.circular(8),
+                                topLeft: Radius.circular(common.Spacing.sm),
+                                bottomLeft: Radius.circular(common.Spacing.sm),
                               ),
                             ),
                           ),
@@ -403,8 +385,8 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                           decoration: ShadDecoration(
                             border: ShadBorder(
                               radius: BorderRadius.only(
-                                topRight: Radius.circular(8),
-                                bottomRight: Radius.circular(8),
+                                topRight: Radius.circular(common.Spacing.sm),
+                                bottomRight: Radius.circular(common.Spacing.sm),
                               ),
                             ),
                           ),
@@ -416,8 +398,8 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                           decoration: ShadDecoration(
                             border: ShadBorder(
                               radius: BorderRadius.only(
-                                topRight: Radius.circular(8),
-                                bottomRight: Radius.circular(8),
+                                topRight: Radius.circular(common.Spacing.sm),
+                                bottomRight: Radius.circular(common.Spacing.sm),
                               ),
                             ),
                           ),
@@ -427,7 +409,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
               ),
             ),
 
-            const SizedBox(height: 12),
+            SizedBox(height: common.Spacing.sm + common.Spacing.xs),
 
             // 내용 (viewMode에 따라 렌더링)
             if (_viewMode == 'preview')
@@ -454,11 +436,11 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                 ),
               ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: common.Spacing.lg),
 
             // 버전 정보
             if (_post!.version > 1) ...[
-              const SizedBox(height: 16),
+              SizedBox(height: common.Spacing.md),
               Card(
                 child: ListTile(
                   leading: Icon(AppIcons.star),
@@ -472,7 +454,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
 
             // 내보내기 정보
             if (_post!.exportedTo.isNotEmpty) ...[
-              const SizedBox(height: 16),
+              SizedBox(height: common.Spacing.md),
               Card(
                 child: ListTile(
                   leading: Icon(AppIcons.share),
@@ -484,12 +466,12 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
 
             // Fragment 목록 토글
             if (_fragments.isNotEmpty) ...[
-              const SizedBox(height: 16),
+              SizedBox(height: common.Spacing.md),
               ShadButton.ghost(
                 onPressed: () {
                   setState(() => _showFragments = !_showFragments);
                 },
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: common.Spacing.sm + common.Spacing.xs, vertical: common.Spacing.sm),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -497,7 +479,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                       _showFragments ? AppIcons.chevronDown : AppIcons.chevronRight,
                       size: 16,
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: common.Spacing.sm),
                     Text(
                       'draft.snap_count'.tr(
                         namedArgs: {'count': _fragments.length.toString()},
@@ -509,10 +491,10 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
 
               // Fragment 목록
               if (_showFragments) ...[
-                const SizedBox(height: 12),
+                SizedBox(height: common.Spacing.sm + common.Spacing.xs),
                 ..._fragments.map((fragment) {
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.only(bottom: common.Spacing.sm + common.Spacing.xs),
                     child: FragmentCard(
                       fragment: fragment,
                       onUpdate: () {
