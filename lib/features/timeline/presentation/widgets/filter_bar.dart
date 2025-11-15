@@ -30,140 +30,143 @@ class _FilterBarState extends ConsumerState<FilterBar> {
 
   @override
   Widget build(BuildContext context) {
-    final filter = ref.watch(fragmentFilterProvider);
+    final filterAsync = ref.watch(fragmentFilterProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
+    // AsyncValue에서 값 추출, 로딩/에러 시 기본값 사용 (UI 깜빡임 방지)
+    final filter = filterAsync.asData?.value ?? const FragmentFilterState();
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          // 검색 입력 (태그 Pills 포함)
-          Expanded(
-            child: Focus(
-              onKeyEvent: (node, event) {
-                // Backspace로 마지막 태그 삭제
-                if (event is KeyDownEvent &&
-                    event.logicalKey == LogicalKeyboardKey.backspace &&
-                    _searchController.text.isEmpty &&
-                    filter.selectedTags.isNotEmpty) {
-                  final lastTag = filter.selectedTags.last;
-                  ref
-                      .read(fragmentFilterProvider.notifier)
-                      .removeTag(lastTag);
-                  return KeyEventResult.handled;
-                }
-                return KeyEventResult.ignored;
-              },
-              child: ShadInput(
-                controller: _searchController,
-                focusNode: _focusNode,
-                placeholder: filter.selectedTags.isEmpty
-                    ? Text('filter.search_placeholder'.tr())
-                    : null,
-                onChanged: (value) {
-                  ref
-                      .read(fragmentFilterProvider.notifier)
-                      .setQuery(value);
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          children: [
+            // 검색 입력 (태그 Pills 포함)
+            Expanded(
+              child: Focus(
+                onKeyEvent: (node, event) {
+                  // Backspace로 마지막 태그 삭제
+                  if (event is KeyDownEvent &&
+                      event.logicalKey == LogicalKeyboardKey.backspace &&
+                      _searchController.text.isEmpty &&
+                      filter.selectedTags.isNotEmpty) {
+                    final lastTag = filter.selectedTags.last;
+                    ref
+                        .read(fragmentFilterProvider.notifier)
+                        .removeTag(lastTag);
+                    return KeyEventResult.handled;
+                  }
+                  return KeyEventResult.ignored;
                 },
-                style: const TextStyle(fontSize: 14),
-                leading: filter.selectedTags.isNotEmpty
-                    ? SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: filter.selectedTags.map((tag) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 4),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: colorScheme.primary.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(9999),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      tag,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: colorScheme.primary,
+                child: ShadInput(
+                  controller: _searchController,
+                  focusNode: _focusNode,
+                  placeholder: filter.selectedTags.isEmpty
+                      ? Text('filter.search_placeholder'.tr())
+                      : null,
+                  onChanged: (value) {
+                    ref
+                        .read(fragmentFilterProvider.notifier)
+                        .setQuery(value);
+                  },
+                  style: const TextStyle(fontSize: 14),
+                  leading: filter.selectedTags.isNotEmpty
+                      ? SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: filter.selectedTags.map((tag) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 4),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.primary.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(9999),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        tag,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: colorScheme.primary,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 2),
-                                    GestureDetector(
-                                      onTap: () {
-                                        ref
-                                            .read(fragmentFilterProvider.notifier)
-                                            .removeTag(tag);
-                                      },
-                                      child: Icon(
-                                        AppIcons.close,
-                                        size: 12,
-                                        color: colorScheme.primary,
+                                      const SizedBox(width: 2),
+                                      GestureDetector(
+                                        onTap: () {
+                                          ref
+                                              .read(fragmentFilterProvider.notifier)
+                                              .removeTag(tag);
+                                        },
+                                        child: Icon(
+                                          AppIcons.close,
+                                          size: 12,
+                                          color: colorScheme.primary,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      )
-                    : null,
+                              );
+                            }).toList(),
+                          ),
+                        )
+                      : null,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 8),
+            const SizedBox(width: 8),
 
-          // 정렬 버튼
-          PopupMenuButton<String>(
-            icon: Icon(AppIcons.sort, color: colorScheme.onSurfaceVariant),
-            tooltip: 'filter.sort'.tr(),
-            onSelected: (value) {
-              ref.read(fragmentFilterProvider.notifier).setSortBy(value);
-            },
-            itemBuilder: (context) => [
-              _buildSortMenuItem(
-                context,
-                'event',
-                'filter.sort_event'.tr(),
-                filter.sortBy == 'event',
-              ),
-              _buildSortMenuItem(
-                context,
-                'created',
-                'filter.sort_created'.tr(),
-                filter.sortBy == 'created',
-              ),
-              _buildSortMenuItem(
-                context,
-                'updated',
-                'filter.sort_updated'.tr(),
-                filter.sortBy == 'updated',
-              ),
-            ],
-          ),
-
-          // 정렬 방향 토글
-          ShadIconButton.ghost(
-            padding: const EdgeInsets.all(8),
-            icon: Icon(
-              filter.sortOrder == 'desc'
-                  ? AppIcons.arrowDown
-                  : AppIcons.arrowUp,
-              size: 20,
-              color: colorScheme.onSurfaceVariant,
+            // 정렬 버튼
+            PopupMenuButton<String>(
+              icon: Icon(AppIcons.sort, color: colorScheme.onSurfaceVariant),
+              tooltip: 'filter.sort'.tr(),
+              onSelected: (value) {
+                ref.read(fragmentFilterProvider.notifier).setSortBy(value);
+              },
+              itemBuilder: (context) => [
+                _buildSortMenuItem(
+                  context,
+                  'event',
+                  'filter.sort_event'.tr(),
+                  filter.sortBy == 'event',
+                ),
+                _buildSortMenuItem(
+                  context,
+                  'created',
+                  'filter.sort_created'.tr(),
+                  filter.sortBy == 'created',
+                ),
+                _buildSortMenuItem(
+                  context,
+                  'updated',
+                  'filter.sort_updated'.tr(),
+                  filter.sortBy == 'updated',
+                ),
+              ],
             ),
-            onPressed: () {
-              ref.read(fragmentFilterProvider.notifier).toggleSortOrder();
-            },
-          ),
-        ],
-      ),
-    );
+
+            // 정렬 방향 토글
+            ShadIconButton.ghost(
+              padding: const EdgeInsets.all(8),
+              icon: Icon(
+                filter.sortOrder == 'desc'
+                    ? AppIcons.arrowDown
+                    : AppIcons.arrowUp,
+                size: 20,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              onPressed: () {
+                ref.read(fragmentFilterProvider.notifier).toggleSortOrder();
+              },
+            ),
+          ],
+        ),
+      );
   }
 
   PopupMenuItem<String> _buildSortMenuItem(

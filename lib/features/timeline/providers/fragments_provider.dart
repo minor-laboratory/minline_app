@@ -1,8 +1,11 @@
 import 'package:isar_community/isar.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/database/database_service.dart';
+import '../../../core/utils/logger.dart';
 import '../../../models/fragment.dart';
+import '../../settings/providers/settings_provider.dart';
 
 part 'fragments_provider.g.dart';
 
@@ -66,46 +69,93 @@ Future<int> fragmentCount(Ref ref) async {
   return await isar.fragments.filter().deletedEqualTo(false).count();
 }
 
-/// Fragment 필터 상태 Provider
+/// Fragment 필터 상태 Provider (정렬 설정 영구 저장)
 @riverpod
 class FragmentFilter extends _$FragmentFilter {
+  static const String _sortByKey = 'fragment_sort_by';
+  static const String _sortOrderKey = 'fragment_sort_order';
+
+  SharedPreferences? _prefs; // SharedPreferences 캐싱
+
   @override
-  FragmentFilterState build() {
-    return const FragmentFilterState();
-  }
+  Future<FragmentFilterState> build() async {
+    _prefs = await ref.watch(sharedPreferencesProvider.future);
 
-  void setQuery(String value) {
-    state = state.copyWith(query: value);
-  }
+    final sortBy = _prefs!.getString(_sortByKey) ?? 'event';
+    final sortOrder = _prefs!.getString(_sortOrderKey) ?? 'desc';
 
-  void setSortBy(String value) {
-    state = state.copyWith(sortBy: value);
-  }
-
-  void toggleSortOrder() {
-    state = state.copyWith(
-      sortOrder: state.sortOrder == 'desc' ? 'asc' : 'desc',
+    return FragmentFilterState(
+      sortBy: sortBy,
+      sortOrder: sortOrder,
     );
   }
 
+  void setQuery(String value) {
+    final currentState = state.asData?.value;
+    if (currentState == null) return;
+
+    state = AsyncValue.data(currentState.copyWith(query: value));
+  }
+
+  Future<void> setSortBy(String value) async {
+    final currentState = state.asData?.value;
+    if (currentState == null) return;
+
+    state = AsyncValue.data(currentState.copyWith(sortBy: value));
+
+    try {
+      // 캐싱된 SharedPreferences 사용
+      await _prefs?.setString(_sortByKey, value);
+    } catch (e, stack) {
+      logger.e('Failed to save sortBy', e, stack);
+      // UI는 이미 업데이트되었으므로 다음 앱 시작 시 이전 값으로 복원됨
+    }
+  }
+
+  Future<void> toggleSortOrder() async {
+    final currentState = state.asData?.value;
+    if (currentState == null) return;
+
+    final newOrder = currentState.sortOrder == 'desc' ? 'asc' : 'desc';
+    state = AsyncValue.data(currentState.copyWith(sortOrder: newOrder));
+
+    try {
+      // 캐싱된 SharedPreferences 사용
+      await _prefs?.setString(_sortOrderKey, newOrder);
+    } catch (e, stack) {
+      logger.e('Failed to save sortOrder', e, stack);
+      // UI는 이미 업데이트되었으므로 다음 앱 시작 시 이전 값으로 복원됨
+    }
+  }
+
   void toggleTag(String tag) {
-    final newTags = List<String>.from(state.selectedTags);
+    final currentState = state.asData?.value;
+    if (currentState == null) return;
+
+    final newTags = List<String>.from(currentState.selectedTags);
     if (newTags.contains(tag)) {
       newTags.remove(tag);
     } else {
       newTags.add(tag);
     }
-    state = state.copyWith(selectedTags: newTags);
+    state = AsyncValue.data(currentState.copyWith(selectedTags: newTags));
   }
 
   void removeTag(String tag) {
-    final newTags = List<String>.from(state.selectedTags);
+    final currentState = state.asData?.value;
+    if (currentState == null) return;
+
+    final newTags = List<String>.from(currentState.selectedTags);
     newTags.remove(tag);
-    state = state.copyWith(selectedTags: newTags);
+    state = AsyncValue.data(currentState.copyWith(selectedTags: newTags));
   }
 
-  void reset() {
-    state = const FragmentFilterState();
+  Future<void> reset() async {
+    state = const AsyncValue.data(FragmentFilterState());
+
+    // 캐싱된 SharedPreferences 사용
+    await _prefs?.remove(_sortByKey);
+    await _prefs?.remove(_sortOrderKey);
   }
 }
 
@@ -142,7 +192,10 @@ class FragmentFilterState {
 @riverpod
 Stream<List<Fragment>> filteredFragments(Ref ref) async* {
   final isar = DatabaseService.instance.isar;
-  final filter = ref.watch(fragmentFilterProvider);
+  final filterAsync = ref.watch(fragmentFilterProvider);
+
+  // AsyncValue가 로딩 중이면 기본값 사용 (UI 깜빡임 방지)
+  final filter = filterAsync.asData?.value ?? const FragmentFilterState();
 
   // 필터링 및 정렬 로직을 함수로 추출
   List<Fragment> filterAndSort(List<Fragment> fragments) {
