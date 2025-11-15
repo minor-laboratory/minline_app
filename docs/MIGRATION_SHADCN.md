@@ -9,10 +9,13 @@
 
 ## 📊 현재 상태 (2025년 기준)
 
-- **Material UI**: 99% (107개 파일)
-- **shadcn_ui**: 1% (1개 파일 - FragmentInputBar)
-- **혼용 가능**: ShadApp.custom으로 Material + shadcn_ui 모두 사용 가능
-- **기본 원칙**: Material UI 사용, 웹 동등성 필요 시 shadcn_ui 선택
+- **Shadcn Theme**: 100% 적용 완료 (모든 파일에서 `ShadTheme.of(context)` 사용)
+- **Material Design → Shadcn 색상 전환**: 완료
+  - `colorScheme.onSurfaceVariant` → `theme.colorScheme.mutedForeground`
+  - `colorScheme.surfaceVariant` → `theme.colorScheme.muted`
+  - `colorScheme.outline` → `theme.colorScheme.border`
+- **혼용 가능**: ShadApp.custom으로 Material 위젯 + Shadcn Theme 모두 사용
+- **기본 원칙**: Material 위젯 사용, Shadcn Theme 시스템 사용
 
 ## 📐 웹↔앱 컴포넌트 매핑
 
@@ -312,19 +315,46 @@ ShadApp.custom(
 
 ### 2. 테마 시스템
 
-**shadcn_ui 컴포넌트는 Material Theme 자동 감지:**
-```dart
-// theme.colorScheme.primary 자동 사용
-ShadButton(
-  onPressed: () {},
-  child: Text('Button'),
-)
+**Shadcn Theme 사용 (ShadTheme.of(context)):**
 
-// 명시적 색상 지정도 가능
-ShadButton(
-  backgroundColor: Colors.blue,
-  onPressed: () {},
-  child: Text('Button'),
+```dart
+import 'package:shadcn_ui/shadcn_ui.dart';
+
+final theme = ShadTheme.of(context);
+
+// ✅ Shadcn 색상 사용
+Container(
+  color: theme.colorScheme.muted,  // bg-muted
+  child: Text(
+    'Text',
+    style: TextStyle(color: theme.colorScheme.mutedForeground),
+  ),
+)
+```
+
+**Material Design → Shadcn 색상 매핑:**
+
+| Material Design | Shadcn Theme | 용도 | 예시 |
+|----------------|--------------|------|------|
+| `colorScheme.onSurfaceVariant` | `theme.colorScheme.mutedForeground` | 보조 텍스트, 아이콘 | Fragment 메타데이터 |
+| `colorScheme.surfaceVariant` | `theme.colorScheme.muted` | 배경, 카드 | AI 태그 배경 |
+| `colorScheme.outline` | `theme.colorScheme.border` | 테두리 | 카드 테두리 |
+| `colorScheme.primary` | `theme.colorScheme.primary` | 강조 색상 (동일) | 버튼, 링크 |
+
+**❌ Material Design (기존):**
+```dart
+Text(
+  'Secondary text',
+  style: TextStyle(color: colorScheme.onSurfaceVariant),
+)
+```
+
+**✅ Shadcn Theme (변경 후):**
+```dart
+final theme = ShadTheme.of(context);
+Text(
+  'Secondary text',
+  style: TextStyle(color: theme.colorScheme.mutedForeground),
 )
 ```
 

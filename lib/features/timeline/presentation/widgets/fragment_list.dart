@@ -12,7 +12,12 @@ import 'fragment_card.dart';
 ///
 /// Timeline 화면의 메인 리스트
 class FragmentList extends ConsumerStatefulWidget {
-  const FragmentList({super.key});
+  final VoidCallback? onEnterSearchMode;
+
+  const FragmentList({
+    super.key,
+    this.onEnterSearchMode,
+  });
 
   @override
   ConsumerState<FragmentList> createState() => _FragmentListState();
@@ -118,6 +123,8 @@ class _FragmentListState extends ConsumerState<FragmentList> {
               onTagClick: (tag) {
                 // 태그 필터 토글
                 ref.read(fragmentFilterProvider.notifier).toggleTag(tag);
+                // 검색 모드로 자동 전환
+                widget.onEnterSearchMode?.call();
               },
             );
           },

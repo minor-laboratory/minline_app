@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../core/utils/app_icons.dart';
 import '../../core/utils/storage_utils.dart';
@@ -18,7 +19,7 @@ class UserAvatarButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(currentUserProvider);
     final userProfileAsync = ref.watch(userProfileProvider);
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = ShadTheme.of(context);
 
     return GestureDetector(
       onTap: () => context.push('/settings'),
@@ -28,7 +29,7 @@ class UserAvatarButton extends ConsumerWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: colorScheme.outline.withValues(alpha: 0.2),
+            color: theme.colorScheme.border.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -36,12 +37,12 @@ class UserAvatarButton extends ConsumerWidget {
           child: userProfileAsync.when(
             data: (profile) => _buildAvatar(
               context,
-              colorScheme,
+              theme,
               profile,
               currentUser,
             ),
-            loading: () => _buildDefaultAvatar(colorScheme),
-            error: (_, __) => _buildDefaultAvatar(colorScheme),
+            loading: () => _buildDefaultAvatar(theme),
+            error: (_, __) => _buildDefaultAvatar(theme),
           ),
         ),
       ),
@@ -50,7 +51,7 @@ class UserAvatarButton extends ConsumerWidget {
 
   Widget _buildAvatar(
     BuildContext context,
-    ColorScheme colorScheme,
+    ShadThemeData theme,
     Map<String, dynamic>? profile,
     dynamic currentUser,
   ) {
@@ -71,30 +72,30 @@ class UserAvatarButton extends ConsumerWidget {
       return CachedNetworkImage(
         imageUrl: imageUrl,
         fit: BoxFit.cover,
-        placeholder: (context, url) => _buildDefaultAvatar(colorScheme),
-        errorWidget: (context, url, error) => _buildDefaultAvatar(colorScheme),
+        placeholder: (context, url) => _buildDefaultAvatar(theme),
+        errorWidget: (context, url, error) => _buildDefaultAvatar(theme),
       );
     }
 
-    return _buildDefaultAvatar(colorScheme);
+    return _buildDefaultAvatar(theme);
   }
 
-  Widget _buildDefaultAvatar(ColorScheme colorScheme) {
+  Widget _buildDefaultAvatar(ShadThemeData theme) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            colorScheme.primaryContainer,
-            colorScheme.primaryContainer.withValues(alpha: 0.8),
+            theme.colorScheme.accent,
+            theme.colorScheme.accent.withValues(alpha: 0.8),
           ],
         ),
       ),
       child: Icon(
         AppIcons.user,
         size: 18,
-        color: colorScheme.onPrimaryContainer,
+        color: theme.colorScheme.accentForeground,
       ),
     );
   }

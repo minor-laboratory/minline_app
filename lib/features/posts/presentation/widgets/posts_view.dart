@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
 import '../../providers/posts_provider.dart';
@@ -30,6 +31,7 @@ class _PostsViewState extends ConsumerState<PostsView>
     return postsStream.when(
       data: (posts) {
         if (posts.isEmpty) {
+          final theme = ShadTheme.of(context);
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -39,7 +41,7 @@ class _PostsViewState extends ConsumerState<PostsView>
                   Icon(
                     AppIcons.posts,
                     size: 64,
-                    color: Theme.of(context).colorScheme.outline,
+                    color: theme.colorScheme.border,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -50,7 +52,7 @@ class _PostsViewState extends ConsumerState<PostsView>
                   Text(
                     'posts.empty_message'.tr(),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          color: theme.colorScheme.mutedForeground,
                         ),
                     textAlign: TextAlign.center,
                   ),
@@ -85,34 +87,37 @@ class _PostsViewState extends ConsumerState<PostsView>
       loading: () => const Center(
         child: CircularProgressIndicator(),
       ),
-      error: (error, stack) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                AppIcons.error,
-                size: 64,
-                color: Theme.of(context).colorScheme.error,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'timeline.error_title'.tr(),
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                error.toString(),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+      error: (error, stack) {
+        final theme = ShadTheme.of(context);
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  AppIcons.error,
+                  size: 64,
+                  color: theme.colorScheme.destructive,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'timeline.error_title'.tr(),
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  error.toString(),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.mutedForeground,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

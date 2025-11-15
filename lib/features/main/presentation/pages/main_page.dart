@@ -154,7 +154,10 @@ class _MainPageState extends ConsumerState<MainPage> {
         physics: const NeverScrollableScrollPhysics(),
         onPageChanged: _onPageChanged,
         children: [
-          TimelineView(viewMode: _viewMode),
+          TimelineView(
+            viewMode: _viewMode,
+            onEnterSearchMode: _enterSearchMode,
+          ),
           DraftsView(analyzeMessage: _analyzeMessage),
           const PostsView(),
         ],
@@ -228,7 +231,7 @@ class _MainPageState extends ConsumerState<MainPage> {
   PreferredSizeWidget _buildSearchAppBar() {
     final filterAsync = ref.watch(fragmentFilterProvider);
     final filter = filterAsync.asData?.value ?? const FragmentFilterState();
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = ShadTheme.of(context);
 
     return AppBar(
       leading: IconButton(
@@ -270,7 +273,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: colorScheme.primary.withValues(alpha: 0.1),
+                            color: theme.colorScheme.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(9999),
                           ),
                           child: Row(
@@ -280,7 +283,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                                 tag,
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: colorScheme.primary,
+                                  color: theme.colorScheme.primary,
                                 ),
                               ),
                               const SizedBox(width: 2),
@@ -293,7 +296,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                                 child: Icon(
                                   AppIcons.close,
                                   size: 12,
-                                  color: colorScheme.primary,
+                                  color: theme.colorScheme.primary,
                                 ),
                               ),
                             ],
@@ -316,7 +319,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                   child: Icon(
                     AppIcons.close,
                     size: 16,
-                    color: colorScheme.onSurfaceVariant,
+                    color: theme.colorScheme.mutedForeground,
                   ),
                 )
               : null,
@@ -324,7 +327,7 @@ class _MainPageState extends ConsumerState<MainPage> {
       ),
       actions: [
         PopupMenuButton<String>(
-          icon: Icon(AppIcons.sort, color: colorScheme.onSurfaceVariant),
+          icon: Icon(AppIcons.sort, color: theme.colorScheme.mutedForeground),
           tooltip: 'filter.sort'.tr(),
           onSelected: (value) {
             ref.read(fragmentFilterProvider.notifier).setSortBy(value);
@@ -352,7 +355,7 @@ class _MainPageState extends ConsumerState<MainPage> {
           icon: Icon(
             filter.sortOrder == 'desc' ? AppIcons.arrowDown : AppIcons.arrowUp,
             size: 20,
-            color: colorScheme.onSurfaceVariant,
+            color: theme.colorScheme.mutedForeground,
           ),
           onPressed: () {
             ref.read(fragmentFilterProvider.notifier).toggleSortOrder();
@@ -378,7 +381,7 @@ class _MainPageState extends ConsumerState<MainPage> {
             Icon(
               AppIcons.checkCircle,
               size: 16,
-              color: Theme.of(context).colorScheme.primary,
+              color: ShadTheme.of(context).colorScheme.primary,
             ),
           ],
         ],
@@ -393,7 +396,7 @@ class _MainPageState extends ConsumerState<MainPage> {
         child: ShadIconButton.ghost(
           icon: Icon(
             AppIcons.search,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            color: ShadTheme.of(context).colorScheme.mutedForeground,
           ),
           onPressed: _enterSearchMode,
         ),

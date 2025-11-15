@@ -41,6 +41,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
   final _editController = TextEditingController();
   final _tagController = TextEditingController();
   bool _isGeneratingEmbedding = false;
+  bool _showAllTags = false; // 태그 전체 표시 여부
 
   @override
   void dispose() {
@@ -333,8 +334,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final theme = ShadTheme.of(context);
 
     return Container(
       constraints: const BoxConstraints(maxWidth: 600),
@@ -380,7 +380,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                   style: TextStyle(
                     fontSize: 16,
                     height: 1.6,
-                    color: colorScheme.onSurface,
+                    color: theme.colorScheme.foreground,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -404,21 +404,21 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                           placeholder: (context, url) => Container(
                             width: 128,
                             height: 128,
-                            color: colorScheme.surfaceContainerHighest,
+                            color: theme.colorScheme.muted,
                             child: Center(
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: colorScheme.primary,
+                                color: theme.colorScheme.primary,
                               ),
                             ),
                           ),
                           errorWidget: (context, url, error) => Container(
                             width: 128,
                             height: 128,
-                            color: colorScheme.surfaceContainerHighest,
+                            color: theme.colorScheme.muted,
                             child: Icon(
                               AppIcons.image,
-                              color: colorScheme.onSurfaceVariant,
+                              color: theme.colorScheme.mutedForeground,
                             ),
                           ),
                         ),
@@ -442,7 +442,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                         Icon(
                           _getEventTimeIcon(widget.fragment.eventTimeSource),
                           size: 14,
-                          color: colorScheme.primary,
+                          color: theme.colorScheme.primary,
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -453,31 +453,16 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                           ),
                           style: TextStyle(
                             fontSize: 12,
-                            color: colorScheme.onSurfaceVariant,
+                            color: theme.colorScheme.mutedForeground,
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                  // 태그 (항상 표시, 태그 추가 버튼 포함)
+                  // 태그 (접기/펼치기 기능 포함)
                   const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: [
-                      // AI 태그
-                      ...widget.fragment.tags.map(
-                        (tag) => _buildAITag(context, tag),
-                      ),
-                      // 사용자 태그
-                      ...widget.fragment.userTags.map(
-                        (tag) => _buildUserTag(context, tag),
-                      ),
-                      // 태그 추가 버튼
-                      _buildAddTagButton(context),
-                    ],
-                  ),
+                  _buildTagsSection(context),
                 ],
               ),
 
@@ -492,7 +477,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Row(
@@ -501,7 +486,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                         Icon(
                           AppIcons.fileText,
                           size: 12,
-                          color: colorScheme.primary,
+                          color: theme.colorScheme.primary,
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -509,7 +494,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                               .tr(namedArgs: {'title': widget.draft!.title}),
                           style: TextStyle(
                             fontSize: 12,
-                            color: colorScheme.primary,
+                            color: theme.colorScheme.primary,
                           ),
                         ),
                       ],
@@ -526,14 +511,14 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                   Icon(
                     AppIcons.fileText,
                     size: 12,
-                    color: colorScheme.onSurfaceVariant,
+                    color: theme.colorScheme.mutedForeground,
                   ),
                   const SizedBox(width: 4),
                   Text(
                     _formatTimestamp(context, widget.fragment.timestamp),
                     style: TextStyle(
                       fontSize: 12,
-                      color: colorScheme.onSurfaceVariant,
+                      color: theme.colorScheme.mutedForeground,
                     ),
                   ),
                   // 동기화 대기
@@ -555,7 +540,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                       icon: Icon(
                         AppIcons.moreVert,
                         size: 16,
-                        color: colorScheme.onSurfaceVariant,
+                        color: theme.colorScheme.mutedForeground,
                       ),
                     onSelected: (value) {
                       switch (value) {
@@ -602,11 +587,11 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                         child: Row(
                           children: [
                             Icon(AppIcons.delete,
-                                size: 16, color: colorScheme.error),
+                                size: 16, color: theme.colorScheme.destructive),
                             const SizedBox(width: 8),
                             Text(
                               'common.delete'.tr(),
-                              style: TextStyle(color: colorScheme.error),
+                              style: TextStyle(color: theme.colorScheme.destructive),
                             ),
                           ],
                         ),
@@ -685,28 +670,92 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
     return intl.DateFormat('time.date_format'.tr(), locale).format(date);
   }
 
-  /// AI 태그 위젯
+  /// 태그 섹션 (접기/펼치기 기능)
+  Widget _buildTagsSection(BuildContext context) {
+    final allTags = [
+      ...widget.fragment.tags,
+      ...widget.fragment.userTags,
+    ];
+
+    const maxVisibleTags = 4; // 접을 때 보여줄 최대 태그 수
+    final hasMoreTags = allTags.length > maxVisibleTags;
+    final visibleTags = _showAllTags ? allTags : allTags.take(maxVisibleTags).toList();
+    final hiddenCount = allTags.length - maxVisibleTags;
+
+    return Wrap(
+      spacing: 4,
+      runSpacing: 4,
+      children: [
+        // AI 태그
+        ...widget.fragment.tags.take(
+          _showAllTags ? widget.fragment.tags.length :
+          (visibleTags.length - widget.fragment.userTags.length).clamp(0, widget.fragment.tags.length)
+        ).map((tag) => _buildAITag(context, tag)),
+
+        // 사용자 태그
+        ...widget.fragment.userTags.where((tag) => visibleTags.contains(tag))
+          .map((tag) => _buildUserTag(context, tag)),
+
+        // 더보기 버튼 (태그가 많을 때만)
+        if (hasMoreTags)
+          _buildToggleTagsButton(context, hiddenCount),
+
+        // 태그 추가 버튼
+        _buildAddTagButton(context),
+      ],
+    );
+  }
+
+  /// 태그 펼치기/접기 버튼
+  Widget _buildToggleTagsButton(BuildContext context, int hiddenCount) {
+    final theme = ShadTheme.of(context);
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _showAllTags = !_showAllTags;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.muted.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          _showAllTags ? 'common.show_less'.tr() : 'common.show_more'.tr(namedArgs: {'count': '+$hiddenCount'}),
+          style: TextStyle(
+            fontSize: 12,
+            color: theme.colorScheme.mutedForeground,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// AI 태그 위젯 (웹 스타일)
   Widget _buildAITag(BuildContext context, String tag) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = ShadTheme.of(context);
 
     return GestureDetector(
       onTap: () => widget.onTagClick?.call(tag),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
+          color: theme.colorScheme.muted,
           borderRadius: BorderRadius.circular(6),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(AppIcons.sparkles, size: 12, color: colorScheme.primary),
+            Icon(AppIcons.sparkles, size: 12, color: theme.colorScheme.primary),
             const SizedBox(width: 4),
             Text(
               tag,
               style: TextStyle(
                 fontSize: 12,
-                color: colorScheme.onSurfaceVariant,
+                color: theme.colorScheme.mutedForeground,
               ),
             ),
             const SizedBox(width: 4),
@@ -715,7 +764,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
               child: Icon(
                 AppIcons.close,
                 size: 12,
-                color: colorScheme.onSurfaceVariant,
+                color: theme.colorScheme.mutedForeground,
               ),
             ),
           ],
@@ -726,6 +775,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
 
   /// AI 태그 숨기기 BottomSheet
   void _showHideAiTagSheet(String tag) {
+    final theme = ShadTheme.of(context);
     showModalBottomSheet(
       context: context,
       builder: (context) => Padding(
@@ -753,8 +803,8 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.error,
-                    foregroundColor: Theme.of(context).colorScheme.onError,
+                    backgroundColor: theme.colorScheme.destructive,
+                    foregroundColor: theme.colorScheme.destructiveForeground,
                   ),
                   child: Text('tag.hide'.tr()),
                 ),
@@ -767,28 +817,28 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
     );
   }
 
-  /// 사용자 태그 위젯
+  /// 사용자 태그 위젯 (웹 스타일)
   Widget _buildUserTag(BuildContext context, String tag) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = ShadTheme.of(context);
 
     return GestureDetector(
       onTap: () => widget.onTagClick?.call(tag),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: colorScheme.primaryContainer,
+          color: theme.colorScheme.primary,
           borderRadius: BorderRadius.circular(6),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(AppIcons.edit, size: 12, color: colorScheme.onPrimaryContainer),
+            Icon(AppIcons.edit, size: 12, color: theme.colorScheme.primaryForeground),
             const SizedBox(width: 4),
             Text(
               tag,
               style: TextStyle(
                 fontSize: 12,
-                color: colorScheme.onPrimaryContainer,
+                color: theme.colorScheme.primaryForeground,
               ),
             ),
             const SizedBox(width: 4),
@@ -797,7 +847,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
               child: Icon(
                 AppIcons.close,
                 size: 12,
-                color: colorScheme.onPrimaryContainer,
+                color: theme.colorScheme.primaryForeground,
               ),
             ),
           ],
@@ -808,6 +858,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
 
   /// 사용자 태그 삭제 BottomSheet
   void _showRemoveUserTagSheet(String tag) {
+    final theme = ShadTheme.of(context);
     showModalBottomSheet(
       context: context,
       builder: (context) => Padding(
@@ -835,8 +886,8 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.error,
-                    foregroundColor: Theme.of(context).colorScheme.onError,
+                    backgroundColor: theme.colorScheme.destructive,
+                    foregroundColor: theme.colorScheme.destructiveForeground,
                   ),
                   child: Text('common.delete'.tr()),
                 ),
@@ -849,27 +900,27 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
     );
   }
 
-  /// 태그 추가 버튼
+  /// 태그 추가 버튼 (웹 스타일)
   Widget _buildAddTagButton(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = ShadTheme.of(context);
     return GestureDetector(
       onTap: _showAddTagPage,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+          color: theme.colorScheme.muted.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(AppIcons.add, size: 12, color: colorScheme.onSurfaceVariant),
+            Icon(AppIcons.add, size: 12, color: theme.colorScheme.mutedForeground),
             const SizedBox(width: 4),
             Text(
               'tag.add_tag'.tr(),
               style: TextStyle(
                 fontSize: 12,
-                color: colorScheme.onSurfaceVariant,
+                color: theme.colorScheme.mutedForeground,
               ),
             ),
           ],

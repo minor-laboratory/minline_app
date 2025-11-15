@@ -544,6 +544,30 @@ xl: 20px  // Dialog
 - 탭 시: scale 0.95 → 1.0 (100ms)
 - 또는 Material elevation 변화
 
+### 태그 클릭
+
+**동작:**
+- FragmentCard의 태그 클릭 시 자동으로 검색 모드로 전환
+- 클릭한 태그가 검색 필터에 추가됨
+- 검색 AppBar가 표시되고, 태그가 pill 형태로 검색창에 표시됨
+
+**구현:**
+```dart
+// FragmentCard → FragmentList → TimelineView → MainPage 콜백 체인
+FragmentCard(
+  onTagClick: (tag) {
+    ref.read(fragmentFilterProvider.notifier).toggleTag(tag);
+    widget.onEnterSearchMode?.call();
+  },
+)
+```
+
+**사용자 경험:**
+1. 사용자가 Fragment 카드의 태그 클릭
+2. 자동으로 검색 모드로 전환 (일반 AppBar → 검색 AppBar)
+3. 클릭한 태그가 검색창 왼쪽에 pill로 표시됨
+4. 해당 태그를 포함한 Fragment만 필터링되어 표시됨
+
 ### 스크롤
 
 **Timeline:**

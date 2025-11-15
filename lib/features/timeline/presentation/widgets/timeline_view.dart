@@ -12,10 +12,12 @@ import 'fragment_list.dart';
 /// Fragment 리스트 + 하단 고정 입력바
 class TimelineView extends ConsumerStatefulWidget {
   final String viewMode; // 'timeline' | 'calendar'
+  final VoidCallback? onEnterSearchMode;
 
   const TimelineView({
     super.key,
     this.viewMode = 'timeline',
+    this.onEnterSearchMode,
   });
 
   @override
@@ -33,10 +35,14 @@ class _TimelineViewState extends ConsumerState<TimelineView>
     final fragmentsAsync = ref.watch(fragmentsStreamProvider);
 
     return widget.viewMode == 'timeline'
-        ? const Column(
+        ? Column(
             children: [
-              Expanded(child: FragmentList()),
-              FragmentInputBar(),
+              Expanded(
+                child: FragmentList(
+                  onEnterSearchMode: widget.onEnterSearchMode,
+                ),
+              ),
+              const FragmentInputBar(),
             ],
           )
         : fragmentsAsync.when(

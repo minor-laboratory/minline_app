@@ -111,8 +111,8 @@ class _FeedbackPageState extends State<FeedbackPage> {
             Text(
               'feedback.select_or_describe'.tr(),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 24),
 
@@ -182,13 +182,13 @@ class _FeedbackPageState extends State<FeedbackPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.errorContainer,
+                  color: ShadTheme.of(context).colorScheme.destructive.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   _errorMessage!,
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
+                    color: ShadTheme.of(context).colorScheme.destructiveForeground,
                   ),
                 ),
               ),

@@ -35,7 +35,7 @@ class _PostCardState extends ConsumerState<PostCard> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = ShadTheme.of(context);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -60,7 +60,7 @@ class _PostCardState extends ConsumerState<PostCard> {
               Text(
                 _getContentPreview(),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                      color: theme.colorScheme.mutedForeground,
                     ),
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
@@ -74,7 +74,7 @@ class _PostCardState extends ConsumerState<PostCard> {
                   Icon(
                     AppIcons.file,
                     size: 14,
-                    color: colorScheme.onSurfaceVariant,
+                    color: theme.colorScheme.mutedForeground,
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -82,32 +82,32 @@ class _PostCardState extends ConsumerState<PostCard> {
                       'count': widget.post.fragmentIds.length.toString(),
                     }),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
+                          color: theme.colorScheme.mutedForeground,
                         ),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     '•',
-                    style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    style: TextStyle(color: theme.colorScheme.mutedForeground),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     DateFormat.yMMMd(context.locale.languageCode).format(widget.post.createdAt),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
+                          color: theme.colorScheme.mutedForeground,
                         ),
                   ),
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest,
+                      color: theme.colorScheme.muted,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       'posts.template_${widget.post.template}'.tr(),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
+                            color: theme.colorScheme.mutedForeground,
                           ),
                     ),
                   ),
@@ -115,19 +115,19 @@ class _PostCardState extends ConsumerState<PostCard> {
                     const SizedBox(width: 8),
                     Text(
                       '•',
-                      style: TextStyle(color: colorScheme.onSurfaceVariant),
+                      style: TextStyle(color: theme.colorScheme.mutedForeground),
                     ),
                     const SizedBox(width: 8),
                     Icon(
                       AppIcons.share,
                       size: 14,
-                      color: colorScheme.primary,
+                      color: theme.colorScheme.primary,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       'post.exported'.tr(),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: colorScheme.primary,
+                            color: theme.colorScheme.primary,
                           ),
                     ),
                   ],

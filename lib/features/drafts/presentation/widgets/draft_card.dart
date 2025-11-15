@@ -184,34 +184,36 @@ class _DraftCardState extends ConsumerState<DraftCard> {
   }
 
   Color _getStatusColor() {
+    final theme = ShadTheme.of(context);
     switch (widget.draft.status) {
       case 'pending':
-        return Theme.of(context).colorScheme.primary.withValues(alpha: 0.1);
+        return theme.colorScheme.primary.withValues(alpha: 0.1);
       case 'accepted':
-        return Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1);
+        return theme.colorScheme.secondary.withValues(alpha: 0.1);
       case 'rejected':
-        return Theme.of(context).colorScheme.surfaceContainerHighest;
+        return theme.colorScheme.muted;
       default:
-        return Theme.of(context).colorScheme.surfaceContainerHighest;
+        return theme.colorScheme.muted;
     }
   }
 
   Color _getStatusTextColor() {
+    final theme = ShadTheme.of(context);
     switch (widget.draft.status) {
       case 'pending':
-        return Theme.of(context).colorScheme.primary;
+        return theme.colorScheme.primary;
       case 'accepted':
-        return Theme.of(context).colorScheme.secondary;
+        return theme.colorScheme.secondary;
       case 'rejected':
-        return Theme.of(context).colorScheme.onSurfaceVariant;
+        return theme.colorScheme.mutedForeground;
       default:
-        return Theme.of(context).colorScheme.onSurfaceVariant;
+        return theme.colorScheme.mutedForeground;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = ShadTheme.of(context);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -237,7 +239,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                         Text(
                           widget.draft.reason!,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
+                                color: theme.colorScheme.mutedForeground,
                               ),
                         ),
                       ],
@@ -270,7 +272,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                 Icon(
                   AppIcons.file,
                   size: 14,
-                  color: colorScheme.onSurfaceVariant,
+                  color: theme.colorScheme.mutedForeground,
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -278,20 +280,20 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                     'count': _fragments.length.toString(),
                   }),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                        color: theme.colorScheme.mutedForeground,
                       ),
                 ),
                 if (widget.draft.similarityScore != null) ...[
                   const SizedBox(width: 8),
                   Text(
                     '•',
-                    style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    style: TextStyle(color: theme.colorScheme.mutedForeground),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     '${'draft.similarity'.tr()} ${(widget.draft.similarityScore! * 100).round()}%',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
+                          color: theme.colorScheme.mutedForeground,
                         ),
                   ),
                 ],
@@ -328,7 +330,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                 decoration: BoxDecoration(
                   border: Border(
                     left: BorderSide(
-                      color: colorScheme.outline,
+                      color: theme.colorScheme.border,
                       width: 2,
                     ),
                   ),
@@ -340,7 +342,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest,
+                        color: theme.colorScheme.muted,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
@@ -356,7 +358,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                           Text(
                             DateFormat('MMM d, HH:mm').format(fragment.eventTime),
                             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
+                                  color: theme.colorScheme.mutedForeground,
                                 ),
                           ),
                         ],

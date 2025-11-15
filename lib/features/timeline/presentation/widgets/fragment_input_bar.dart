@@ -207,23 +207,22 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Theme.of(context).colorScheme.error,
+        backgroundColor: ShadTheme.of(context).colorScheme.destructive,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final theme = ShadTheme.of(context);
 
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: colorScheme.surface,
+          color: theme.colorScheme.background,
           border: Border(
-            top: BorderSide(color: colorScheme.outline.withValues(alpha: 0.2)),
+            top: BorderSide(color: theme.colorScheme.border.withValues(alpha: 0.2)),
           ),
         ),
         child: Column(
@@ -231,7 +230,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
           children: [
             // 이미지 프리뷰
             if (_selectedImages.isNotEmpty) ...[
-              _buildImagePreview(colorScheme),
+              _buildImagePreview(theme),
               const SizedBox(height: 12),
             ],
 
@@ -261,16 +260,16 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
             Row(
               children: [
                 // 이미지 추가 버튼
-                _buildImageButton(colorScheme),
+                _buildImageButton(theme),
                 const SizedBox(width: 8),
 
                 // 글자수 표시
-                _buildCharCounter(colorScheme),
+                _buildCharCounter(theme),
 
                 const Spacer(),
 
                 // 저장 버튼
-                _buildSaveButton(colorScheme),
+                _buildSaveButton(theme),
               ],
             ),
           ],
@@ -280,7 +279,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
   }
 
   /// 이미지 프리뷰 위젯
-  Widget _buildImagePreview(ColorScheme colorScheme) {
+  Widget _buildImagePreview(ShadThemeData theme) {
     return SizedBox(
       height: 80,
       child: ListView.builder(
@@ -313,13 +312,13 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: colorScheme.error,
+                        color: theme.colorScheme.destructive,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         AppIcons.close,
                         size: 12,
-                        color: colorScheme.onError,
+                        color: theme.colorScheme.destructiveForeground,
                       ),
                     ),
                   ),
@@ -333,7 +332,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
   }
 
   /// 이미지 추가 버튼
-  Widget _buildImageButton(ColorScheme colorScheme) {
+  Widget _buildImageButton(ShadThemeData theme) {
     return GestureDetector(
       onTap: _isLoading ? null : _pickImages,
       child: Container(
@@ -341,8 +340,8 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
         padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: _isLoading
-              ? colorScheme.surfaceContainerHighest
-              : colorScheme.secondaryContainer,
+              ? theme.colorScheme.muted
+              : theme.colorScheme.secondary,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -352,8 +351,8 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
               AppIcons.imagePlus,
               size: 16,
               color: _isLoading
-                  ? colorScheme.onSurfaceVariant
-                  : colorScheme.onSecondaryContainer,
+                  ? theme.colorScheme.mutedForeground
+                  : theme.colorScheme.secondaryForeground,
             ),
             if (_selectedImages.isNotEmpty) ...[
               const SizedBox(width: 6),
@@ -362,8 +361,8 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
                 style: TextStyle(
                   fontSize: 12,
                   color: _isLoading
-                      ? colorScheme.onSurfaceVariant
-                      : colorScheme.onSecondaryContainer,
+                      ? theme.colorScheme.mutedForeground
+                      : theme.colorScheme.secondaryForeground,
                 ),
               ),
             ],
@@ -374,14 +373,14 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
   }
 
   /// 글자수 카운터
-  Widget _buildCharCounter(ColorScheme colorScheme) {
+  Widget _buildCharCounter(ShadThemeData theme) {
     final charCount = _contentController.text.length;
 
     return Container(
       height: 32,
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
+        color: theme.colorScheme.muted,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Center(
@@ -389,7 +388,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
           '$charCount / $_maxLength',
           style: TextStyle(
             fontSize: 14,
-            color: colorScheme.onSurfaceVariant,
+            color: theme.colorScheme.mutedForeground,
             fontFeatures: const [FontFeature.tabularFigures()],
           ),
         ),
@@ -398,7 +397,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
   }
 
   /// 저장 버튼
-  Widget _buildSaveButton(ColorScheme colorScheme) {
+  Widget _buildSaveButton(ShadThemeData theme) {
     final isEnabled = _isValid && !_isLoading;
 
     return ShadButton(
@@ -413,7 +412,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
                   height: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: colorScheme.onPrimary,
+                    color: theme.colorScheme.primaryForeground,
                   ),
                 ),
                 const SizedBox(width: 8),

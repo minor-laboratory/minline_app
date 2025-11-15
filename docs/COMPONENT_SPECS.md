@@ -29,17 +29,34 @@ showShadDialog(context: context, builder: (context) => ShadDialog(...))
 
 ### 색상 시스템
 
-**테마 사용 필수** (하드코딩 금지):
+**Shadcn Theme 사용 필수** (Material Design → Shadcn 전환됨):
+
 ```dart
 // ❌ 하드코딩
 Color(0xFF2563EB)
 Colors.blue
 
-// ✅ 테마 사용 (shadcn_ui가 자동 감지)
-theme.colorScheme.primary
-theme.colorScheme.surface
-theme.colorScheme.onSurface
+// ✅ Shadcn Theme 사용 (ShadTheme.of(context))
+final theme = ShadTheme.of(context);
+
+// Material Design 색상 → Shadcn 색상 매핑
+theme.colorScheme.primary           // Primary color
+theme.colorScheme.primaryForeground // Primary 위 텍스트 색상
+theme.colorScheme.muted             // bg-muted (onSurfaceVariant 대체)
+theme.colorScheme.mutedForeground   // text-muted-foreground (onSurfaceVariant 대체)
+theme.colorScheme.border            // Border color (outline 대체)
+theme.colorScheme.ring              // Focus ring color
 ```
+
+**Material Design → Shadcn 색상 매핑표:**
+| Material Design | Shadcn Theme | 용도 |
+|----------------|--------------|------|
+| `colorScheme.onSurfaceVariant` | `theme.colorScheme.mutedForeground` | 보조 텍스트, 아이콘 |
+| `colorScheme.surfaceVariant` | `theme.colorScheme.muted` | 배경, 카드 |
+| `colorScheme.outline` | `theme.colorScheme.border` | 테두리 |
+| `colorScheme.primary` | `theme.colorScheme.primary` | 강조 색상 (동일) |
+
+**상세 가이드:** [docs/MIGRATION_SHADCN.md](MIGRATION_SHADCN.md) 참조
 
 ### 크기 시스템
 
@@ -437,60 +454,94 @@ String formatDate(DateTime date, String source) {
 
 **태그**:
 
-AI 태그:
+**태그 클릭 동작** (중요):
+- 태그 클릭 시 자동으로 검색 모드로 전환
+- 클릭한 태그가 검색 필터에 추가됨
+- MainPage → TimelineView → FragmentList → FragmentCard 콜백 체인
+
 ```dart
-Container(
-  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),  // px-2 py-1
-  decoration: BoxDecoration(
-    color: theme.colorScheme.surfaceVariant,  // bg-muted
-    borderRadius: BorderRadius.circular(6),  // rounded-md
-  ),
-  child: Row(
-    children: [
-      Icon(AppIcons.sparkles, size: 12),
-      SizedBox(width: 4),
-      Text(tag, style: TextStyle(fontSize: 12)),
-      // Hover 시 X 버튼 표시 (GestureDetector로 구현)
-    ],
+// FragmentCard에서 onTagClick 콜백 전달
+FragmentCard(
+  fragment: fragment,
+  onTagClick: (tag) {
+    ref.read(fragmentFilterProvider.notifier).toggleTag(tag);
+    widget.onEnterSearchMode?.call();  // 검색 모드로 전환
+  },
+)
+```
+
+AI 태그 (클릭 가능):
+```dart
+GestureDetector(
+  onTap: () => onTagClick?.call(tag),  // 클릭 시 검색 모드로 전환
+  child: Container(
+    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(
+      color: theme.colorScheme.muted.withValues(alpha: 0.5),  // Shadcn muted
+      borderRadius: BorderRadius.circular(6),
+    ),
+    child: Row(
+      children: [
+        Icon(AppIcons.sparkles, size: 12, color: theme.colorScheme.mutedForeground),
+        SizedBox(width: 4),
+        Text(
+          tag,
+          style: TextStyle(fontSize: 12, color: theme.colorScheme.mutedForeground),
+        ),
+      ],
+    ),
   ),
 )
 ```
 
-사용자 태그:
+사용자 태그 (편집 가능):
 ```dart
-Container(
-  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-  decoration: BoxDecoration(
-    color: theme.colorScheme.primary,  // bg-primary
-    borderRadius: BorderRadius.circular(6),
-  ),
-  child: Row(
-    children: [
-      Icon(AppIcons.edit, size: 12, color: theme.colorScheme.onPrimary),
-      SizedBox(width: 4),
-      Text(
-        tag,
-        style: TextStyle(fontSize: 12, color: theme.colorScheme.onPrimary),
-      ),
-    ],
+GestureDetector(
+  onTap: () {
+    // Long press: 태그 편집 페이지로 이동
+    // Single tap: 검색 모드로 전환 (onTagClick)
+  },
+  child: Container(
+    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(
+      color: theme.colorScheme.muted,  // Shadcn muted
+      borderRadius: BorderRadius.circular(6),
+    ),
+    child: Row(
+      children: [
+        Icon(AppIcons.tag, size: 12, color: theme.colorScheme.mutedForeground),
+        SizedBox(width: 4),
+        Text(
+          tag,
+          style: TextStyle(fontSize: 12, color: theme.colorScheme.mutedForeground),
+        ),
+        // X 버튼 (hover 시 표시)
+      ],
+    ),
   ),
 )
 ```
 
 태그 추가 버튼:
 ```dart
-Container(
-  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-  decoration: BoxDecoration(
-    color: theme.colorScheme.surfaceVariant.withValues(alpha: 0.5),
-    borderRadius: BorderRadius.circular(6),
-  ),
-  child: Row(
-    children: [
-      Icon(AppIcons.add, size: 12),
-      SizedBox(width: 4),
-      Text('tag.add_tag'.tr(), style: TextStyle(fontSize: 12)),
-    ],
+GestureDetector(
+  onTap: () => context.push('/tag/edit/${fragment.remoteID}'),
+  child: Container(
+    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(
+      color: theme.colorScheme.muted.withValues(alpha: 0.5),
+      borderRadius: BorderRadius.circular(6),
+    ),
+    child: Row(
+      children: [
+        Icon(AppIcons.add, size: 12, color: theme.colorScheme.mutedForeground),
+        SizedBox(width: 4),
+        Text(
+          'tag.add_tag'.tr(),
+          style: TextStyle(fontSize: 12, color: theme.colorScheme.mutedForeground),
+        ),
+      ],
+    ),
   ),
 )
 ```

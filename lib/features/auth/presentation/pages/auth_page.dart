@@ -107,7 +107,8 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       if (_isSignUpMode) {
         if (_confirmPasswordController.text.isEmpty) {
           _confirmPasswordError = null;
-        } else if (_passwordController.text != _confirmPasswordController.text) {
+        } else if (_passwordController.text !=
+            _confirmPasswordController.text) {
           _confirmPasswordError = 'validation.passwordNotMatch'.tr();
         } else {
           _confirmPasswordError = null;
@@ -115,15 +116,19 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       }
 
       // Form valid check
-      final emailValid = _emailController.text.isNotEmpty &&
+      final emailValid =
+          _emailController.text.isNotEmpty &&
           _emailError == null &&
           _isValidEmail(_emailController.text);
-      final passwordValid = _passwordController.text.isNotEmpty &&
+      final passwordValid =
+          _passwordController.text.isNotEmpty &&
           _passwordError == null &&
           _passwordController.text.length >= 6;
-      final nameValid = !_isSignUpMode ||
+      final nameValid =
+          !_isSignUpMode ||
           (_nameController.text.trim().isNotEmpty && _nameError == null);
-      final confirmValid = !_isSignUpMode ||
+      final confirmValid =
+          !_isSignUpMode ||
           (_confirmPasswordController.text.isNotEmpty &&
               _confirmPasswordError == null);
 
@@ -140,12 +145,16 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       }
     }
 
-    logger.i('📧 [AuthPage] 이메일 ${_isSignUpMode ? "회원가입" : "로그인"} 시도: ${_emailController.text}');
+    logger.i(
+      '📧 [AuthPage] 이메일 ${_isSignUpMode ? "회원가입" : "로그인"} 시도: ${_emailController.text}',
+    );
     setState(() => _isLoading = true);
 
     try {
       if (_isSignUpMode) {
-        await ref.read(common.authNotifierProvider.notifier).signUpWithEmail(
+        await ref
+            .read(common.authNotifierProvider.notifier)
+            .signUpWithEmail(
               email: _emailController.text.trim(),
               password: _passwordController.text,
               name: _nameController.text.trim().isEmpty
@@ -158,7 +167,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
         _showToast('auth.signup_success'.tr(), isSuccess: true);
         context.go('/');
       } else {
-        await ref.read(common.authNotifierProvider.notifier).signInWithEmail(
+        await ref
+            .read(common.authNotifierProvider.notifier)
+            .signInWithEmail(
               email: _emailController.text.trim(),
               password: _passwordController.text,
             );
@@ -232,8 +243,11 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     }
   }
 
-  void _showToast(String message,
-      {bool isError = false, bool isSuccess = false}) {
+  void _showToast(
+    String message, {
+    bool isError = false,
+    bool isSuccess = false,
+  }) {
     final theme = Theme.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -241,8 +255,8 @@ class _AuthPageState extends ConsumerState<AuthPage> {
         backgroundColor: isError
             ? theme.colorScheme.error
             : isSuccess
-                ? theme.extension<common.MinorLabCustomColors>()?.success
-                : null,
+            ? theme.extension<common.MinorLabCustomColors>()?.success
+            : null,
       ),
     );
   }
@@ -340,11 +354,10 @@ class _AuthPageState extends ConsumerState<AuthPage> {
           children: [
             const Expanded(child: ShadSeparator.horizontal()),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: common.Spacing.md),
-              child: Text(
-                'auth.or'.tr(),
-                style: theme.textTheme.muted,
+              padding: const EdgeInsets.symmetric(
+                horizontal: common.Spacing.md,
               ),
+              child: Text('auth.or'.tr(), style: theme.textTheme.muted),
             ),
             const Expanded(child: ShadSeparator.horizontal()),
           ],
@@ -385,11 +398,10 @@ class _AuthPageState extends ConsumerState<AuthPage> {
           children: [
             const Expanded(child: ShadSeparator.horizontal()),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: common.Spacing.md),
-              child: Text(
-                'auth.or'.tr(),
-                style: theme.textTheme.muted,
+              padding: const EdgeInsets.symmetric(
+                horizontal: common.Spacing.md,
               ),
+              child: Text('auth.or'.tr(), style: theme.textTheme.muted),
             ),
             const Expanded(child: ShadSeparator.horizontal()),
           ],
@@ -415,11 +427,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   Widget _buildHeader(ShadThemeData theme) {
     return Column(
       children: [
-        Icon(
-          AppIcons.sparkles,
-          size: 56,
-          color: theme.colorScheme.primary,
-        ),
+        Icon(AppIcons.sparkles, size: 56, color: theme.colorScheme.primary),
         const SizedBox(height: common.Spacing.md),
         Text(
           AppConstants.appName,
@@ -517,7 +525,8 @@ class _AuthPageState extends ConsumerState<AuthPage> {
             obscure: _obscureConfirmPassword,
             error: _confirmPasswordError,
             onToggleObscure: () => setState(
-                () => _obscureConfirmPassword = !_obscureConfirmPassword),
+              () => _obscureConfirmPassword = !_obscureConfirmPassword,
+            ),
             enabled: !_isLoading,
             onSubmitted: _isFormValid ? _handleEmailAuth : null,
           ),
@@ -529,7 +538,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
           Align(
             alignment: Alignment.centerRight,
             child: ShadButton.ghost(
-              onPressed: _isLoading ? null : () => context.push('/auth/reset-password'),
+              onPressed: _isLoading
+                  ? null
+                  : () => context.push('/auth/reset-password'),
               child: Text('auth.forgot_password'.tr()),
             ),
           ),
@@ -563,8 +574,8 @@ class _AuthPageState extends ConsumerState<AuthPage> {
           Text(
             error,
             style: ShadTheme.of(context).textTheme.small.copyWith(
-                  color: ShadTheme.of(context).colorScheme.destructive,
-                ),
+              color: ShadTheme.of(context).colorScheme.destructive,
+            ),
           ),
         ],
       ],
@@ -592,10 +603,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
             height: 24,
             padding: EdgeInsets.zero,
             onPressed: onToggleObscure,
-            child: Icon(
-              obscure ? AppIcons.eyeOff : AppIcons.eye,
-              size: 16,
-            ),
+            child: Icon(obscure ? AppIcons.eyeOff : AppIcons.eye, size: 16),
           ),
           obscureText: obscure,
           enabled: enabled,
@@ -606,8 +614,8 @@ class _AuthPageState extends ConsumerState<AuthPage> {
           Text(
             error,
             style: ShadTheme.of(context).textTheme.small.copyWith(
-                  color: ShadTheme.of(context).colorScheme.destructive,
-                ),
+              color: ShadTheme.of(context).colorScheme.destructive,
+            ),
           ),
         ],
       ],

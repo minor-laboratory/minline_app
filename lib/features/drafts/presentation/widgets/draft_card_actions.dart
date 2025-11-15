@@ -30,7 +30,7 @@ class DraftCardActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = ShadTheme.of(context);
 
     if (status == 'pending') {
       return Row(
@@ -82,7 +82,7 @@ class DraftCardActions extends StatelessWidget {
               icon: Icon(
                 AppIcons.moreVert,
                 size: 16,
-                color: colorScheme.onSurfaceVariant,
+                color: theme.colorScheme.mutedForeground,
               ),
               onSelected: (value) {
                 switch (value) {
@@ -104,8 +104,8 @@ class DraftCardActions extends StatelessWidget {
                         hasSubmittedFeedback ? AppIcons.checkCircle : AppIcons.flag,
                         size: 16,
                         color: hasSubmittedFeedback
-                            ? colorScheme.outline
-                            : colorScheme.onSurface,
+                            ? theme.colorScheme.border
+                            : theme.colorScheme.foreground,
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -114,8 +114,8 @@ class DraftCardActions extends StatelessWidget {
                             : 'feedback.report_issue'.tr(),
                         style: TextStyle(
                           color: hasSubmittedFeedback
-                              ? colorScheme.outline
-                              : colorScheme.onSurface,
+                              ? theme.colorScheme.border
+                              : theme.colorScheme.foreground,
                         ),
                       ),
                     ],
@@ -126,11 +126,11 @@ class DraftCardActions extends StatelessWidget {
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(AppIcons.delete, size: 16, color: colorScheme.error),
+                      Icon(AppIcons.delete, size: 16, color: theme.colorScheme.destructive),
                       const SizedBox(width: 8),
                       Text(
                         'common.delete'.tr(),
-                        style: TextStyle(color: colorScheme.error),
+                        style: TextStyle(color: theme.colorScheme.destructive),
                       ),
                     ],
                   ),
@@ -183,7 +183,7 @@ class DraftCardActions extends StatelessWidget {
               icon: Icon(
                 AppIcons.moreVert,
                 size: 16,
-                color: colorScheme.onSurfaceVariant,
+                color: theme.colorScheme.mutedForeground,
               ),
               onSelected: (value) {
                 switch (value) {
@@ -205,8 +205,8 @@ class DraftCardActions extends StatelessWidget {
                         hasSubmittedFeedback ? AppIcons.checkCircle : AppIcons.flag,
                         size: 16,
                         color: hasSubmittedFeedback
-                            ? colorScheme.outline
-                            : colorScheme.onSurface,
+                            ? theme.colorScheme.border
+                            : theme.colorScheme.foreground,
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -215,8 +215,8 @@ class DraftCardActions extends StatelessWidget {
                             : 'feedback.report_issue'.tr(),
                         style: TextStyle(
                           color: hasSubmittedFeedback
-                              ? colorScheme.outline
-                              : colorScheme.onSurface,
+                              ? theme.colorScheme.border
+                              : theme.colorScheme.foreground,
                         ),
                       ),
                     ],
@@ -227,11 +227,11 @@ class DraftCardActions extends StatelessWidget {
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(AppIcons.delete, size: 16, color: colorScheme.error),
+                      Icon(AppIcons.delete, size: 16, color: theme.colorScheme.destructive),
                       const SizedBox(width: 8),
                       Text(
                         'common.delete'.tr(),
-                        style: TextStyle(color: colorScheme.error),
+                        style: TextStyle(color: theme.colorScheme.destructive),
                       ),
                     ],
                   ),
@@ -268,7 +268,7 @@ class DraftCardActions extends StatelessWidget {
               icon: Icon(
                 AppIcons.moreVert,
                 size: 16,
-                color: colorScheme.onSurfaceVariant,
+                color: theme.colorScheme.mutedForeground,
               ),
               onSelected: (value) {
                 switch (value) {
@@ -290,8 +290,8 @@ class DraftCardActions extends StatelessWidget {
                         hasSubmittedFeedback ? AppIcons.checkCircle : AppIcons.flag,
                         size: 16,
                         color: hasSubmittedFeedback
-                            ? colorScheme.outline
-                            : colorScheme.onSurface,
+                            ? theme.colorScheme.border
+                            : theme.colorScheme.foreground,
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -300,8 +300,8 @@ class DraftCardActions extends StatelessWidget {
                             : 'feedback.report_issue'.tr(),
                         style: TextStyle(
                           color: hasSubmittedFeedback
-                              ? colorScheme.outline
-                              : colorScheme.onSurface,
+                              ? theme.colorScheme.border
+                              : theme.colorScheme.foreground,
                         ),
                       ),
                     ],
@@ -312,11 +312,11 @@ class DraftCardActions extends StatelessWidget {
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(AppIcons.delete, size: 16, color: colorScheme.error),
+                      Icon(AppIcons.delete, size: 16, color: theme.colorScheme.destructive),
                       const SizedBox(width: 8),
                       Text(
                         'common.delete'.tr(),
-                        style: TextStyle(color: colorScheme.error),
+                        style: TextStyle(color: theme.colorScheme.destructive),
                       ),
                     ],
                   ),

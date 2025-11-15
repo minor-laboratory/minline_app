@@ -20,7 +20,8 @@ class AccountWithdrawalPage extends ConsumerStatefulWidget {
   const AccountWithdrawalPage({super.key});
 
   @override
-  ConsumerState<AccountWithdrawalPage> createState() => _AccountWithdrawalPageState();
+  ConsumerState<AccountWithdrawalPage> createState() =>
+      _AccountWithdrawalPageState();
 }
 
 class _AccountWithdrawalPageState extends ConsumerState<AccountWithdrawalPage> {
@@ -40,15 +41,14 @@ class _AccountWithdrawalPageState extends ConsumerState<AccountWithdrawalPage> {
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
 
-    final canWithdraw = _confirmationChecked &&
-                       _confirmationController.text.trim().toLowerCase() == 'withdrawal_confirmation_text'.tr().toLowerCase();
+    final canWithdraw =
+        _confirmationChecked &&
+        _confirmationController.text.trim().toLowerCase() ==
+            'withdrawal_confirmation_text'.tr().toLowerCase();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'withdrawal_title'.tr(),
-          style: textTheme.titleLarge,
-        ),
+        title: Text('withdrawal_title'.tr(), style: textTheme.titleLarge),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -56,17 +56,13 @@ class _AccountWithdrawalPageState extends ConsumerState<AccountWithdrawalPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // 경고 아이콘과 제목
-            Icon(
-              AppIcons.warning,
-              size: 64,
-              color: colorScheme.error,
-            ),
+            Icon(AppIcons.warning, size: 64, color: colorScheme.destructive),
             const SizedBox(height: 16),
 
             Text(
               'withdrawal_warning_title'.tr(),
               style: textTheme.headlineSmall?.copyWith(
-                color: colorScheme.error,
+                color: colorScheme.destructive,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
@@ -74,10 +70,7 @@ class _AccountWithdrawalPageState extends ConsumerState<AccountWithdrawalPage> {
             const SizedBox(height: 24),
 
             // 탈퇴 안내사항
-            Text(
-              'withdrawal_notice'.tr(),
-              style: textTheme.bodyLarge,
-            ),
+            Text('withdrawal_notice'.tr(), style: textTheme.bodyLarge),
             const SizedBox(height: 16),
 
             // 탈퇴 확인 체크박스
@@ -113,7 +106,7 @@ class _AccountWithdrawalPageState extends ConsumerState<AccountWithdrawalPage> {
                     child: Text(
                       'common.cancel'.tr(),
                       style: textTheme.labelLarge?.copyWith(
-                        color: colorScheme.onSurface,
+                        color: colorScheme.foreground,
                       ),
                     ),
                   ),
@@ -121,22 +114,26 @@ class _AccountWithdrawalPageState extends ConsumerState<AccountWithdrawalPage> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: ShadButton(
-                    onPressed: (_isLoading || !canWithdraw) ? null : _processWithdrawal,
-                    backgroundColor: colorScheme.error,
-                    foregroundColor: colorScheme.onError,
+                    onPressed: (_isLoading || !canWithdraw)
+                        ? null
+                        : _processWithdrawal,
+                    backgroundColor: colorScheme.destructive,
+                    foregroundColor: colorScheme.destructiveForeground,
                     child: _isLoading
                         ? SizedBox(
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(colorScheme.onError),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                colorScheme.destructiveForeground,
+                              ),
                             ),
                           )
                         : Text(
                             'withdrawal_button'.tr(),
                             style: textTheme.labelLarge?.copyWith(
-                              color: colorScheme.onError,
+                              color: colorScheme.destructiveForeground,
                             ),
                           ),
                   ),
@@ -176,7 +173,7 @@ class _AccountWithdrawalPageState extends ConsumerState<AccountWithdrawalPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('withdrawal_error'.tr()),
-            backgroundColor: ShadTheme.of(context).colorScheme.error,
+            backgroundColor: ShadTheme.of(context).colorScheme.destructive,
           ),
         );
       }

@@ -324,7 +324,9 @@
     "generating": "Generating...",
     "generate": "Generate",
     "regenerating": "Regenerating...",
-    "regenerate": "Regenerate"
+    "regenerate": "Regenerate",
+    "show_more": "Show more {count}",
+    "show_less": "Show less"
   },
   "profile": {
     "title": "Profile",

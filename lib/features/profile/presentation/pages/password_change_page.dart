@@ -58,7 +58,8 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
     final bool isValid;
     if (_hasExistingPassword == true) {
       // 기존 비밀번호가 있는 경우: 모든 필드 필수
-      isValid = currentPassword.isNotEmpty &&
+      isValid =
+          currentPassword.isNotEmpty &&
           newPassword.length >= 6 &&
           confirmPassword == newPassword;
     } else {
@@ -278,14 +279,17 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                               child: Icon(AppIcons.password, size: 20),
                             ),
                             trailing: Padding(
-                              padding: EdgeInsets.only(right: common.Spacing.xs),
+                              padding: EdgeInsets.only(
+                                right: common.Spacing.xs,
+                              ),
                               child: ShadButton.ghost(
                                 width: 40,
                                 height: 40,
                                 padding: EdgeInsets.zero,
                                 onPressed: () {
                                   setState(() {
-                                    _obscureCurrentPassword = !_obscureCurrentPassword;
+                                    _obscureCurrentPassword =
+                                        !_obscureCurrentPassword;
                                   });
                                 },
                                 child: Icon(
@@ -304,7 +308,9 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                               child: Text(
                                 errorText,
                                 style: TextStyle(
-                                  color: ShadTheme.of(context).colorScheme.error,
+                                  color: ShadTheme.of(
+                                    context,
+                                  ).colorScheme.error,
                                   fontSize: 12,
                                 ),
                               ),
@@ -371,7 +377,7 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                             child: Text(
                               errorText,
                               style: TextStyle(
-                                color: ShadTheme.of(context).colorScheme.error,
+                                color: ShadTheme.of(context).colorScheme.destructive,
                                 fontSize: 12,
                               ),
                             ),
@@ -414,7 +420,8 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                               padding: EdgeInsets.zero,
                               onPressed: () {
                                 setState(() {
-                                  _obscureConfirmPassword = !_obscureConfirmPassword;
+                                  _obscureConfirmPassword =
+                                      !_obscureConfirmPassword;
                                 });
                               },
                               child: Icon(
@@ -433,7 +440,7 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                             child: Text(
                               errorText,
                               style: TextStyle(
-                                color: ShadTheme.of(context).colorScheme.error,
+                                color: ShadTheme.of(context).colorScheme.destructive,
                                 fontSize: 12,
                               ),
                             ),

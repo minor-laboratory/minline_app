@@ -117,9 +117,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
       final response = await supabase.functions.invoke(
         'generate-post',
         body: body,
-        headers: {
-          'Accept': 'text/event-stream',
-        },
+        headers: {'Accept': 'text/event-stream'},
       );
 
       if (response.status != 200) {
@@ -187,20 +185,14 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text('post.create_title'.tr()),
-        ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        appBar: AppBar(title: Text('post.create_title'.tr())),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     if (_draft == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text('post.create_title'.tr()),
-        ),
+        appBar: AppBar(title: Text('post.create_title'.tr())),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -208,7 +200,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
               Icon(
                 AppIcons.error,
                 size: 64,
-                color: Theme.of(context).colorScheme.error,
+                color: ShadTheme.of(context).colorScheme.destructive,
               ),
               const SizedBox(height: 16),
               Text(
@@ -241,7 +233,11 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                   else
                     Icon(AppIcons.sparkles, size: 16),
                   const SizedBox(width: 8),
-                  Text(_isGenerating ? 'post.generating'.tr() : 'post.generate'.tr()),
+                  Text(
+                    _isGenerating
+                        ? 'post.generating'.tr()
+                        : 'post.generate'.tr(),
+                  ),
                 ],
               ),
             ),
@@ -284,8 +280,8 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                       Text(
                         _draft!.reason!,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ],
@@ -349,8 +345,8 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                       child: Text(
                         _errorMessage!,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onErrorContainer,
-                            ),
+                          color: Theme.of(context).colorScheme.onErrorContainer,
+                        ),
                       ),
                     ),
                   ],
@@ -369,9 +365,8 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                       if (_generatingTitle.isNotEmpty) ...[
                         Text(
                           _generatingTitle,
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 16),
                         const Divider(),
@@ -392,7 +387,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                             // 커서 애니메이션 (생성 중일 때만)
                             if (_isGenerating)
                               _CursorBlinker(
-                                color: Theme.of(context).colorScheme.primary,
+                                color: ShadTheme.of(context).colorScheme.primary,
                               ),
                           ],
                         ),
@@ -410,8 +405,11 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                         const SizedBox(height: 8),
                         Text(
                           '${_progress.toInt()}%',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
                               ),
                         ),
                       ],
@@ -429,8 +427,11 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                             const SizedBox(width: 8),
                             Text(
                               'post.generation_complete'.tr(),
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Theme.of(context).colorScheme.primary,
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                     fontWeight: FontWeight.w600,
                                   ),
                             ),
@@ -450,8 +451,8 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                     child: Text(
                       'post.preview_placeholder'.tr(),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 ),
@@ -464,18 +465,18 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
 
   Widget _buildTemplateCard(PostTemplate template) {
     final isSelected = _selectedTemplate == template.id;
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = ShadTheme.of(context);
 
     return GestureDetector(
       onTap: () {
         setState(() => _selectedTemplate = template.id);
       },
       child: Card(
-        color: isSelected ? colorScheme.primaryContainer : null,
+        color: isSelected ? theme.colorScheme.accent : null,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: isSelected
-              ? BorderSide(color: colorScheme.primary, width: 2)
+              ? BorderSide(color: theme.colorScheme.primary, width: 2)
               : BorderSide.none,
         ),
         child: Padding(
@@ -488,16 +489,16 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                 height: 48,
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? colorScheme.primary
-                      : colorScheme.surfaceContainerHighest,
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.muted,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   template.icon,
                   size: 24,
                   color: isSelected
-                      ? colorScheme.onPrimary
-                      : colorScheme.onSurfaceVariant,
+                      ? theme.colorScheme.primaryForeground
+                      : theme.colorScheme.mutedForeground,
                 ),
               ),
               const SizedBox(width: 16),
@@ -510,20 +511,22 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                     Text(
                       template.nameKey.tr(),
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: isSelected
-                                ? colorScheme.onPrimaryContainer
-                                : colorScheme.onSurface,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        color: isSelected
+                            ? theme.colorScheme.accentForeground
+                            : theme.colorScheme.foreground,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       template.descKey.tr(),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: isSelected
-                                ? colorScheme.onPrimaryContainer.withValues(alpha: 0.8)
-                                : colorScheme.onSurfaceVariant,
-                          ),
+                        color: isSelected
+                            ? theme.colorScheme.accentForeground.withValues(
+                                alpha: 0.8,
+                              )
+                            : theme.colorScheme.mutedForeground,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -536,7 +539,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                 Icon(
                   AppIcons.checkCircle,
                   size: 20,
-                  color: colorScheme.primary,
+                  color: theme.colorScheme.primary,
                 ),
               ],
             ],
@@ -551,9 +554,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
 class _CursorBlinker extends StatefulWidget {
   final Color color;
 
-  const _CursorBlinker({
-    required this.color,
-  });
+  const _CursorBlinker({required this.color});
 
   @override
   State<_CursorBlinker> createState() => _CursorBlinkerState();
@@ -582,11 +583,7 @@ class _CursorBlinkerState extends State<_CursorBlinker>
   Widget build(BuildContext context) {
     return FadeTransition(
       opacity: _controller,
-      child: Container(
-        width: 2,
-        height: 20,
-        color: widget.color,
-      ),
+      child: Container(width: 2, height: 20, color: widget.color),
     );
   }
 }

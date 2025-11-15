@@ -31,7 +31,7 @@ class _FilterBarState extends ConsumerState<FilterBar> {
   @override
   Widget build(BuildContext context) {
     final filterAsync = ref.watch(fragmentFilterProvider);
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = ShadTheme.of(context);
 
     // AsyncValue에서 값 추출, 로딩/에러 시 기본값 사용 (UI 깜빡임 방지)
     final filter = filterAsync.asData?.value ?? const FragmentFilterState();
@@ -82,7 +82,7 @@ class _FilterBarState extends ConsumerState<FilterBar> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: colorScheme.primary.withValues(alpha: 0.1),
+                                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(9999),
                                   ),
                                   child: Row(
@@ -92,7 +92,7 @@ class _FilterBarState extends ConsumerState<FilterBar> {
                                         tag,
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: colorScheme.primary,
+                                          color: theme.colorScheme.primary,
                                         ),
                                       ),
                                       const SizedBox(width: 2),
@@ -105,7 +105,7 @@ class _FilterBarState extends ConsumerState<FilterBar> {
                                         child: Icon(
                                           AppIcons.close,
                                           size: 12,
-                                          color: colorScheme.primary,
+                                          color: theme.colorScheme.primary,
                                         ),
                                       ),
                                     ],
@@ -130,7 +130,7 @@ class _FilterBarState extends ConsumerState<FilterBar> {
                           child: Icon(
                             AppIcons.close,
                             size: 16,
-                            color: colorScheme.onSurfaceVariant,
+                            color: theme.colorScheme.mutedForeground,
                           ),
                         )
                       : null,
@@ -141,7 +141,7 @@ class _FilterBarState extends ConsumerState<FilterBar> {
 
             // 정렬 버튼
             PopupMenuButton<String>(
-              icon: Icon(AppIcons.sort, color: colorScheme.onSurfaceVariant),
+              icon: Icon(AppIcons.sort, color: theme.colorScheme.mutedForeground),
               tooltip: 'filter.sort'.tr(),
               onSelected: (value) {
                 ref.read(fragmentFilterProvider.notifier).setSortBy(value);
@@ -176,7 +176,7 @@ class _FilterBarState extends ConsumerState<FilterBar> {
                     ? AppIcons.arrowDown
                     : AppIcons.arrowUp,
                 size: 20,
-                color: colorScheme.onSurfaceVariant,
+                color: theme.colorScheme.mutedForeground,
               ),
               onPressed: () {
                 ref.read(fragmentFilterProvider.notifier).toggleSortOrder();
@@ -203,7 +203,7 @@ class _FilterBarState extends ConsumerState<FilterBar> {
             Icon(
               AppIcons.checkCircle,
               size: 16,
-              color: Theme.of(context).colorScheme.primary,
+              color: ShadTheme.of(context).colorScheme.primary,
             ),
           ],
         ],

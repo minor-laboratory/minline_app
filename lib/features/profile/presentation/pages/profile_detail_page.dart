@@ -131,7 +131,7 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('profile_image_delete_failed'.tr()),
-            backgroundColor: ShadTheme.of(context).colorScheme.error,
+            backgroundColor: ShadTheme.of(context).colorScheme.destructive,
           ),
         );
       }
@@ -190,9 +190,9 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
       });
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('profile_image_updated'.tr())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('profile_image_updated'.tr())));
       }
     } catch (e, stackTrace) {
       logger.e('Failed to save profile image', e, stackTrace);
@@ -229,9 +229,9 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
       ref.invalidate(userProfileProvider);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('profile_name_updated'.tr())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('profile_name_updated'.tr())));
       }
     } catch (e, stackTrace) {
       logger.e('Failed to save profile name', e, stackTrace);
@@ -239,7 +239,7 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('profile_name_save_failed'.tr()),
-            backgroundColor: ShadTheme.of(context).colorScheme.error,
+            backgroundColor: ShadTheme.of(context).colorScheme.destructive,
           ),
         );
       }
@@ -274,14 +274,14 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
                     children: [
                       Icon(
                         AppIcons.delete,
-                        color: theme.colorScheme.error,
+                        color: theme.colorScheme.destructive,
                         size: 16,
                       ),
                       const SizedBox(width: 8),
                       Text(
                         'withdrawal_title'.tr(),
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.error,
+                          color: theme.colorScheme.destructive,
                         ),
                       ),
                     ],
@@ -308,23 +308,23 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
                 children: [
                   CircleAvatar(
                     radius: 60,
-                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                    backgroundColor: theme.colorScheme.muted,
                     backgroundImage: _selectedImage != null
                         ? FileImage(_selectedImage!)
                         : currentPhotoUrl != null
-                            ? CachedNetworkImageProvider(
-                                    StorageUtils.getUserPhotoUrl(
-                                      ref.read(currentUserProvider)?.id ?? '',
-                                      currentPhotoUrl,
-                                    ),
-                                  )
-                                  as ImageProvider
-                            : null,
+                        ? CachedNetworkImageProvider(
+                                StorageUtils.getUserPhotoUrl(
+                                  ref.read(currentUserProvider)?.id ?? '',
+                                  currentPhotoUrl,
+                                ),
+                              )
+                              as ImageProvider
+                        : null,
                     child: (_selectedImage == null && currentPhotoUrl == null)
                         ? Icon(
                             AppIcons.user,
                             size: 60,
-                            color: theme.colorScheme.onSurfaceVariant,
+                            color: theme.colorScheme.mutedForeground,
                           )
                         : null,
                   ),
@@ -379,7 +379,7 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : Icon(AppIcons.delete, size: 16),
-                  foregroundColor: theme.colorScheme.error,
+                  foregroundColor: theme.colorScheme.destructive,
                   child: Text(
                     _selectedImage != null
                         ? 'common.cancel'.tr()
@@ -480,15 +480,16 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: providerColor.withAlpha(25), // 0.1 * 255 = 25
+                  color: providerColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   providerType == 'email'
                       ? AppIcons.email
                       : providerType == 'google'
-                          ? AppIcons.email // 구글 아이콘 대체
-                          : AppIcons.userCircle, // 애플 아이콘 대체
+                      ? AppIcons
+                            .email // 구글 아이콘 대체
+                      : AppIcons.userCircle, // 애플 아이콘 대체
                   size: 24,
                   color: providerColor,
                 ),
@@ -506,7 +507,7 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
                     Text(
                       'settings.${providerType}_login'.tr(),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                        color: theme.colorScheme.mutedForeground,
                       ),
                     ),
                   ],
@@ -609,7 +610,7 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('messages.logout_failed'.tr()),
-              backgroundColor: ShadTheme.of(context).colorScheme.error,
+              backgroundColor: ShadTheme.of(context).colorScheme.destructive,
             ),
           );
         }

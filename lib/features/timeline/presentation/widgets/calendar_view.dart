@@ -13,10 +13,7 @@ import 'fragment_card.dart';
 class CalendarView extends ConsumerStatefulWidget {
   final List<Fragment> allFragments;
 
-  const CalendarView({
-    required this.allFragments,
-    super.key,
-  });
+  const CalendarView({required this.allFragments, super.key});
 
   @override
   ConsumerState<CalendarView> createState() => _CalendarViewState();
@@ -40,18 +37,23 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
     final lastDay = DateTime(_currentMonth.year, _currentMonth.month + 1, 0);
 
     // 첫 번째 날의 요일 (0: Sunday, 6: Saturday)
-    final startWeekday = firstDay.weekday % 7; // DateTime uses 1-7, convert to 0-6
+    final startWeekday =
+        firstDay.weekday % 7; // DateTime uses 1-7, convert to 0-6
 
     // 첫 주의 빈 칸 채우기 (이전 월 날짜)
     final previousMonthDays = <DateTime>[];
     for (var i = 0; i < startWeekday; i++) {
-      previousMonthDays.add(firstDay.subtract(Duration(days: startWeekday - i)));
+      previousMonthDays.add(
+        firstDay.subtract(Duration(days: startWeekday - i)),
+      );
     }
 
     // 현재 월의 모든 날짜
     final currentMonthDays = <DateTime>[];
     for (var i = 0; i < lastDay.day; i++) {
-      currentMonthDays.add(DateTime(_currentMonth.year, _currentMonth.month, i + 1));
+      currentMonthDays.add(
+        DateTime(_currentMonth.year, _currentMonth.month, i + 1),
+      );
     }
 
     // 마지막 주의 빈 칸 채우기 (다음 월 날짜)
@@ -95,7 +97,9 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
   /// 오늘 날짜인지 확인
   bool _isToday(DateTime date) {
     final now = DateTime.now();
-    return date.year == now.year && date.month == now.month && date.day == now.day;
+    return date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
   }
 
   /// 선택된 날짜인지 확인
@@ -152,7 +156,7 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = ShadTheme.of(context);
     final fragmentCounts = _getFragmentCountByDate();
     final selectedFragments = _getFragmentsForSelectedDate();
 
@@ -171,9 +175,9 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
               ),
               Text(
                 DateFormat('MMMM yyyy').format(_currentMonth),
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
               Row(
                 mainAxisSize: MainAxisSize.min,
@@ -197,27 +201,31 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
-            children: [
-              'calendar.weekday_sun',
-              'calendar.weekday_mon',
-              'calendar.weekday_tue',
-              'calendar.weekday_wed',
-              'calendar.weekday_thu',
-              'calendar.weekday_fri',
-              'calendar.weekday_sat',
-            ]
-                .map((key) => Expanded(
-                      child: Center(
-                        child: Text(
-                          key.tr(),
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                                fontWeight: FontWeight.w600,
-                              ),
+            children:
+                [
+                      'calendar.weekday_sun',
+                      'calendar.weekday_mon',
+                      'calendar.weekday_tue',
+                      'calendar.weekday_wed',
+                      'calendar.weekday_thu',
+                      'calendar.weekday_fri',
+                      'calendar.weekday_sat',
+                    ]
+                    .map(
+                      (key) => Expanded(
+                        child: Center(
+                          child: Text(
+                            key.tr(),
+                            style: Theme.of(context).textTheme.labelSmall
+                                ?.copyWith(
+                                  color: theme.colorScheme.mutedForeground,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
                         ),
                       ),
-                    ))
-                .toList(),
+                    )
+                    .toList(),
           ),
         ),
 
@@ -249,11 +257,9 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? colorScheme.primary
-                        : null,
+                    color: isSelected ? theme.colorScheme.primary : null,
                     border: !isSelected && isToday
-                        ? Border.all(color: colorScheme.primary, width: 2)
+                        ? Border.all(color: theme.colorScheme.primary, width: 2)
                         : null,
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -264,10 +270,12 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
                         '${date.day}',
                         style: TextStyle(
                           color: isSelected
-                              ? colorScheme.onPrimary
+                              ? theme.colorScheme.primaryForeground
                               : !isSameMonth
-                                  ? colorScheme.onSurfaceVariant.withValues(alpha: 0.3)
-                                  : colorScheme.onSurface,
+                              ? theme.colorScheme.mutedForeground.withValues(
+                                  alpha: 0.3,
+                                )
+                              : theme.colorScheme.foreground,
                           fontWeight: isSelected ? FontWeight.w600 : null,
                         ),
                       ),
@@ -277,8 +285,8 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
                           style: TextStyle(
                             fontSize: 10,
                             color: isSelected
-                                ? colorScheme.onPrimary
-                                : colorScheme.primary,
+                                ? theme.colorScheme.primaryForeground
+                                : theme.colorScheme.primary,
                           ),
                         ),
                     ],
@@ -303,8 +311,8 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
                     child: Text(
                       'calendar.no_fragments'.tr(),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
+                        color: theme.colorScheme.mutedForeground,
+                      ),
                     ),
                   ),
                 )
@@ -312,9 +320,7 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: selectedFragments.length,
                   itemBuilder: (context, index) {
-                    return FragmentCard(
-                      fragment: selectedFragments[index],
-                    );
+                    return FragmentCard(fragment: selectedFragments[index]);
                   },
                 ),
         ),

@@ -8,7 +8,10 @@ AI 기반 자동 조합 저널 앱 (Flutter 버전)
 
 - [ ] 모든 텍스트 `.tr()` 형식 사용 (하드코딩 금지)
 - [ ] 모든 아이콘 `AppIcons.xxx` 사용 (Lucide)
-- [ ] 모든 색상 테마 시스템 사용 (`minorlab_common`)
+- [ ] 모든 색상 **Shadcn Theme** 사용 (`ShadTheme.of(context)`)
+  - `theme.colorScheme.mutedForeground` (보조 텍스트)
+  - `theme.colorScheme.muted` (배경)
+  - `theme.colorScheme.border` (테두리)
 - [ ] `flutter analyze` 통과 (No issues found!)
 - [ ] Isar 데이터 저장 확인 (Isar Inspector)
 - [ ] 실제 동작 확인 (에뮬레이터/실기기)
@@ -98,6 +101,26 @@ Icon(Icons.settings)
 Icon(AppIcons.add)
 Icon(AppIcons.settings)
 ```
+
+**❌ 색상 하드코딩 / Material Design 색상**
+```dart
+Container(color: Colors.blue)
+Text('Text', style: TextStyle(color: colorScheme.onSurfaceVariant))
+```
+
+**✅ Shadcn Theme 사용**
+```dart
+final theme = ShadTheme.of(context);
+Container(color: theme.colorScheme.muted)
+Text('Text', style: TextStyle(color: theme.colorScheme.mutedForeground))
+```
+
+**Material Design → Shadcn 색상 매핑:**
+- `colorScheme.onSurfaceVariant` → `theme.colorScheme.mutedForeground` (보조 텍스트)
+- `colorScheme.surfaceVariant` → `theme.colorScheme.muted` (배경)
+- `colorScheme.outline` → `theme.colorScheme.border` (테두리)
+
+**상세**: [docs/MIGRATION_SHADCN.md](docs/MIGRATION_SHADCN.md) 참조
 
 ### 3. AI 비용 최소화
 
@@ -404,9 +427,10 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 1. **동기화 실패로 저장 차단** → 로컬 우선, 동기화는 백그라운드
 2. **텍스트 하드코딩** → `.tr()` 사용
-3. **전체 코드 복사** → 핵심만 발췌
-4. **테스트 없이 완료** → 실제 동작 확인 필수
-5. **서버 스키마 무시** → 웹 DB 스키마와 일치 필수
+3. **Material Design 색상 사용** → Shadcn Theme 사용 (`ShadTheme.of(context)`)
+4. **전체 코드 복사** → 핵심만 발췌
+5. **테스트 없이 완료** → 실제 동작 확인 필수
+6. **서버 스키마 무시** → 웹 DB 스키마와 일치 필수
 
 ---
 

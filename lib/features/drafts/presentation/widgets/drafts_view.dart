@@ -42,7 +42,7 @@ class _DraftsViewState extends ConsumerState<DraftsView>
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              color: ShadTheme.of(context).colorScheme.muted,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -189,6 +189,7 @@ class _DraftTabContentState extends State<_DraftTabContent> {
             : allDrafts.where((d) => d.status == widget.status).toList();
 
         if (filteredDrafts.isEmpty) {
+          final theme = ShadTheme.of(context);
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -198,7 +199,7 @@ class _DraftTabContentState extends State<_DraftTabContent> {
                   Icon(
                     AppIcons.sparkles,
                     size: 64,
-                    color: Theme.of(context).colorScheme.outline,
+                    color: theme.colorScheme.border,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -212,7 +213,7 @@ class _DraftTabContentState extends State<_DraftTabContent> {
                     Text(
                       'draft.empty_hint'.tr(),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: theme.colorScheme.mutedForeground,
                           ),
                       textAlign: TextAlign.center,
                     ),
@@ -256,34 +257,37 @@ class _DraftTabContentState extends State<_DraftTabContent> {
       loading: () => const Center(
         child: CircularProgressIndicator(),
       ),
-      error: (error, stack) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                AppIcons.error,
-                size: 64,
-                color: Theme.of(context).colorScheme.error,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'timeline.error_title'.tr(),
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                error.toString(),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+      error: (error, stack) {
+        final theme = ShadTheme.of(context);
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  AppIcons.error,
+                  size: 64,
+                  color: theme.colorScheme.destructive,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'timeline.error_title'.tr(),
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  error.toString(),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.mutedForeground,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
