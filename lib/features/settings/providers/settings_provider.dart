@@ -114,3 +114,22 @@ class BackgroundColorNotifier extends _$BackgroundColorNotifier {
     await prefs.setString(_key, option.toString());
   }
 }
+
+/// 앱 시작시 입력 활성화 Provider
+@riverpod
+class AutoFocusInputNotifier extends _$AutoFocusInputNotifier {
+  static const String _key = 'auto_focus_input';
+
+  @override
+  Future<bool> build() async {
+    final prefs = await ref.watch(sharedPreferencesProvider.future);
+    return prefs.getBool(_key) ?? false; // 기본값: false
+  }
+
+  Future<void> setAutoFocusInput(bool enabled) async {
+    state = AsyncValue.data(enabled);
+
+    final prefs = await ref.read(sharedPreferencesProvider.future);
+    await prefs.setBool(_key, enabled);
+  }
+}

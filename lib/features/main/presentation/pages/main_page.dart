@@ -12,6 +12,7 @@ import '../../../../shared/widgets/user_avatar_button.dart';
 import '../../../drafts/presentation/widgets/drafts_view.dart';
 import '../../../drafts/providers/drafts_provider.dart';
 import '../../../posts/presentation/widgets/posts_view.dart';
+import '../../../settings/providers/settings_provider.dart';
 import '../../../timeline/presentation/widgets/timeline_view.dart';
 import '../../../timeline/providers/fragments_provider.dart';
 
@@ -27,7 +28,7 @@ class MainPage extends ConsumerStatefulWidget {
   ConsumerState<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends ConsumerState<MainPage> {
+class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver {
   late final PageController _pageController;
   late int _currentPageIndex;
 
@@ -36,6 +37,9 @@ class _MainPageState extends ConsumerState<MainPage> {
   bool _isSearchMode = false;
   final _searchController = TextEditingController();
   final _searchFocusNode = FocusNode();
+
+  // Timeline 포커스 트리거 콜백
+  VoidCallback? _timelineFocusTrigger;
 
   // Draft 상태
   bool _isAnalyzing = false;
@@ -46,7 +50,13 @@ class _MainPageState extends ConsumerState<MainPage> {
     super.initState();
     _currentPageIndex = widget.initialTab;
     _pageController = PageController(initialPage: widget.initialTab);
+    WidgetsBinding.instance.addObserver(this);
     logger.i('MainPage initialized with tab: ${widget.initialTab}');
+
+    // 앱 시작 시에도 자동 포커스 체크
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _handleAppResumed();
+    });
   }
 
   @override
@@ -63,10 +73,51 @@ class _MainPageState extends ConsumerState<MainPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _pageController.dispose();
     _searchController.dispose();
     _searchFocusNode.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      logger.d('[MainPage] App resumed');
+      _handleAppResumed();
+    }
+  }
+
+  /// 앱 포그라운드 진입 시 처리
+  void _handleAppResumed() async {
+    logger.d('[MainPage] _handleAppResumed - pageIndex: $_currentPageIndex, searchMode: $_isSearchMode');
+
+    // 타임라인 탭이 아니면 무시
+    if (_currentPageIndex != 0) {
+      logger.d('[MainPage] Not timeline tab, skipping');
+      return;
+    }
+
+    // 검색 모드이면 무시
+    if (_isSearchMode) {
+      logger.d('[MainPage] Search mode active, skipping');
+      return;
+    }
+
+    // 설정 확인 (비동기 - Provider 로드 완료까지 대기)
+    try {
+      final enabled = await ref.read(autoFocusInputProvider.future);
+      logger.d('[MainPage] Auto-focus enabled: $enabled, trigger: ${_timelineFocusTrigger != null}');
+
+      if (enabled && _timelineFocusTrigger != null) {
+        logger.d('[MainPage] Triggering focus');
+        _timelineFocusTrigger!.call();
+      }
+    } catch (e) {
+      logger.e('[MainPage] Failed to read auto-focus setting: $e');
+    }
   }
 
   void _onTabChanged(int index) {
@@ -180,6 +231,9 @@ class _MainPageState extends ConsumerState<MainPage> {
           TimelineView(
             viewMode: _viewMode,
             onEnterSearchMode: _enterSearchMode,
+            onRegisterFocusTrigger: (trigger) {
+              _timelineFocusTrigger = trigger;
+            },
           ),
           DraftsView(analyzeMessage: _analyzeMessage),
           const PostsView(),

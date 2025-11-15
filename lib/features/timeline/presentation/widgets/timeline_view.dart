@@ -13,11 +13,13 @@ import 'fragment_list.dart';
 class TimelineView extends ConsumerStatefulWidget {
   final String viewMode; // 'timeline' | 'calendar'
   final VoidCallback? onEnterSearchMode;
+  final void Function(VoidCallback)? onRegisterFocusTrigger;
 
   const TimelineView({
     super.key,
     this.viewMode = 'timeline',
     this.onEnterSearchMode,
+    this.onRegisterFocusTrigger,
   });
 
   @override
@@ -42,7 +44,9 @@ class _TimelineViewState extends ConsumerState<TimelineView>
                   onEnterSearchMode: widget.onEnterSearchMode,
                 ),
               ),
-              const FragmentInputBar(),
+              FragmentInputBar(
+                onRegisterFocusTrigger: widget.onRegisterFocusTrigger,
+              ),
             ],
           )
         : fragmentsAsync.when(

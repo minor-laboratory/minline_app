@@ -192,6 +192,44 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             },
           ),
 
+          Consumer(
+            builder: (context, ref, child) {
+              final autoFocusAsync = ref.watch(autoFocusInputProvider);
+
+              return autoFocusAsync.when(
+                data: (enabled) => ListTile(
+                  leading: Icon(AppIcons.edit),
+                  title: Text('settings.auto_focus_input'.tr()),
+                  subtitle: Text('settings.auto_focus_input_description'.tr()),
+                  trailing: ShadSwitch(
+                    value: enabled,
+                    onChanged: (value) {
+                      ref.read(autoFocusInputProvider.notifier).setAutoFocusInput(value);
+                    },
+                  ),
+                ),
+                loading: () => ListTile(
+                  leading: Icon(AppIcons.edit),
+                  title: Text('settings.auto_focus_input'.tr()),
+                  subtitle: Text('settings.auto_focus_input_description'.tr()),
+                  trailing: ShadSwitch(
+                    value: false,
+                    onChanged: null,
+                  ),
+                ),
+                error: (_, __) => ListTile(
+                  leading: Icon(AppIcons.edit),
+                  title: Text('settings.auto_focus_input'.tr()),
+                  subtitle: Text('settings.auto_focus_input_description'.tr()),
+                  trailing: ShadSwitch(
+                    value: false,
+                    onChanged: null,
+                  ),
+                ),
+              );
+            },
+          ),
+
           ShadSeparator.horizontal(
             margin: const EdgeInsets.symmetric(horizontal: common.Spacing.md),
           ),

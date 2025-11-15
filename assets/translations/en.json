@@ -149,6 +149,8 @@
     "dark_mode": "Dark",
     "language": "Language",
     "language_description": "Korean / English",
+    "auto_focus_input": "Auto-focus input on app start",
+    "auto_focus_input_description": "Automatically focus input field on Timeline",
     "use_system_language": "Use System Language",
     "use_system_language_description": "Follow device language settings",
     "available_languages": "Available Languages",

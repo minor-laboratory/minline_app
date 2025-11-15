@@ -149,6 +149,8 @@
     "dark_mode": "다크",
     "language": "언어",
     "language_description": "한국어 / English",
+    "auto_focus_input": "앱 시작시 입력 활성화",
+    "auto_focus_input_description": "타임라인 화면에서 자동으로 입력창 활성화",
     "use_system_language": "시스템 언어 사용",
     "use_system_language_description": "기기의 언어 설정을 따릅니다",
     "available_languages": "사용 가능한 언어",

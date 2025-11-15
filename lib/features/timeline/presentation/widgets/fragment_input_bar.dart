@@ -20,7 +20,12 @@ import '../../../auth/widgets/login_required_bottom_sheet.dart';
 ///
 /// Timeline 화면 하단 고정 입력바 (채팅 앱 스타일)
 class FragmentInputBar extends ConsumerStatefulWidget {
-  const FragmentInputBar({super.key});
+  final void Function(VoidCallback)? onRegisterFocusTrigger;
+
+  const FragmentInputBar({
+    super.key,
+    this.onRegisterFocusTrigger,
+  });
 
   @override
   ConsumerState<FragmentInputBar> createState() => _FragmentInputBarState();
@@ -28,6 +33,7 @@ class FragmentInputBar extends ConsumerStatefulWidget {
 
 class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
   final _contentController = TextEditingController();
+  final _focusNode = FocusNode();
   final _imagePicker = ImagePicker();
   final List<File> _selectedImages = [];
   bool _isLoading = false;
@@ -36,8 +42,24 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
   static const int _maxImages = 3;
 
   @override
+  void initState() {
+    super.initState();
+    // 포커스 트리거 콜백 등록
+    widget.onRegisterFocusTrigger?.call(() {
+      if (mounted) {
+        logger.d('[FragmentInputBar] Focus trigger called, requesting focus');
+        _focusNode.requestFocus();
+      } else {
+        logger.d('[FragmentInputBar] Focus trigger called but widget not mounted');
+      }
+    });
+    logger.d('[FragmentInputBar] initState - callback registered');
+  }
+
+  @override
   void dispose() {
     _contentController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -238,6 +260,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
             // 텍스트 입력
             ShadInput(
               controller: _contentController,
+              focusNode: _focusNode,
               enabled: !_isLoading,
               placeholder: Text('snap.input_placeholder'.tr()),
               minLines: 1, // 기본 1줄
