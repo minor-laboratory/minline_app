@@ -150,6 +150,16 @@ class FragmentFilter extends _$FragmentFilter {
     state = AsyncValue.data(currentState.copyWith(selectedTags: newTags));
   }
 
+  void clearSearch() {
+    final currentState = state.asData?.value;
+    if (currentState == null) return;
+
+    state = AsyncValue.data(currentState.copyWith(
+      query: '',
+      selectedTags: [],
+    ));
+  }
+
   Future<void> reset() async {
     state = const AsyncValue.data(FragmentFilterState());
 

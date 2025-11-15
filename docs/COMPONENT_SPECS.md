@@ -1117,7 +1117,39 @@ Focus(
 )
 ```
 
-#### 3. 정렬 메뉴
+#### 3. 검색 초기화 버튼 (trailing)
+
+검색어 또는 태그가 선택되면 우측에 X 버튼 표시:
+
+**⚠️ 중요**: trailing 버튼은 **반드시 크기 고정** 필요 (ShadInput 높이 변경 방지)
+
+```dart
+// ✅ 올바름: ShadButton.ghost + 크기 고정
+trailing: (filter.query.isNotEmpty || filter.selectedTags.isNotEmpty)
+    ? ShadButton.ghost(
+        width: 24,         // 필수
+        height: 24,        // 필수
+        padding: EdgeInsets.zero,
+        onPressed: () {
+          _searchController.clear();
+          ref.read(fragmentFilterProvider.notifier).clearSearch();
+        },
+        child: Icon(AppIcons.close, size: 16, color: colorScheme.onSurfaceVariant),
+      )
+    : null,
+
+// ❌ 잘못: GestureDetector만 사용 (크기 미지정)
+trailing: GestureDetector(
+  onTap: () => _clear(),
+  child: Icon(AppIcons.close),  // 높이 변경 위험!
+),
+```
+
+**clearSearch() 동작**:
+- 검색어 초기화 (`query: ''`)
+- 선택된 태그 제거 (`selectedTags: []`)
+
+#### 4. 정렬 메뉴
 
 선택된 항목 표시:
 

@@ -116,6 +116,24 @@ class _FilterBarState extends ConsumerState<FilterBar> {
                           ),
                         )
                       : null,
+                  trailing: (filter.query.isNotEmpty || filter.selectedTags.isNotEmpty)
+                      ? ShadButton.ghost(
+                          width: 24,
+                          height: 24,
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            _searchController.clear();
+                            ref
+                                .read(fragmentFilterProvider.notifier)
+                                .clearSearch();
+                          },
+                          child: Icon(
+                            AppIcons.close,
+                            size: 16,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        )
+                      : null,
                 ),
               ),
             ),
