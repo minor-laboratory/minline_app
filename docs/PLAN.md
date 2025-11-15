@@ -370,7 +370,7 @@ pubspec.yaml (flutter_markdown: ^0.7.4+1) ✅
 - [x] PostTemplates 상수 파일 생성
 - [x] Fragment 목록 토글 (PostDetailPage)
 - [x] Markdown 내보내기 (share_plus)
-- [x] 피드백 신고 기능
+- [x] 피드백 신고 기능 (FeedbackPage)
 - [x] Preview/Source 모드 토글
 
 **파일:**
@@ -392,7 +392,7 @@ pubspec.yaml (share_plus: ^10.1.4) ✅
 - Fragment 2개 미만 시 에러 메시지 확인
 - Fragment 목록 토글 확인 (내용, 시간, AI 태그)
 - Markdown 내보내기 확인 (share_plus)
-- 피드백 신고 확인 (FeedbackDialog)
+- 피드백 신고 확인 (FeedbackPage)
 - Preview/Source 모드 토글 확인
 
 ### 2.5 라우팅 ✅ 완료

@@ -1747,7 +1747,7 @@ Card(
 | Markdown 내보내기 | 브라우저 다운로드 | share_plus (공유 시트) |
 | Fragment 목록 표시 | 항상 표시 | 토글 버튼 (접기/펼치기) |
 | 재생성 | 별도 페이지 | 더보기 메뉴 |
-| 피드백 신고 | 모달 | 더보기 메뉴 → FeedbackDialog |
+| 피드백 신고 | 모달 | 더보기 메뉴 → FeedbackPage |
 
 ### 신규 기능 (앱 전용)
 
@@ -1859,13 +1859,7 @@ Future<void> _handleFeedback() async {
     return;
   }
 
-  await showShadDialog<bool>(
-    context: context,
-    builder: (context) => FeedbackDialog(
-      targetType: 'post',
-      targetId: _post.remoteID,
-    ),
-  );
+  await context.push('/feedback/post/${_post.remoteID}');
 }
 ```
 
