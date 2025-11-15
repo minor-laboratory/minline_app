@@ -157,7 +157,7 @@ class _AccountWithdrawalPageState extends ConsumerState<AccountWithdrawalPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('withdrawal_success'.tr()),
-            backgroundColor: Colors.green,
+            backgroundColor: ShadTheme.of(context).colorScheme.primary,
           ),
         );
 

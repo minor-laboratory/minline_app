@@ -113,7 +113,7 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('auth.reauthentication_required'.tr()),
-        backgroundColor: Colors.orange,
+        backgroundColor: ShadTheme.of(context).colorScheme.primary,
         duration: const Duration(seconds: 3),
       ),
     );
@@ -163,7 +163,7 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                 ? 'messages.password_changed_success'.tr()
                 : 'messages.password_set_success'.tr(),
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: ShadTheme.of(context).colorScheme.primary,
         ),
       );
 
@@ -199,7 +199,10 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: ShadTheme.of(context).colorScheme.destructive,
+        ),
       );
     } finally {
       if (mounted) {
@@ -294,8 +297,8 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                                 },
                                 child: Icon(
                                   _obscureCurrentPassword
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
+                                      ? AppIcons.eye
+                                      : AppIcons.eyeOff,
                                   size: 20,
                                 ),
                               ),
@@ -348,7 +351,7 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                           enabled: !_isLoading,
                           leading: const Padding(
                             padding: EdgeInsets.only(left: 12, right: 8),
-                            child: Icon(Icons.lock_outline, size: 20),
+                            child: Icon(AppIcons.passwordOutline, size: 20),
                           ),
                           trailing: Padding(
                             padding: const EdgeInsets.only(right: 4),
@@ -363,8 +366,8 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                               },
                               child: Icon(
                                 _obscureNewPassword
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
+                                    ? AppIcons.eye
+                                    : AppIcons.eyeOff,
                                 size: 20,
                               ),
                             ),
@@ -410,7 +413,7 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                           enabled: !_isLoading,
                           leading: const Padding(
                             padding: EdgeInsets.only(left: 12, right: 8),
-                            child: Icon(Icons.lock_outline, size: 20),
+                            child: Icon(AppIcons.passwordOutline, size: 20),
                           ),
                           trailing: Padding(
                             padding: const EdgeInsets.only(right: 4),
@@ -426,8 +429,8 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                               },
                               child: Icon(
                                 _obscureConfirmPassword
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
+                                    ? AppIcons.eye
+                                    : AppIcons.eyeOff,
                                 size: 20,
                               ),
                             ),
@@ -458,12 +461,12 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                   enabled: _isFormValid && !_isLoading,
                   onPressed: _isLoading ? null : _handlePasswordChange,
                   child: _isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: ShadTheme.of(context).colorScheme.primaryForeground,
                           ),
                         )
                       : Text(

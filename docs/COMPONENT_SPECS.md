@@ -84,6 +84,43 @@ Icon(AppIcons.timeline)
 Icon(AppIcons.sparkles)
 ```
 
+### SnackBar 색상
+
+**일반 SnackBar** (정보 표시):
+```dart
+ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(content: Text('post.export_success'.tr())),
+)
+```
+
+**에러 SnackBar** (에러 표시):
+```dart
+ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content: Text('snap.content_or_media_required'.tr()),
+    backgroundColor: ShadTheme.of(context).colorScheme.destructive,
+  ),
+)
+```
+
+**주의**: Material Design의 `colorScheme.error` 사용 금지 → Shadcn의 `colorScheme.destructive` 사용
+
+### PopupMenuButton Padding
+
+**AppBar 및 카드 내 PopupMenuButton**:
+```dart
+// ✅ 오른쪽 padding 추가 (시각적 균형)
+PopupMenuButton<String>(
+  padding: const EdgeInsets.only(right: 8),
+  icon: Icon(AppIcons.moreVert),
+  itemBuilder: (context) => [...],
+)
+```
+
+**이유**:
+- AppBar의 actions 영역이나 카드 우측에 배치될 때 시각적 균형 유지
+- Material Design 가이드라인 준수 (우측 여백 8dp)
+
 ---
 
 ## 1. FragmentInputBar (하단 고정)

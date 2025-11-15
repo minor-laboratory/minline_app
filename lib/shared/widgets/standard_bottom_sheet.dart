@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:easy_localization/easy_localization.dart';
+
+import '../../core/utils/app_icons.dart';
 import 'responsive_modal_sheet.dart';
 
 /// 📋 표준 Bottom Sheet 패턴 구현
@@ -295,7 +297,7 @@ class _SelectionListContent<T> extends StatelessWidget {
             ? Text(option.subtitle!, style: materialTheme.textTheme.bodyMedium)
             : null,
           trailing: isSelected
-            ? Icon(Icons.check)
+            ? const Icon(AppIcons.check)
             : null,
           onTap: () => Navigator.of(context).pop(option.value),
         );

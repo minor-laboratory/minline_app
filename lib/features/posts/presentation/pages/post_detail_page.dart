@@ -248,69 +248,72 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
             onPressed: _handleExport,
           ),
           // 더보기 메뉴
-          SizedBox(
-            width: 28,
-            height: 28,
-            child: PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              icon: Icon(
-                AppIcons.moreVert,
-                size: 16,
-                color: colorScheme.onSurfaceVariant,
-              ),
-              onSelected: (value) {
-                switch (value) {
-                  case 'regenerate':
-                    _handleRegenerate();
-                    break;
-                  case 'feedback':
-                    _handleFeedback();
-                    break;
-                  case 'delete':
-                    _deletePost();
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                // 재생성 (draftId가 있는 경우에만)
-                if (_post?.draftId != null)
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: SizedBox(
+              width: 28,
+              height: 28,
+              child: PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  AppIcons.moreVert,
+                  size: 16,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                onSelected: (value) {
+                  switch (value) {
+                    case 'regenerate':
+                      _handleRegenerate();
+                      break;
+                    case 'feedback':
+                      _handleFeedback();
+                      break;
+                    case 'delete':
+                      _deletePost();
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  // 재생성 (draftId가 있는 경우에만)
+                  if (_post?.draftId != null)
+                    PopupMenuItem(
+                      value: 'regenerate',
+                      child: Row(
+                        children: [
+                          Icon(AppIcons.refresh, size: 16),
+                          const SizedBox(width: 8),
+                          Text('post.regenerate'.tr()),
+                        ],
+                      ),
+                    ),
+                  // 피드백 신고
                   PopupMenuItem(
-                    value: 'regenerate',
+                    value: 'feedback',
                     child: Row(
                       children: [
-                        Icon(AppIcons.refresh, size: 16),
+                        Icon(AppIcons.flag, size: 16),
                         const SizedBox(width: 8),
-                        Text('post.regenerate'.tr()),
+                        Text('feedback.report_issue'.tr()),
                       ],
                     ),
                   ),
-                // 피드백 신고
-                PopupMenuItem(
-                  value: 'feedback',
-                  child: Row(
-                    children: [
-                      Icon(AppIcons.flag, size: 16),
-                      const SizedBox(width: 8),
-                      Text('feedback.report_issue'.tr()),
-                    ],
+                  const PopupMenuDivider(),
+                  // 삭제
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(AppIcons.delete, size: 16, color: colorScheme.error),
+                        const SizedBox(width: 8),
+                        Text(
+                          'common.delete'.tr(),
+                          style: TextStyle(color: colorScheme.error),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const PopupMenuDivider(),
-                // 삭제
-                PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(AppIcons.delete, size: 16, color: colorScheme.error),
-                      const SizedBox(width: 8),
-                      Text(
-                        'common.delete'.tr(),
-                        style: TextStyle(color: colorScheme.error),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

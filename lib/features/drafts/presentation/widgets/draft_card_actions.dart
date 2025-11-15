@@ -74,68 +74,71 @@ class DraftCardActions extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           // More 버튼
-          SizedBox(
-            width: 28,
-            height: 28,
-            child: PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              icon: Icon(
-                AppIcons.moreVert,
-                size: 16,
-                color: theme.colorScheme.mutedForeground,
-              ),
-              onSelected: (value) {
-                switch (value) {
-                  case 'feedback':
-                    onFeedback();
-                    break;
-                  case 'delete':
-                    onDelete();
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'feedback',
-                  enabled: !hasSubmittedFeedback,
-                  child: Row(
-                    children: [
-                      Icon(
-                        hasSubmittedFeedback ? AppIcons.checkCircle : AppIcons.flag,
-                        size: 16,
-                        color: hasSubmittedFeedback
-                            ? theme.colorScheme.border
-                            : theme.colorScheme.foreground,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        hasSubmittedFeedback
-                            ? 'feedback.submitted'.tr()
-                            : 'feedback.report_issue'.tr(),
-                        style: TextStyle(
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: SizedBox(
+              width: 28,
+              height: 28,
+              child: PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  AppIcons.moreVert,
+                  size: 16,
+                  color: theme.colorScheme.mutedForeground,
+                ),
+                onSelected: (value) {
+                  switch (value) {
+                    case 'feedback':
+                      onFeedback();
+                      break;
+                    case 'delete':
+                      onDelete();
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'feedback',
+                    enabled: !hasSubmittedFeedback,
+                    child: Row(
+                      children: [
+                        Icon(
+                          hasSubmittedFeedback ? AppIcons.checkCircle : AppIcons.flag,
+                          size: 16,
                           color: hasSubmittedFeedback
                               ? theme.colorScheme.border
                               : theme.colorScheme.foreground,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Text(
+                          hasSubmittedFeedback
+                              ? 'feedback.submitted'.tr()
+                              : 'feedback.report_issue'.tr(),
+                          style: TextStyle(
+                            color: hasSubmittedFeedback
+                                ? theme.colorScheme.border
+                                : theme.colorScheme.foreground,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const PopupMenuDivider(),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(AppIcons.delete, size: 16, color: theme.colorScheme.destructive),
-                      const SizedBox(width: 8),
-                      Text(
-                        'common.delete'.tr(),
-                        style: TextStyle(color: theme.colorScheme.destructive),
-                      ),
-                    ],
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(AppIcons.delete, size: 16, color: theme.colorScheme.destructive),
+                        const SizedBox(width: 8),
+                        Text(
+                          'common.delete'.tr(),
+                          style: TextStyle(color: theme.colorScheme.destructive),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -175,68 +178,71 @@ class DraftCardActions extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           // More 버튼
-          SizedBox(
-            width: 28,
-            height: 28,
-            child: PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              icon: Icon(
-                AppIcons.moreVert,
-                size: 16,
-                color: theme.colorScheme.mutedForeground,
-              ),
-              onSelected: (value) {
-                switch (value) {
-                  case 'feedback':
-                    onFeedback();
-                    break;
-                  case 'delete':
-                    onDelete();
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'feedback',
-                  enabled: !hasSubmittedFeedback,
-                  child: Row(
-                    children: [
-                      Icon(
-                        hasSubmittedFeedback ? AppIcons.checkCircle : AppIcons.flag,
-                        size: 16,
-                        color: hasSubmittedFeedback
-                            ? theme.colorScheme.border
-                            : theme.colorScheme.foreground,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        hasSubmittedFeedback
-                            ? 'feedback.submitted'.tr()
-                            : 'feedback.report_issue'.tr(),
-                        style: TextStyle(
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: SizedBox(
+              width: 28,
+              height: 28,
+              child: PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  AppIcons.moreVert,
+                  size: 16,
+                  color: theme.colorScheme.mutedForeground,
+                ),
+                onSelected: (value) {
+                  switch (value) {
+                    case 'feedback':
+                      onFeedback();
+                      break;
+                    case 'delete':
+                      onDelete();
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'feedback',
+                    enabled: !hasSubmittedFeedback,
+                    child: Row(
+                      children: [
+                        Icon(
+                          hasSubmittedFeedback ? AppIcons.checkCircle : AppIcons.flag,
+                          size: 16,
                           color: hasSubmittedFeedback
                               ? theme.colorScheme.border
                               : theme.colorScheme.foreground,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Text(
+                          hasSubmittedFeedback
+                              ? 'feedback.submitted'.tr()
+                              : 'feedback.report_issue'.tr(),
+                          style: TextStyle(
+                            color: hasSubmittedFeedback
+                                ? theme.colorScheme.border
+                                : theme.colorScheme.foreground,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const PopupMenuDivider(),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(AppIcons.delete, size: 16, color: theme.colorScheme.destructive),
-                      const SizedBox(width: 8),
-                      Text(
-                        'common.delete'.tr(),
-                        style: TextStyle(color: theme.colorScheme.destructive),
-                      ),
-                    ],
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(AppIcons.delete, size: 16, color: theme.colorScheme.destructive),
+                        const SizedBox(width: 8),
+                        Text(
+                          'common.delete'.tr(),
+                          style: TextStyle(color: theme.colorScheme.destructive),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -260,68 +266,71 @@ class DraftCardActions extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           // More 버튼
-          SizedBox(
-            width: 28,
-            height: 28,
-            child: PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              icon: Icon(
-                AppIcons.moreVert,
-                size: 16,
-                color: theme.colorScheme.mutedForeground,
-              ),
-              onSelected: (value) {
-                switch (value) {
-                  case 'feedback':
-                    onFeedback();
-                    break;
-                  case 'delete':
-                    onDelete();
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'feedback',
-                  enabled: !hasSubmittedFeedback,
-                  child: Row(
-                    children: [
-                      Icon(
-                        hasSubmittedFeedback ? AppIcons.checkCircle : AppIcons.flag,
-                        size: 16,
-                        color: hasSubmittedFeedback
-                            ? theme.colorScheme.border
-                            : theme.colorScheme.foreground,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        hasSubmittedFeedback
-                            ? 'feedback.submitted'.tr()
-                            : 'feedback.report_issue'.tr(),
-                        style: TextStyle(
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: SizedBox(
+              width: 28,
+              height: 28,
+              child: PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  AppIcons.moreVert,
+                  size: 16,
+                  color: theme.colorScheme.mutedForeground,
+                ),
+                onSelected: (value) {
+                  switch (value) {
+                    case 'feedback':
+                      onFeedback();
+                      break;
+                    case 'delete':
+                      onDelete();
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'feedback',
+                    enabled: !hasSubmittedFeedback,
+                    child: Row(
+                      children: [
+                        Icon(
+                          hasSubmittedFeedback ? AppIcons.checkCircle : AppIcons.flag,
+                          size: 16,
                           color: hasSubmittedFeedback
                               ? theme.colorScheme.border
                               : theme.colorScheme.foreground,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Text(
+                          hasSubmittedFeedback
+                              ? 'feedback.submitted'.tr()
+                              : 'feedback.report_issue'.tr(),
+                          style: TextStyle(
+                            color: hasSubmittedFeedback
+                                ? theme.colorScheme.border
+                                : theme.colorScheme.foreground,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const PopupMenuDivider(),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(AppIcons.delete, size: 16, color: theme.colorScheme.destructive),
-                      const SizedBox(width: 8),
-                      Text(
-                        'common.delete'.tr(),
-                        style: TextStyle(color: theme.colorScheme.destructive),
-                      ),
-                    ],
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(AppIcons.delete, size: 16, color: theme.colorScheme.destructive),
+                        const SizedBox(width: 8),
+                        Text(
+                          'common.delete'.tr(),
+                          style: TextStyle(color: theme.colorScheme.destructive),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

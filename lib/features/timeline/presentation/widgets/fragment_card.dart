@@ -527,76 +527,79 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                     Icon(
                       AppIcons.clock,
                       size: 12,
-                      color: Colors.blue,
+                      color: theme.colorScheme.primary,
                     ),
                   ],
                   const Spacer(),
                   // 더보기 메뉴 (PopupMenuButton) - 웹과 동일한 크기
-                  SizedBox(
-                    width: 28,
-                    height: 28,
-                    child: PopupMenuButton<String>(
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                        AppIcons.moreVert,
-                        size: 16,
-                        color: theme.colorScheme.mutedForeground,
-                      ),
-                    onSelected: (value) {
-                      switch (value) {
-                        case 'edit':
-                          _startEdit();
-                          break;
-                        case 'generate':
-                          _handleGenerateEmbedding();
-                          break;
-                        case 'delete':
-                          _showDeleteDialog();
-                          break;
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'edit',
-                        child: Row(
-                          children: [
-                            Icon(AppIcons.edit, size: 16),
-                            const SizedBox(width: 8),
-                            Text('common.edit'.tr()),
-                          ],
+                  Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: SizedBox(
+                      width: 28,
+                      height: 28,
+                      child: PopupMenuButton<String>(
+                        padding: EdgeInsets.zero,
+                        icon: Icon(
+                          AppIcons.moreVert,
+                          size: 16,
+                          color: theme.colorScheme.mutedForeground,
                         ),
-                      ),
-                      PopupMenuItem(
-                        value: 'generate',
-                        enabled: !_isGeneratingEmbedding,
-                        child: Row(
-                          children: [
-                            Icon(AppIcons.sparkles, size: 16),
-                            const SizedBox(width: 8),
-                            Text(
-                              _isGeneratingEmbedding
-                                  ? 'common.generating'.tr()
-                                  : 'common.generate'.tr(),
-                            ),
-                          ],
+                      onSelected: (value) {
+                        switch (value) {
+                          case 'edit':
+                            _startEdit();
+                            break;
+                          case 'generate':
+                            _handleGenerateEmbedding();
+                            break;
+                          case 'delete':
+                            _showDeleteDialog();
+                            break;
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 'edit',
+                          child: Row(
+                            children: [
+                              Icon(AppIcons.edit, size: 16),
+                              const SizedBox(width: 8),
+                              Text('common.edit'.tr()),
+                            ],
+                          ),
                         ),
-                      ),
-                      const PopupMenuDivider(),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(AppIcons.delete,
-                                size: 16, color: theme.colorScheme.destructive),
-                            const SizedBox(width: 8),
-                            Text(
-                              'common.delete'.tr(),
-                              style: TextStyle(color: theme.colorScheme.destructive),
-                            ),
-                          ],
+                        PopupMenuItem(
+                          value: 'generate',
+                          enabled: !_isGeneratingEmbedding,
+                          child: Row(
+                            children: [
+                              Icon(AppIcons.sparkles, size: 16),
+                              const SizedBox(width: 8),
+                              Text(
+                                _isGeneratingEmbedding
+                                    ? 'common.generating'.tr()
+                                    : 'common.generate'.tr(),
+                              ),
+                            ],
+                          ),
                         ),
+                        const PopupMenuDivider(),
+                        PopupMenuItem(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(AppIcons.delete,
+                                  size: 16, color: theme.colorScheme.destructive),
+                              const SizedBox(width: 8),
+                              Text(
+                                'common.delete'.tr(),
+                                style: TextStyle(color: theme.colorScheme.destructive),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                       ),
-                    ],
                     ),
                   ),
                 ],
