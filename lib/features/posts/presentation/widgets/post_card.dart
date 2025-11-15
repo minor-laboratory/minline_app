@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import '../../../../core/database/database_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../models/post.dart';
 
@@ -25,63 +24,6 @@ class PostCard extends ConsumerStatefulWidget {
 }
 
 class _PostCardState extends ConsumerState<PostCard> {
-  bool _isLoading = false;
-
-  Future<void> _showDeleteDialog() async {
-    final confirmed = await showShadDialog<bool>(
-      context: context,
-      builder: (context) => ShadDialog(
-        title: Text('post.delete_title'.tr()),
-        description: Text('post.delete_confirm'.tr()),
-        actions: [
-          ShadButton.outline(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('common.cancel'.tr()),
-          ),
-          ShadButton.destructive(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text('common.delete'.tr()),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      _deletePost();
-    }
-  }
-
-  Future<void> _deletePost() async {
-    if (_isLoading) return;
-
-    setState(() => _isLoading = true);
-
-    try {
-      final isar = DatabaseService.instance.isar;
-
-      await isar.writeTxn(() async {
-        final post = await isar.posts.get(widget.post.id);
-        if (post != null) {
-          post.deleted = true;
-          post.synced = false;
-          post.refreshAt = DateTime.now();
-          await isar.posts.put(post);
-        }
-      });
-
-      widget.onUpdate?.call();
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('common.error'.tr())),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
 
   String _getContentPreview() {
     final content = widget.post.content;
@@ -104,42 +46,12 @@ class _PostCardState extends ConsumerState<PostCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 제목 & 공개 여부
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      widget.post.title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+              // 제목
+              Text(
+                widget.post.title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  if (widget.post.isPublic)
-                    ShadBadge(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(AppIcons.language, size: 12),
-                          const SizedBox(width: 4),
-                          Text('post.public'.tr()),
-                        ],
-                      ),
-                    )
-                  else
-                    ShadBadge.outline(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(AppIcons.password, size: 12),
-                          const SizedBox(width: 4),
-                          Text('post.private'.tr()),
-                        ],
-                      ),
-                    ),
-                ],
               ),
 
               const SizedBox(height: 12),
@@ -180,10 +92,24 @@ class _PostCardState extends ConsumerState<PostCard> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    DateFormat('MMM d').format(widget.post.createdAt),
+                    DateFormat.yMMMd(context.locale.languageCode).format(widget.post.createdAt),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'posts.template_${widget.post.template}'.tr(),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                    ),
                   ),
                   if (widget.post.exportedTo.isNotEmpty) ...[
                     const SizedBox(width: 8),
@@ -208,19 +134,6 @@ class _PostCardState extends ConsumerState<PostCard> {
                 ],
               ),
 
-              const ShadSeparator.horizontal(),
-              const SizedBox(height: 12),
-
-              // 액션 버튼
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ShadIconButton.ghost(
-                    icon: Icon(AppIcons.delete, size: 16),
-                    onPressed: _isLoading ? null : _showDeleteDialog,
-                  ),
-                ],
-              ),
             ],
           ),
         ),

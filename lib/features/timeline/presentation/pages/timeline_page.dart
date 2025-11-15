@@ -70,19 +70,34 @@ class _TimelinePageState extends ConsumerState<TimelinePage> {
             onPressed: () => context.push('/posts'),
           ),
           // Settings
-          PopupMenuButton(
-            icon: Icon(AppIcons.moreVert),
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'settings',
-                child: Text('settings.title'.tr()),
+          SizedBox(
+            width: 28,
+            height: 28,
+            child: PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                AppIcons.moreVert,
+                size: 16,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
-            ],
-            onSelected: (value) {
-              if (value == 'settings') {
-                context.push('/settings');
-              }
-            },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'settings',
+                  child: Row(
+                    children: [
+                      Icon(AppIcons.settings, size: 16),
+                      const SizedBox(width: 8),
+                      Text('settings.title'.tr()),
+                    ],
+                  ),
+                ),
+              ],
+              onSelected: (value) {
+                if (value == 'settings') {
+                  context.push('/settings');
+                }
+              },
+            ),
           ),
         ],
       ),

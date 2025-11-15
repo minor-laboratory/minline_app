@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/database/database_service.dart';
@@ -10,6 +9,7 @@ import '../../../../core/utils/app_icons.dart';
 import '../../../../models/draft.dart';
 import '../../../../models/fragment.dart';
 import '../../../../shared/widgets/feedback_dialog.dart';
+import 'draft_card_actions.dart';
 
 /// Draft 카드 위젯
 class DraftCard extends ConsumerStatefulWidget {
@@ -172,57 +172,6 @@ class _DraftCardState extends ConsumerState<DraftCard> {
     }
   }
 
-  Future<void> _showMoreMenu() async {
-    showShadSheet(
-      context: context,
-      builder: (context) => ShadSheet(
-        title: Text('common.more'.tr()),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: _hasSubmittedFeedback
-                    ? null
-                    : () {
-                        Navigator.of(context).pop();
-                        _showFeedbackDialog();
-                      },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  child: Row(
-                    children: [
-                      Icon(
-                        _hasSubmittedFeedback ? AppIcons.checkCircle : AppIcons.flag,
-                        size: 20,
-                        color: _hasSubmittedFeedback
-                            ? Theme.of(context).colorScheme.outline
-                            : Theme.of(context).colorScheme.onSurface,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          _hasSubmittedFeedback
-                              ? 'feedback.submitted'.tr()
-                              : 'feedback.report_issue'.tr(),
-                          style: TextStyle(
-                            color: _hasSubmittedFeedback
-                                ? Theme.of(context).colorScheme.outline
-                                : Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Future<void> _showFeedbackDialog() async {
     final result = await showShadDialog<bool>(
@@ -313,12 +262,6 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                           fontWeight: FontWeight.w600,
                         ),
                   ),
-                ),
-                const SizedBox(width: 4),
-                ShadButton.ghost(
-                  onPressed: _showMoreMenu,
-                  padding: EdgeInsets.zero,
-                  child: Icon(AppIcons.moreVert, size: 16),
                 ),
               ],
             ),
@@ -431,107 +374,16 @@ class _DraftCardState extends ConsumerState<DraftCard> {
             const Divider(height: 24),
 
             // 액션 버튼
-            if (widget.draft.status == 'pending')
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ShadButton.outline(
-                    onPressed: _isLoading ? null : () => _updateStatus('rejected'),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(AppIcons.error, size: 16),
-                        const SizedBox(width: 6),
-                        Text('draft.reject_action'.tr()),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  ShadButton(
-                    onPressed: _isLoading ? null : () => _updateStatus('accepted'),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (_isLoading)
-                          const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        else
-                          Icon(AppIcons.checkCircle, size: 16),
-                        const SizedBox(width: 6),
-                        Text(
-                          _isLoading ? 'common.loading'.tr() : 'draft.accept_action'.tr(),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  ShadIconButton.ghost(
-                    onPressed: _showDeleteDialog,
-                    icon: Icon(AppIcons.delete, size: 16),
-                  ),
-                ],
-              )
-            else if (widget.draft.status == 'accepted')
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ShadButton.outline(
-                    onPressed: _isLoading ? null : () => _updateStatus('rejected'),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(AppIcons.error, size: 16),
-                        const SizedBox(width: 6),
-                        Text('draft.reject_action'.tr()),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  ShadButton(
-                    onPressed: _isLoading
-                        ? null
-                        : () => context.push('/posts/create/${widget.draft.remoteID}'),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(AppIcons.fileText, size: 16),
-                        const SizedBox(width: 6),
-                        Text('draft.create_post'.tr()),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  ShadIconButton.ghost(
-                    onPressed: _showDeleteDialog,
-                    icon: Icon(AppIcons.delete, size: 16),
-                  ),
-                ],
-              )
-            else if (widget.draft.status == 'rejected')
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ShadButton(
-                    onPressed: _isLoading ? null : () => _updateStatus('accepted'),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(AppIcons.checkCircle, size: 16),
-                        const SizedBox(width: 6),
-                        Text('draft.reaccept_action'.tr()),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  ShadIconButton.ghost(
-                    onPressed: _showDeleteDialog,
-                    icon: Icon(AppIcons.delete, size: 16),
-                  ),
-                ],
-              ),
+            DraftCardActions(
+              status: widget.draft.status,
+              isLoading: _isLoading,
+              hasSubmittedFeedback: _hasSubmittedFeedback,
+              draftRemoteID: widget.draft.remoteID,
+              onAccept: () => _updateStatus('accepted'),
+              onReject: () => _updateStatus('rejected'),
+              onDelete: _showDeleteDialog,
+              onFeedback: _showFeedbackDialog,
+            ),
           ],
         ),
       ),

@@ -17,6 +17,7 @@ import '../../../../core/utils/logger.dart';
 import '../../../../models/fragment.dart';
 import '../../../../models/post.dart';
 import '../../../../shared/widgets/feedback_dialog.dart';
+import '../../../timeline/presentation/widgets/fragment_card.dart';
 
 /// Post 상세 화면
 class PostDetailPage extends ConsumerStatefulWidget {
@@ -124,36 +125,6 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     }
   }
 
-  Future<void> _togglePublic() async {
-    if (_post == null) return;
-
-    try {
-      final isar = DatabaseService.instance.isar;
-      _post!.isPublic = !_post!.isPublic;
-      await isar.writeTxn(() => isar.posts.put(_post!));
-
-      if (mounted) {
-        setState(() {});
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              _post!.isPublic
-                  ? 'posts.made_public'.tr()
-                  : 'posts.made_private'.tr(),
-            ),
-          ),
-        );
-      }
-    } catch (e, stack) {
-      logger.e('[PostDetail] Failed to toggle public', e, stack);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('common.error'.tr())),
-        );
-      }
-    }
-  }
-
   /// Markdown 파일로 내보내기
   Future<void> _handleExport() async {
     if (_post == null) return;
@@ -249,20 +220,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
   }
 
   String _getTemplateLabel(String template) {
-    switch (template) {
-      case 'product_review':
-        return 'posts.template_product_review'.tr();
-      case 'timeline':
-        return 'posts.template_timeline'.tr();
-      case 'essay':
-        return 'posts.template_essay'.tr();
-      case 'travel':
-        return 'posts.template_travel'.tr();
-      case 'project':
-        return 'posts.template_project'.tr();
-      default:
-        return template;
-    }
+    return 'posts.template_$template'.tr();
   }
 
   @override
@@ -295,47 +253,70 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
             onPressed: _handleExport,
           ),
           // 더보기 메뉴
-          ShadIconButton.ghost(
-            icon: Icon(AppIcons.moreVert),
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (context) => SafeArea(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+          SizedBox(
+            width: 28,
+            height: 28,
+            child: PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                AppIcons.moreVert,
+                size: 16,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              onSelected: (value) {
+                switch (value) {
+                  case 'regenerate':
+                    _handleRegenerate();
+                    break;
+                  case 'feedback':
+                    _handleFeedback();
+                    break;
+                  case 'delete':
+                    _deletePost();
+                    break;
+                }
+              },
+              itemBuilder: (context) => [
+                // 재생성 (draftId가 있는 경우에만)
+                if (_post?.draftId != null)
+                  PopupMenuItem(
+                    value: 'regenerate',
+                    child: Row(
+                      children: [
+                        Icon(AppIcons.refresh, size: 16),
+                        const SizedBox(width: 8),
+                        Text('post.regenerate'.tr()),
+                      ],
+                    ),
+                  ),
+                // 피드백 신고
+                PopupMenuItem(
+                  value: 'feedback',
+                  child: Row(
                     children: [
-                      // 재생성 (draftId가 있는 경우에만)
-                      if (_post?.draftId != null)
-                        ListTile(
-                          leading: Icon(AppIcons.refresh),
-                          title: Text('post.regenerate'.tr()),
-                          onTap: () {
-                            context.pop();
-                            _handleRegenerate();
-                          },
-                        ),
-                      // 피드백 신고
-                      ListTile(
-                        leading: Icon(AppIcons.flag),
-                        title: Text('feedback.report_issue'.tr()),
-                        onTap: () {
-                          context.pop();
-                          _handleFeedback();
-                        },
-                      ),
-                      ListTile(
-                        leading: Icon(AppIcons.delete),
-                        title: Text('common.delete'.tr()),
-                        onTap: () {
-                          context.pop();
-                          _deletePost();
-                        },
+                      Icon(AppIcons.flag, size: 16),
+                      const SizedBox(width: 8),
+                      Text('feedback.report_issue'.tr()),
+                    ],
+                  ),
+                ),
+                const PopupMenuDivider(),
+                // 삭제
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(AppIcons.delete, size: 16, color: colorScheme.error),
+                      const SizedBox(width: 8),
+                      Text(
+                        'common.delete'.tr(),
+                        style: TextStyle(color: colorScheme.error),
                       ),
                     ],
                   ),
                 ),
-              );
-            },
+              ],
+            ),
           ),
         ],
       ),
@@ -383,29 +364,6 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
-                ),
-
-                const Spacer(),
-
-                // 공개 여부
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      _post!.isPublic ? AppIcons.language : AppIcons.password,
-                      size: 16,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      _post!.isPublic
-                          ? 'posts.public'.tr()
-                          : 'posts.private'.tr(),
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
@@ -507,16 +465,6 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
 
             const SizedBox(height: 24),
 
-            // 공개 여부 토글
-            Card(
-              child: SwitchListTile(
-                title: Text('posts.make_public'.tr()),
-                subtitle: Text('posts.make_public_description'.tr()),
-                value: _post!.isPublic,
-                onChanged: (_) => _togglePublic(),
-              ),
-            ),
-
             // 버전 정보
             if (_post!.version > 1) ...[
               const SizedBox(height: 16),
@@ -571,72 +519,14 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
               // Fragment 목록
               if (_showFragments) ...[
                 const SizedBox(height: 12),
-                ...List.generate(_fragments.length, (index) {
-                  final fragment = _fragments[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Fragment 내용
-                            Text(
-                              fragment.content,
-                              style: textTheme.bodyMedium,
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            // Fragment 메타 정보
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      AppIcons.calendar,
-                                      size: 14,
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      DateFormat('MMM d, HH:mm').format(fragment.eventTime),
-                                      style: textTheme.bodySmall?.copyWith(
-                                        color: colorScheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                // AI 태그
-                                if (fragment.tags.isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  Wrap(
-                                    spacing: 6,
-                                    runSpacing: 6,
-                                    children: fragment.tags
-                                        .take(3)
-                                        .map(
-                                          (tag) => Chip(
-                                            label: Text(tag),
-                                            labelStyle: textTheme.labelSmall,
-                                            labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-                                            padding: EdgeInsets.zero,
-                                            visualDensity: VisualDensity.compact,
-                                            backgroundColor: colorScheme.secondaryContainer,
-                                            side: BorderSide.none,
-                                          ),
-                                        )
-                                        .toList(),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
+                ..._fragments.map((fragment) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: FragmentCard(
+                      fragment: fragment,
+                      onUpdate: () {
+                        // Post 상세 화면에서는 Fragment 수정 불가
+                      },
                     ),
                   );
                 }),

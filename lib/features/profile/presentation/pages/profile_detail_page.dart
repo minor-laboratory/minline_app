@@ -256,34 +256,44 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
       appBar: AppBar(
         title: Text('profile.title'.tr()),
         actions: [
-          PopupMenuButton<String>(
-            tooltip: 'settings.advanced_settings'.tr(),
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              PopupMenuItem<String>(
-                value: 'withdrawal',
-                child: Row(
-                  children: [
-                    Icon(
-                      AppIcons.delete,
-                      color: theme.colorScheme.error,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'withdrawal_title'.tr(),
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.error,
-                      ),
-                    ),
-                  ],
-                ),
+          SizedBox(
+            width: 28,
+            height: 28,
+            child: PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                AppIcons.moreVert,
+                size: 16,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
-            ],
-            onSelected: (String value) {
-              if (value == 'withdrawal') {
-                context.push('/settings/account/withdrawal');
-              }
-            },
+              tooltip: 'settings.advanced_settings'.tr(),
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  value: 'withdrawal',
+                  child: Row(
+                    children: [
+                      Icon(
+                        AppIcons.delete,
+                        color: theme.colorScheme.error,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'withdrawal_title'.tr(),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.error,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              onSelected: (String value) {
+                if (value == 'withdrawal') {
+                  context.push('/settings/account/withdrawal');
+                }
+              },
+            ),
           ),
         ],
       ),

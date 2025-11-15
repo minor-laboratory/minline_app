@@ -26,32 +26,32 @@ class PostTemplates {
     PostTemplate(
       id: 'product_review',
       icon: AppIcons.package,
-      nameKey: 'template.product_review',
-      descKey: 'template.product_review_desc',
+      nameKey: 'post.template_product_review',
+      descKey: 'post.template_product_review_desc',
     ),
     PostTemplate(
       id: 'timeline',
       icon: AppIcons.calendar,
-      nameKey: 'template.timeline',
-      descKey: 'template.timeline_desc',
+      nameKey: 'post.template_timeline',
+      descKey: 'post.template_timeline_desc',
     ),
     PostTemplate(
       id: 'essay',
       icon: AppIcons.edit,
-      nameKey: 'template.essay',
-      descKey: 'template.essay_desc',
+      nameKey: 'post.template_essay',
+      descKey: 'post.template_essay_desc',
     ),
     PostTemplate(
       id: 'travel',
       icon: AppIcons.plane,
-      nameKey: 'template.travel',
-      descKey: 'template.travel_desc',
+      nameKey: 'post.template_travel',
+      descKey: 'post.template_travel_desc',
     ),
     PostTemplate(
       id: 'project',
       icon: AppIcons.rocket,
-      nameKey: 'template.project',
-      descKey: 'template.project_desc',
+      nameKey: 'post.template_project',
+      descKey: 'post.template_project_desc',
     ),
   ];
 
