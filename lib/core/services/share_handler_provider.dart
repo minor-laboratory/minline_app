@@ -4,8 +4,16 @@ import 'share_handler_service.dart';
 
 part 'share_handler_provider.g.dart';
 
-/// ShareHandlerService Provider
-@riverpod
+/// ShareHandlerService Provider (keepAlive: true)
+///
+/// 앱 전체 생명주기 동안 유지되는 singleton 서비스
+@Riverpod(keepAlive: true)
 ShareHandlerService shareHandlerService(Ref ref) {
-  return ShareHandlerService();
+  final service = ShareHandlerService();
+
+  ref.onDispose(() {
+    service.dispose();
+  });
+
+  return service;
 }

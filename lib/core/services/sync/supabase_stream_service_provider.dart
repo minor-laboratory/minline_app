@@ -1,0 +1,21 @@
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import 'supabase_stream_service.dart';
+
+part 'supabase_stream_service_provider.g.dart';
+
+/// SupabaseStreamService Provider (keepAlive: true)
+///
+/// 앱 전체 생명주기 동안 유지되는 singleton 서비스
+/// LifecycleService에서 로그인 시 시작, 로그아웃 시 중지
+@Riverpod(keepAlive: true)
+SupabaseStreamService supabaseStreamService(Ref ref) {
+  final service = SupabaseStreamService();
+
+  // 서비스 정리는 LifecycleService에서 관리 (로그아웃 시)
+  ref.onDispose(() {
+    service.dispose();
+  });
+
+  return service;
+}

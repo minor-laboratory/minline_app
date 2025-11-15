@@ -14,9 +14,9 @@ import '../../utils/logger.dart';
 /// Mutex를 통해 순차적으로 서버에 동기화하는 서비스
 ///
 /// Why: synced = false인 항목이 생기면 자동으로 서버에 업로드 (1초 디바운스)
+///
+/// Lifecycle: @Riverpod(keepAlive: true) Provider로 관리
 class IsarWatchSyncService {
-  static IsarWatchSyncService? _instance;
-
   final SupabaseClient _supabase = Supabase.instance.client;
 
   /// 순차 처리를 위한 Mutex
@@ -35,12 +35,7 @@ class IsarWatchSyncService {
   /// 서비스 활성화 상태
   bool _isActive = false;
 
-  IsarWatchSyncService._();
-
-  factory IsarWatchSyncService() {
-    _instance ??= IsarWatchSyncService._();
-    return _instance!;
-  }
+  IsarWatchSyncService();
 
   /// 동기화 서비스 시작
   Future<void> start() async {

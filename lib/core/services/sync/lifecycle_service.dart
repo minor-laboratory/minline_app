@@ -6,8 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../utils/logger.dart';
-import 'isar_watch_sync_service.dart';
-import 'supabase_stream_service.dart';
+import 'isar_watch_sync_service_provider.dart';
+import 'supabase_stream_service_provider.dart';
 
 /// 앱 생명주기 및 네트워크 상태에 따른 동기화 서비스 관리
 ///
@@ -36,10 +36,6 @@ class LifecycleService with WidgetsBindingObserver {
 
   // Auth 상태 감지
   StreamSubscription<AuthState>? _authSubscription;
-
-  // 동기화 서비스 참조 (싱글톤 인스턴스 보관)
-  IsarWatchSyncService? _isarWatchSyncService;
-  SupabaseStreamService? _supabaseStreamService;
 
   /// 동기화 가능 조건
   bool get _canSync => _isLoggedIn && _isInForeground && _hasNetwork;
@@ -125,10 +121,8 @@ class LifecycleService with WidgetsBindingObserver {
     logger.i('[LifecycleService] User logged in - preparing sync services');
     _isLoggedIn = true;
 
-    // 동기화 서비스 싱글톤 인스턴스 생성 및 저장
-    _isarWatchSyncService = IsarWatchSyncService();
-    _supabaseStreamService = SupabaseStreamService();
-    logger.d('[LifecycleService] Sync service instances created and stored');
+    // keepAlive Provider로 관리되므로 인스턴스 저장 불필요
+    logger.d('[LifecycleService] Sync services will be accessed via Provider');
 
     _updateSyncServices();
   }
@@ -141,11 +135,8 @@ class LifecycleService with WidgetsBindingObserver {
     // 모든 동기화 서비스 중지
     _stopAllServices();
 
-    // 서비스 인스턴스 정리
-    _isarWatchSyncService = null;
-    _supabaseStreamService?.dispose();
-    _supabaseStreamService = null;
-    logger.d('[LifecycleService] Sync service instances disposed');
+    // keepAlive Provider로 관리되므로 인스턴스 정리 불필요
+    logger.d('[LifecycleService] Sync services stopped');
   }
 
   /// 앱 생명주기 상태 변경 처리
@@ -217,16 +208,16 @@ class LifecycleService with WidgetsBindingObserver {
     _isServicesRunning = true; // 플래그 먼저 설정
     logger.i('[LifecycleService] Starting all sync services');
 
-    // IsarWatchSyncService 시작 (로컬 → 서버) - 저장된 인스턴스 사용
-    _isarWatchSyncService?.start().then((_) {
+    // IsarWatchSyncService 시작 (로컬 → 서버) - keepAlive Provider로 접근
+    _ref!.read(isarWatchSyncServiceProvider).start().then((_) {
       logger.d('[LifecycleService] IsarWatchSyncService started');
     }).catchError((e, stack) {
       logger.e('[LifecycleService] Failed to start IsarWatchSyncService', e,
           stack);
     });
 
-    // SupabaseStreamService 시작 (서버 → 로컬) - 저장된 인스턴스 사용
-    _supabaseStreamService?.startListening().then((_) {
+    // SupabaseStreamService 시작 (서버 → 로컬) - keepAlive Provider로 접근
+    _ref!.read(supabaseStreamServiceProvider).startListening().then((_) {
       logger.d('[LifecycleService] SupabaseStreamService started');
     }).catchError((e, stack) {
       logger.e(
@@ -250,12 +241,12 @@ class LifecycleService with WidgetsBindingObserver {
     _isServicesRunning = false; // 플래그 먼저 설정
     logger.i('[LifecycleService] Stopping all sync services');
 
-    // IsarWatchSyncService 중지 - 저장된 인스턴스 사용
-    _isarWatchSyncService?.stop();
+    // IsarWatchSyncService 중지 - keepAlive Provider로 접근
+    _ref!.read(isarWatchSyncServiceProvider).stop();
     logger.d('[LifecycleService] IsarWatchSyncService stopped');
 
-    // SupabaseStreamService 중지 - 저장된 인스턴스 사용
-    _supabaseStreamService?.stopListening();
+    // SupabaseStreamService 중지 - keepAlive Provider로 접근
+    _ref!.read(supabaseStreamServiceProvider).stopListening();
     logger.d('[LifecycleService] SupabaseStreamService stopped');
   }
 
@@ -291,11 +282,8 @@ class LifecycleService with WidgetsBindingObserver {
     _connectivitySubscription?.cancel();
     _authSubscription?.cancel();
 
-    // 서비스 중지 및 정리
+    // 서비스 중지 (Provider가 lifecycle 관리)
     _stopAllServices();
-    _isarWatchSyncService = null;
-    _supabaseStreamService?.dispose();
-    _supabaseStreamService = null;
 
     _isInitialized = false;
     _ref = null;

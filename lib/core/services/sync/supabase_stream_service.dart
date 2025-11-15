@@ -16,9 +16,9 @@ import 'sync_metadata_service.dart';
 /// - 초기 데이터 + 실시간 업데이트 통합
 /// - 서버 사이드 타임스탬프 필터링 (증분 업데이트)
 /// - 비용 효율적 (Realtime Channel 대비 50% 절감)
+///
+/// Lifecycle: @Riverpod(keepAlive: true) Provider로 관리
 class SupabaseStreamService {
-  static SupabaseStreamService? _instance;
-
   final SupabaseClient _supabase = Supabase.instance.client;
 
   /// Stream subscriptions
@@ -32,12 +32,7 @@ class SupabaseStreamService {
   /// 서비스 활성화 상태
   bool _isListening = false;
 
-  SupabaseStreamService._();
-
-  factory SupabaseStreamService() {
-    _instance ??= SupabaseStreamService._();
-    return _instance!;
-  }
+  SupabaseStreamService();
 
   /// 현재 상태
   bool get isListening => _isListening;
