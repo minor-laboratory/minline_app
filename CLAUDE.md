@@ -36,6 +36,7 @@ AI 기반 자동 조합 저널 앱 (Flutter 버전)
 - [docs/DIFFERENCES_FROM_WEB.md](docs/DIFFERENCES_FROM_WEB.md) - **웹과 다른 점** 확인 시 (공유, 알림, UI)
 - [docs/DESIGN_UI.md](docs/DESIGN_UI.md) - **화면 구현** 시
 - [docs/COMPONENT_SPECS.md](docs/COMPONENT_SPECS.md) - **컴포넌트 구현** 시 (필수)
+- [docs/MOBILE_DIALOG_SHEET_RULES.md](docs/MOBILE_DIALOG_SHEET_RULES.md) - **Dialog/Sheet/Modal 구현** 시 (필수)
 - [docs/PLAN.md](docs/PLAN.md) - **개발 일정 확인** 시
 
 **북랩 (Flutter 패턴)**:
@@ -48,6 +49,7 @@ AI 기반 자동 조합 저널 앱 (Flutter 버전)
 **공통 가이드**:
 - [/docs/flutter/FLUTTER_CODING_STYLE_GUIDE.md](/docs/flutter/FLUTTER_CODING_STYLE_GUIDE.md) - **Flutter 코딩** 시
 - [/docs/flutter/GUIDE_ISAR_PATTERNS.md](/docs/flutter/GUIDE_ISAR_PATTERNS.md) - **Isar 사용** 시
+- [/docs/common/GUIDE_STYLE_COMPONENTS.md](/docs/common/GUIDE_STYLE_COMPONENTS.md) - **컴포넌트/Modal/Dialog** 구현 시 (필수)
 - [/docs/common/GUIDE_SUPABASE_PATTERNS.md](/docs/common/GUIDE_SUPABASE_PATTERNS.md) - **Supabase 에러** 시
 
 ## 핵심 원칙

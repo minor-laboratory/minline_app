@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/database/database_service.dart';
@@ -8,7 +9,6 @@ import '../../../../core/services/feedback_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../models/draft.dart';
 import '../../../../models/fragment.dart';
-import '../../../../shared/widgets/feedback_dialog.dart';
 import 'draft_card_actions.dart';
 
 /// Draft 카드 위젯
@@ -174,12 +174,8 @@ class _DraftCardState extends ConsumerState<DraftCard> {
 
 
   Future<void> _showFeedbackDialog() async {
-    final result = await showShadDialog<bool>(
-      context: context,
-      builder: (context) => FeedbackDialog(
-        targetType: 'draft',
-        targetId: widget.draft.remoteID,
-      ),
+    final result = await context.push<bool>(
+      '/feedback/draft/${widget.draft.remoteID}',
     );
 
     if (result == true) {

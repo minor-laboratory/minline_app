@@ -16,7 +16,6 @@ import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../models/fragment.dart';
 import '../../../../models/post.dart';
-import '../../../../shared/widgets/feedback_dialog.dart';
 import '../../../timeline/presentation/widgets/fragment_card.dart';
 
 /// Post 상세 화면
@@ -207,14 +206,10 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
       return;
     }
 
-    // 피드백 다이얼로그 표시
+    // 피드백 페이지로 이동
     if (mounted) {
-      await showShadDialog<bool>(
-        context: context,
-        builder: (context) => FeedbackDialog(
-          targetType: 'post',
-          targetId: _post!.remoteID,
-        ),
+      await context.push<bool>(
+        '/feedback/post/${_post!.remoteID}',
       );
     }
   }

@@ -5,6 +5,7 @@ import 'package:minorlab_common/minorlab_common.dart' as common;
 
 import '../features/auth/presentation/pages/auth_page.dart';
 import '../features/drafts/presentation/pages/drafts_page.dart';
+import '../features/feedback/presentation/pages/feedback_page.dart';
 import '../features/posts/presentation/pages/post_create_page.dart';
 import '../features/posts/presentation/pages/post_detail_page.dart';
 import '../features/posts/presentation/pages/posts_page.dart';
@@ -138,6 +139,20 @@ final appRouter = GoRouter(
           ),
         ),
       ],
+    ),
+
+    // Feedback
+    GoRoute(
+      path: '/feedback/:targetType/:targetId',
+      name: 'feedback',
+      builder: (context, state) {
+        final targetType = state.pathParameters['targetType']!;
+        final targetId = state.pathParameters['targetId']!;
+        return FeedbackPage(
+          targetType: targetType,
+          targetId: targetId,
+        );
+      },
     ),
   ],
 );
