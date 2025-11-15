@@ -16,11 +16,7 @@ class DraftCard extends ConsumerStatefulWidget {
   final Draft draft;
   final VoidCallback? onUpdate;
 
-  const DraftCard({
-    required this.draft,
-    this.onUpdate,
-    super.key,
-  });
+  const DraftCard({required this.draft, this.onUpdate, super.key});
 
   @override
   ConsumerState<DraftCard> createState() => _DraftCardState();
@@ -105,9 +101,9 @@ class _DraftCardState extends ConsumerState<DraftCard> {
       widget.onUpdate?.call();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('common.error'.tr())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('common.error'.tr())));
       }
     } finally {
       if (mounted) {
@@ -161,9 +157,9 @@ class _DraftCardState extends ConsumerState<DraftCard> {
       widget.onUpdate?.call();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('common.error'.tr())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('common.error'.tr())));
       }
     } finally {
       if (mounted) {
@@ -171,7 +167,6 @@ class _DraftCardState extends ConsumerState<DraftCard> {
       }
     }
   }
-
 
   Future<void> _showFeedbackDialog() async {
     final result = await context.push<bool>(
@@ -215,173 +210,184 @@ class _DraftCardState extends ConsumerState<DraftCard> {
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+    return ShadCard(
+      padding: EdgeInsets.zero,
+      footer: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+        child: DraftCardActions(
+          status: widget.draft.status,
+          isLoading: _isLoading,
+          hasSubmittedFeedback: _hasSubmittedFeedback,
+          draftRemoteID: widget.draft.remoteID,
+          onAccept: () => _updateStatus('accepted'),
+          onReject: () => _updateStatus('rejected'),
+          onDelete: _showDeleteDialog,
+          onFeedback: _showFeedbackDialog,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 제목 & 상태 & 더보기
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.draft.title,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      if (widget.draft.reason != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          widget.draft.reason!,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.mutedForeground,
-                              ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    'draft.status_${widget.draft.status}'.tr(),
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: _getStatusTextColor(),
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            // Fragment 개수 & 유사도
-            Row(
-              children: [
-                Icon(
-                  AppIcons.file,
-                  size: 14,
-                  color: theme.colorScheme.mutedForeground,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'draft.snap_count'.tr(namedArgs: {
-                    'count': _fragments.length.toString(),
-                  }),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.mutedForeground,
-                      ),
-                ),
-                if (widget.draft.similarityScore != null) ...[
-                  const SizedBox(width: 8),
-                  Text(
-                    '•',
-                    style: TextStyle(color: theme.colorScheme.mutedForeground),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${'draft.similarity'.tr()} ${(widget.draft.similarityScore! * 100).round()}%',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.mutedForeground,
-                        ),
-                  ),
-                ],
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            // Fragment 목록 토글
-            ShadButton.ghost(
-              onPressed: () => setState(() => _showFragments = !_showFragments),
-              padding: EdgeInsets.zero,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
+              // 제목 & 상태 & 더보기
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    _showFragments ? AppIcons.chevronDown : AppIcons.chevronRight,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    _showFragments
-                        ? 'draft.toggle_snaps_hide'.tr()
-                        : 'draft.toggle_snaps_show'.tr(),
-                  ),
-                ],
-              ),
-            ),
-
-            if (_showFragments) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.only(left: 12),
-                decoration: BoxDecoration(
-                  border: Border(
-                    left: BorderSide(
-                      color: theme.colorScheme.border,
-                      width: 2,
-                    ),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: _fragments.map((fragment) {
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.muted,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            fragment.content,
-                            style: Theme.of(context).textTheme.bodySmall,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.draft.title,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        if (widget.draft.reason != null) ...[
                           const SizedBox(height: 4),
                           Text(
-                            DateFormat('MMM d, HH:mm').format(fragment.eventTime),
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            widget.draft.reason!,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
                                   color: theme.colorScheme.mutedForeground,
                                 ),
                           ),
                         ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'draft.status_${widget.draft.status}'.tr(),
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: _getStatusTextColor(),
+                        fontWeight: FontWeight.w600,
                       ),
-                    );
-                  }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              // Fragment 개수 & 유사도
+              Row(
+                children: [
+                  Icon(
+                    AppIcons.file,
+                    size: 14,
+                    color: theme.colorScheme.mutedForeground,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'draft.snap_count'.tr(
+                      namedArgs: {'count': _fragments.length.toString()},
+                    ),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.mutedForeground,
+                    ),
+                  ),
+                  if (widget.draft.similarityScore != null) ...[
+                    const SizedBox(width: 8),
+                    Text(
+                      '•',
+                      style: TextStyle(
+                        color: theme.colorScheme.mutedForeground,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${'draft.similarity'.tr()} ${(widget.draft.similarityScore! * 100).round()}%',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.mutedForeground,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              // Fragment 목록 토글
+              ShadButton.ghost(
+                onPressed: () =>
+                    setState(() => _showFragments = !_showFragments),
+                padding: EdgeInsets.zero,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _showFragments
+                          ? AppIcons.chevronDown
+                          : AppIcons.chevronRight,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      _showFragments
+                          ? 'draft.toggle_snaps_hide'.tr()
+                          : 'draft.toggle_snaps_show'.tr(),
+                    ),
+                  ],
                 ),
               ),
+
+              if (_showFragments) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.only(left: 12),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        color: theme.colorScheme.border,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: _fragments.map((fragment) {
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.muted,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              fragment.content,
+                              style: Theme.of(context).textTheme.bodySmall,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              DateFormat(
+                                'MMM d, HH:mm',
+                              ).format(fragment.eventTime),
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: theme.colorScheme.mutedForeground,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
             ],
-
-            const Divider(height: 24),
-
-            // 액션 버튼
-            DraftCardActions(
-              status: widget.draft.status,
-              isLoading: _isLoading,
-              hasSubmittedFeedback: _hasSubmittedFeedback,
-              draftRemoteID: widget.draft.remoteID,
-              onAccept: () => _updateStatus('accepted'),
-              onReject: () => _updateStatus('rejected'),
-              onDelete: _showDeleteDialog,
-              onFeedback: _showFeedbackDialog,
-            ),
           ],
         ),
       ),

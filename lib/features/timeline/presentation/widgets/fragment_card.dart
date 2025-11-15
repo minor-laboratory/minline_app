@@ -152,7 +152,9 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
   Future<void> _showAddTagPage() async {
     logger.d('태그 추가 페이지 이동: ${widget.fragment.remoteID}');
 
-    final tag = await context.push<String>('/tag/edit/${widget.fragment.remoteID}');
+    final tag = await context.push<String>(
+      '/tag/edit/${widget.fragment.remoteID}',
+    );
 
     logger.d('입력한 태그: $tag');
     if (tag == null || tag.isEmpty) {
@@ -265,7 +267,9 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
 
   /// 이벤트 시간 업데이트
   Future<void> _handleEventTimeUpdate(
-      DateTime eventTime, String eventTimeSource) async {
+    DateTime eventTime,
+    String eventTimeSource,
+  ) async {
     setState(() => _isLoading = true);
 
     try {
@@ -338,212 +342,46 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
 
     return Container(
       constraints: const BoxConstraints(maxWidth: 600),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ShadCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 편집 모드
-            if (_isEditing) ...[
-              ShadTextarea(
-                controller: _editController,
-                minHeight: 100,
-                maxHeight: 300,
-                autofocus: true,
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ShadButton.outline(
-                    onPressed: _isLoading ? null : _cancelEdit,
-                    child: Text('common.cancel'.tr()),
-                  ),
-                  const SizedBox(width: 8),
-                  ShadButton(
-                    onPressed: _isLoading ? null : _handleUpdate,
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text('common.save'.tr()),
-                  ),
-                ],
-              ),
-            ] else ...[
-              // 텍스트 내용
-              if (widget.fragment.content.isNotEmpty) ...[
-                Text(
-                  widget.fragment.content,
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 1.6,
-                    color: theme.colorScheme.foreground,
-                  ),
-                ),
-                const SizedBox(height: 12),
-              ],
-
-              // 이미지
-              if (widget.fragment.mediaUrls.isNotEmpty) ...[
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: widget.fragment.mediaUrls.map((url) {
-                    return GestureDetector(
-                      onTap: () => _showImageViewer(url),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: CachedNetworkImage(
-                          imageUrl: url,
-                          width: 128,
-                          height: 128,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
-                            width: 128,
-                            height: 128,
-                            color: theme.colorScheme.muted,
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            width: 128,
-                            height: 128,
-                            color: theme.colorScheme.muted,
-                            child: Icon(
-                              AppIcons.image,
-                              color: theme.colorScheme.mutedForeground,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 12),
-              ],
-
-              // 이벤트 시간 & 태그
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 이벤트 시간
-                  InkWell(
-                    onTap: _showEventTimePicker,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          _getEventTimeIcon(widget.fragment.eventTimeSource),
-                          size: 14,
-                          color: theme.colorScheme.primary,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          _formatEventTime(
-                            context,
-                            widget.fragment.eventTime,
-                            widget.fragment.eventTimeSource,
-                          ),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: theme.colorScheme.mutedForeground,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // 태그 (접기/펼치기 기능 포함)
-                  const SizedBox(height: 8),
-                  _buildTagsSection(context),
-                ],
-              ),
-
-              // Draft 연결 정보
-              if (widget.draft != null) ...[
-                const SizedBox(height: 12),
-                InkWell(
-                  onTap: () {
-                    // Draft 화면으로 이동 (push로 현재 화면 위에 추가)
-                    context.push('/drafts');
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          AppIcons.fileText,
-                          size: 12,
-                          color: theme.colorScheme.primary,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'draft.linked_to'
-                              .tr(namedArgs: {'title': widget.draft!.title}),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-
-              // 하단: 작성시간 & 동기화 상태 & 더보기
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  // 작성 시간
-                  Icon(
-                    AppIcons.fileText,
-                    size: 12,
-                    color: theme.colorScheme.mutedForeground,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    _formatTimestamp(context, widget.fragment.timestamp),
-                    style: TextStyle(
-                      fontSize: 12,
+        padding: EdgeInsets.zero,
+        footer: _isEditing
+            ? null
+            : Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+                child: Row(
+                  children: [
+                    // 작성 시간
+                    Icon(
+                      AppIcons.fileText,
+                      size: 12,
                       color: theme.colorScheme.mutedForeground,
                     ),
-                  ),
-                  // 동기화 대기
-                  if (!widget.fragment.synced) ...[
-                    const SizedBox(width: 8),
-                    Icon(
-                      AppIcons.clock,
-                      size: 12,
-                      color: theme.colorScheme.primary,
+                    const SizedBox(width: 4),
+                    Text(
+                      _formatTimestamp(context, widget.fragment.timestamp),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.mutedForeground,
+                      ),
                     ),
-                  ],
-                  const Spacer(),
-                  // 더보기 메뉴 (PopupMenuButton) - 웹과 동일한 크기
-                  Padding(
-                    padding: const EdgeInsets.only(right: 4),
-                    child: SizedBox(
-                      width: 28,
-                      height: 28,
-                      child: PopupMenuButton<String>(
-                        padding: EdgeInsets.zero,
-                        icon: Icon(
-                          AppIcons.moreVert,
-                          size: 16,
-                          color: theme.colorScheme.mutedForeground,
-                        ),
+                    // 동기화 대기
+                    if (!widget.fragment.synced) ...[
+                      const SizedBox(width: 8),
+                      Icon(
+                        AppIcons.clock,
+                        size: 12,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ],
+                    const Spacer(),
+                    // 더보기 메뉴 (PopupMenuButton)
+                    PopupMenuButton<String>(
+                      padding: const EdgeInsets.all(4),
+                      iconSize: 18,
+                      icon: Icon(
+                        AppIcons.moreVert,
+                        color: theme.colorScheme.mutedForeground,
+                      ),
                       onSelected: (value) {
                         switch (value) {
                           case 'edit':
@@ -588,21 +426,216 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                           value: 'delete',
                           child: Row(
                             children: [
-                              Icon(AppIcons.delete,
-                                  size: 16, color: theme.colorScheme.destructive),
+                              Icon(
+                                AppIcons.delete,
+                                size: 16,
+                                color: theme.colorScheme.destructive,
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 'common.delete'.tr(),
-                                style: TextStyle(color: theme.colorScheme.destructive),
+                                style: TextStyle(
+                                  color: theme.colorScheme.destructive,
+                                ),
                               ),
                             ],
                           ),
                         ),
                       ],
-                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+              ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 편집 모드
+            if (_isEditing) ...[
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ShadInput(
+                      controller: _editController,
+                      enabled: !_isLoading,
+                      minLines: 3,
+                      maxLines: 10,
+                      autofocus: true,
+                      keyboardType: TextInputType.multiline,
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ShadButton.outline(
+                          onPressed: _isLoading ? null : _cancelEdit,
+                          child: Text('common.cancel'.tr()),
+                        ),
+                        const SizedBox(width: 8),
+                        ShadButton(
+                          onPressed: _isLoading ? null : _handleUpdate,
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text('common.save'.tr()),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ] else ...[
+              // 첫 묵음: 내용 & 태그 영역
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 텍스트 내용
+                    if (widget.fragment.content.isNotEmpty) ...[
+                      Text(
+                        widget.fragment.content,
+                        style: TextStyle(
+                          fontSize: 16,
+                          height: 1.6,
+                          color: theme.colorScheme.foreground,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
+                    // 이미지
+                    if (widget.fragment.mediaUrls.isNotEmpty) ...[
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: widget.fragment.mediaUrls.map((url) {
+                          return GestureDetector(
+                            onTap: () => _showImageViewer(url),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: CachedNetworkImage(
+                                imageUrl: url,
+                                width: 128,
+                                height: 128,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Container(
+                                  width: 128,
+                                  height: 128,
+                                  color: theme.colorScheme.muted,
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Container(
+                                  width: 128,
+                                  height: 128,
+                                  color: theme.colorScheme.muted,
+                                  child: Icon(
+                                    AppIcons.image,
+                                    color: theme.colorScheme.mutedForeground,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
+                    // 이벤트 시간 & 태그
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 이벤트 시간
+                        InkWell(
+                          onTap: _showEventTimePicker,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _getEventTimeIcon(
+                                  widget.fragment.eventTimeSource,
+                                ),
+                                size: 14,
+                                color: theme.colorScheme.primary,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                _formatEventTime(
+                                  context,
+                                  widget.fragment.eventTime,
+                                  widget.fragment.eventTimeSource,
+                                ),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: theme.colorScheme.mutedForeground,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // 태그 (접기/펼치기 기능 포함)
+                        const SizedBox(height: 8),
+                        _buildTagsSection(context),
+                      ],
+                    ),
+
+                    // Draft 연결 정보
+                    if (widget.draft != null) ...[
+                      const SizedBox(height: 12),
+                      InkWell(
+                        onTap: () {
+                          // Draft 화면으로 이동 (push로 현재 화면 위에 추가)
+                          context.push('/drafts');
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.1,
+                            ),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                AppIcons.fileText,
+                                size: 12,
+                                color: theme.colorScheme.primary,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'draft.linked_to'.tr(
+                                  namedArgs: {'title': widget.draft!.title},
+                                ),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ],
           ],
@@ -632,12 +665,14 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
     if (includeTime) {
       if (diff.inMinutes < 1) return 'time.just_now'.tr();
       if (diff.inMinutes < 60) {
-        return 'time.minutes_ago'
-            .tr(namedArgs: {'minutes': diff.inMinutes.toString()});
+        return 'time.minutes_ago'.tr(
+          namedArgs: {'minutes': diff.inMinutes.toString()},
+        );
       }
       if (diff.inHours < 24) {
-        return 'time.hours_ago'
-            .tr(namedArgs: {'hours': diff.inHours.toString()});
+        return 'time.hours_ago'.tr(
+          namedArgs: {'hours': diff.inHours.toString()},
+        );
       }
       if (diff.inDays < 7) {
         return 'time.days_ago'.tr(namedArgs: {'days': diff.inDays.toString()});
@@ -646,8 +681,9 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
 
     // 절대 시간
     final locale = Localizations.localeOf(context).languageCode;
-    final format =
-        includeTime ? 'time.datetime_format'.tr() : 'time.date_format'.tr();
+    final format = includeTime
+        ? 'time.datetime_format'.tr()
+        : 'time.date_format'.tr();
     return intl.DateFormat(format, locale).format(date);
   }
 
@@ -658,12 +694,12 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
 
     if (diff.inMinutes < 1) return 'time.just_now'.tr();
     if (diff.inMinutes < 60) {
-      return 'time.minutes_ago'
-          .tr(namedArgs: {'minutes': diff.inMinutes.toString()});
+      return 'time.minutes_ago'.tr(
+        namedArgs: {'minutes': diff.inMinutes.toString()},
+      );
     }
     if (diff.inHours < 24) {
-      return 'time.hours_ago'
-          .tr(namedArgs: {'hours': diff.inHours.toString()});
+      return 'time.hours_ago'.tr(namedArgs: {'hours': diff.inHours.toString()});
     }
     if (diff.inDays < 7) {
       return 'time.days_ago'.tr(namedArgs: {'days': diff.inDays.toString()});
@@ -675,14 +711,13 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
 
   /// 태그 섹션 (접기/펼치기 기능)
   Widget _buildTagsSection(BuildContext context) {
-    final allTags = [
-      ...widget.fragment.tags,
-      ...widget.fragment.userTags,
-    ];
+    final allTags = [...widget.fragment.tags, ...widget.fragment.userTags];
 
     const maxVisibleTags = 4; // 접을 때 보여줄 최대 태그 수
     final hasMoreTags = allTags.length > maxVisibleTags;
-    final visibleTags = _showAllTags ? allTags : allTags.take(maxVisibleTags).toList();
+    final visibleTags = _showAllTags
+        ? allTags
+        : allTags.take(maxVisibleTags).toList();
     final hiddenCount = allTags.length - maxVisibleTags;
 
     return Wrap(
@@ -690,18 +725,22 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
       runSpacing: 4,
       children: [
         // AI 태그
-        ...widget.fragment.tags.take(
-          _showAllTags ? widget.fragment.tags.length :
-          (visibleTags.length - widget.fragment.userTags.length).clamp(0, widget.fragment.tags.length)
-        ).map((tag) => _buildAITag(context, tag)),
+        ...widget.fragment.tags
+            .take(
+              _showAllTags
+                  ? widget.fragment.tags.length
+                  : (visibleTags.length - widget.fragment.userTags.length)
+                        .clamp(0, widget.fragment.tags.length),
+            )
+            .map((tag) => _buildAITag(context, tag)),
 
         // 사용자 태그
-        ...widget.fragment.userTags.where((tag) => visibleTags.contains(tag))
-          .map((tag) => _buildUserTag(context, tag)),
+        ...widget.fragment.userTags
+            .where((tag) => visibleTags.contains(tag))
+            .map((tag) => _buildUserTag(context, tag)),
 
         // 더보기 버튼 (태그가 많을 때만)
-        if (hasMoreTags)
-          _buildToggleTagsButton(context, hiddenCount),
+        if (hasMoreTags) _buildToggleTagsButton(context, hiddenCount),
 
         // 태그 추가 버튼
         _buildAddTagButton(context),
@@ -726,7 +765,9 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
           borderRadius: BorderRadius.circular(6),
         ),
         child: Text(
-          _showAllTags ? 'common.show_less'.tr() : 'common.show_more'.tr(namedArgs: {'count': '+$hiddenCount'}),
+          _showAllTags
+              ? 'common.show_less'.tr()
+              : 'common.show_more'.tr(namedArgs: {'count': '+$hiddenCount'}),
           style: TextStyle(
             fontSize: 12,
             color: theme.colorScheme.mutedForeground,
@@ -778,7 +819,6 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
 
   /// AI 태그 숨기기 BottomSheet
   void _showHideAiTagSheet(String tag) {
-    final theme = ShadTheme.of(context);
     showModalBottomSheet(
       context: context,
       builder: (context) => Padding(
@@ -795,20 +835,16 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(
+                ShadButton.outline(
                   onPressed: () => Navigator.pop(context),
                   child: Text('common.cancel'.tr()),
                 ),
                 const SizedBox(width: 8),
-                ElevatedButton(
+                ShadButton.destructive(
                   onPressed: () {
                     _handleHideAiTag(tag);
                     Navigator.pop(context);
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.destructive,
-                    foregroundColor: theme.colorScheme.destructiveForeground,
-                  ),
                   child: Text('tag.hide'.tr()),
                 ),
               ],
@@ -835,7 +871,11 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(AppIcons.edit, size: 12, color: theme.colorScheme.primaryForeground),
+            Icon(
+              AppIcons.edit,
+              size: 12,
+              color: theme.colorScheme.primaryForeground,
+            ),
             const SizedBox(width: 4),
             Text(
               tag,
@@ -861,7 +901,6 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
 
   /// 사용자 태그 삭제 BottomSheet
   void _showRemoveUserTagSheet(String tag) {
-    final theme = ShadTheme.of(context);
     showModalBottomSheet(
       context: context,
       builder: (context) => Padding(
@@ -878,20 +917,16 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(
+                ShadButton.outline(
                   onPressed: () => Navigator.pop(context),
                   child: Text('common.cancel'.tr()),
                 ),
                 const SizedBox(width: 8),
-                ElevatedButton(
+                ShadButton.destructive(
                   onPressed: () {
                     _handleRemoveUserTag(tag);
                     Navigator.pop(context);
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.destructive,
-                    foregroundColor: theme.colorScheme.destructiveForeground,
-                  ),
                   child: Text('common.delete'.tr()),
                 ),
               ],
@@ -917,7 +952,11 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(AppIcons.add, size: 12, color: theme.colorScheme.mutedForeground),
+            Icon(
+              AppIcons.add,
+              size: 12,
+              color: theme.colorScheme.mutedForeground,
+            ),
             const SizedBox(width: 4),
             Text(
               'tag.add_tag'.tr(),
@@ -931,7 +970,6 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
       ),
     );
   }
-
 }
 
 /// 이벤트 시간 Picker Sheet (Material BottomSheet)
@@ -939,10 +977,7 @@ class _EventTimePickerSheet extends StatefulWidget {
   final Fragment fragment;
   final Function(DateTime, String) onUpdate;
 
-  const _EventTimePickerSheet({
-    required this.fragment,
-    required this.onUpdate,
-  });
+  const _EventTimePickerSheet({required this.fragment, required this.onUpdate});
 
   @override
   State<_EventTimePickerSheet> createState() => _EventTimePickerSheetState();
@@ -1071,9 +1106,17 @@ class _EventTimePickerSheetState extends State<_EventTimePickerSheet> {
           if (_includeTime) ...[
             ListTile(
               leading: Icon(AppIcons.clock),
-              title: Text(timeFormat.format(
-                DateTime(2000, 1, 1, _selectedTime.hour, _selectedTime.minute),
-              )),
+              title: Text(
+                timeFormat.format(
+                  DateTime(
+                    2000,
+                    1,
+                    1,
+                    _selectedTime.hour,
+                    _selectedTime.minute,
+                  ),
+                ),
+              ),
               trailing: Icon(AppIcons.chevronRight),
               onTap: _pickTime,
             ),
@@ -1085,14 +1128,15 @@ class _EventTimePickerSheetState extends State<_EventTimePickerSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              TextButton(
-                onPressed:
-                    _isLoading ? null : () => Navigator.of(context).pop(),
+              ShadButton.outline(
+                enabled: !_isLoading,
+                onPressed: () => Navigator.of(context).pop(),
                 child: Text('common.cancel'.tr()),
               ),
               const SizedBox(width: 8),
-              ElevatedButton(
-                onPressed: _isLoading ? null : _handleSave,
+              ShadButton(
+                enabled: !_isLoading,
+                onPressed: _handleSave,
                 child: _isLoading
                     ? const SizedBox(
                         width: 16,

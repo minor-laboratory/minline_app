@@ -109,17 +109,76 @@ ScaffoldMessenger.of(context).showSnackBar(
 
 **AppBar 및 카드 내 PopupMenuButton**:
 ```dart
-// ✅ 오른쪽 padding 추가 (시각적 균형)
+// ✅ 통일된 padding 사용 (상하좌우 4dp)
 PopupMenuButton<String>(
-  padding: const EdgeInsets.only(right: 8),
-  icon: Icon(AppIcons.moreVert),
+  padding: const EdgeInsets.all(4),
+  iconSize: 18,
+  icon: Icon(
+    AppIcons.moreVert,
+    color: ShadTheme.of(context).colorScheme.mutedForeground,
+  ),
   itemBuilder: (context) => [...],
 )
 ```
 
 **이유**:
-- AppBar의 actions 영역이나 카드 우측에 배치될 때 시각적 균형 유지
-- Material Design 가이드라인 준수 (우측 여백 8dp)
+- 일관된 터치 영역 제공 (상하좌우 동일)
+- iconSize 18로 아이콘 크기 명시
+- Shadcn Theme의 mutedForeground 색상 사용
+
+### ShadCard 패딩 구조
+
+**기본 패턴** (Footer 사용):
+```dart
+ShadCard(
+  padding: EdgeInsets.zero,  // 기본 padding 제거
+  footer: Padding(
+    padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+    child: // Footer 내용 (액션 버튼 등),
+  ),
+  child: Padding(
+    padding: const EdgeInsets.all(16),
+    child: // 실제 카드 내용,
+  ),
+)
+```
+
+**이유**:
+- ShadCard의 footer는 자동으로 Divider를 추가함
+- footer의 오른쪽 padding 0: PopupMenuButton의 padding과 중복 방지
+- child는 16dp padding으로 일관된 여백 유지
+
+### ListView 패턴
+
+**✅ ListView.separated 사용** (카드 목록):
+```dart
+ListView.separated(
+  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+  itemCount: items.length,
+  separatorBuilder: (context, index) => const SizedBox(height: 12),
+  itemBuilder: (context, index) {
+    return MyCard(item: items[index]);  // margin 없이 반환
+  },
+)
+```
+
+**❌ ListView.builder + margin** (비효율적):
+```dart
+ListView.builder(
+  padding: const EdgeInsets.all(16),
+  itemBuilder: (context, index) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),  // 매번 margin 계산
+      child: ...,
+    );
+  },
+)
+```
+
+**이유**:
+- separatorBuilder가 아이템 간격을 명시적으로 관리
+- 카드 자체에는 margin 불필요 (중복 방지)
+- 마지막 아이템 뒤 불필요한 여백 자동 제거
 
 ---
 
@@ -154,7 +213,7 @@ Container(
   decoration: BoxDecoration(
     color: theme.colorScheme.surface,
     border: Border(
-      top: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
+      top: BorderSide(color: theme.colorScheme.border.withValues(alpha: 0.2)),
     ),
   ),
 )
@@ -223,7 +282,7 @@ Container(
   height: 32,
   padding: EdgeInsets.symmetric(horizontal: 10),
   decoration: BoxDecoration(
-    color: theme.colorScheme.surfaceVariant,  // bg-muted
+    color: theme.colorScheme.muted,  // bg-muted
     borderRadius: BorderRadius.circular(16),
   ),
   child: Text(
@@ -319,7 +378,7 @@ return SafeArea(
     decoration: BoxDecoration(
       color: colorScheme.surface,
       border: Border(
-        top: BorderSide(color: colorScheme.outline.withValues(alpha: 0.2)),
+        top: BorderSide(color: theme.colorScheme.border.withValues(alpha: 0.2)),
       ),
     ),
     child: Column(
@@ -391,24 +450,42 @@ window.navigationBarColor = android.graphics.Color.TRANSPARENT
 
 ### 상세 스펙
 
-**카드 컨테이너**:
+**카드 컨테이너** (ShadCard 사용):
 ```dart
 Container(
-  padding: EdgeInsets.all(16),  // p-4
-  decoration: BoxDecoration(
-    color: theme.colorScheme.surface,
-    border: Border.all(color: theme.colorScheme.outline),
-    borderRadius: BorderRadius.circular(8),  // rounded-lg
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withValues(alpha: 0.05),
-        blurRadius: 8,
-        offset: Offset(0, 2),
+  constraints: const BoxConstraints(maxWidth: 600),
+  child: ShadCard(
+    padding: EdgeInsets.zero,
+    footer: Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+      child: Row(
+        children: [
+          // 작성 시간
+          Text(...),
+          Spacer(),
+          // 더보기 메뉴
+          PopupMenuButton(...),
+        ],
       ),
-    ],
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 텍스트, 이미지, 이벤트 시간, 태그 등
+        ],
+      ),
+    ),
   ),
 )
 ```
+
+**중요**:
+- 최대 너비 600px 제약 (웹과 동일)
+- `padding: EdgeInsets.zero`로 ShadCard의 기본 padding 제거
+- `footer`에 메타 정보(작성시간, 메뉴) 배치
+- ListView.separated의 separatorBuilder로 카드 간격 관리 (margin 불필요)
 
 **텍스트 내용**:
 ```dart
@@ -460,7 +537,7 @@ Row(
     SizedBox(width: 6),
     Text(
       formatDate(fragment.eventTime, fragment.eventTimeSource),
-      style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+      style: TextStyle(fontSize: 12, color: theme.colorScheme.mutedForeground),
     ),
   ],
 )
@@ -615,11 +692,11 @@ Row(
     // 작성시간
     Row(
       children: [
-        Icon(AppIcons.drafts, size: 14, color: theme.colorScheme.onSurfaceVariant),
+        Icon(AppIcons.drafts, size: 14, color: theme.colorScheme.mutedForeground),
         SizedBox(width: 4),
         Text(
           formatDate(fragment.timestamp, 'auto'),
-          style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+          style: TextStyle(fontSize: 12, color: theme.colorScheme.mutedForeground),
         ),
         if (!fragment.synced) ...[
           SizedBox(width: 4),
@@ -733,17 +810,30 @@ showShadSheet(
 
 ### 상세 스펙
 
-**카드 컨테이너**:
+**카드 컨테이너** (ShadCard 사용):
 ```dart
-Container(
-  padding: EdgeInsets.all(16),
-  decoration: BoxDecoration(
-    color: theme.colorScheme.surface,
-    border: Border.all(color: theme.colorScheme.outline),
-    borderRadius: BorderRadius.circular(8),
+ShadCard(
+  padding: EdgeInsets.zero,  // 내부 padding 제거
+  footer: Padding(
+    padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+    child: DraftCardActions(...),  // 액션 버튼
+  ),
+  child: Padding(
+    padding: const EdgeInsets.all(16),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 제목, 메타 정보, Fragment 목록 등
+      ],
+    ),
   ),
 )
 ```
+
+**중요**:
+- `padding: EdgeInsets.zero`로 ShadCard의 기본 padding 제거
+- `footer`에 액션 버튼 배치 (Divider 자동 추가됨)
+- `child`에 실제 내용을 Padding으로 감싸서 배치
 
 **헤더** (제목 & 상태):
 ```dart
@@ -760,7 +850,7 @@ Row(
           if (draft.reason != null)
             Text(
               draft.reason!,
-              style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurfaceVariant),
+              style: TextStyle(fontSize: 14, color: theme.colorScheme.mutedForeground),
             ),
         ],
       ),
@@ -789,7 +879,7 @@ Color getStatusColor(String status) {
     case 'accepted':
       return Colors.green;  // accent (없으면 green)
     case 'rejected':
-      return theme.colorScheme.onSurfaceVariant;
+      return theme.colorScheme.mutedForeground;
     default:
       return theme.colorScheme.onSurface;
   }
@@ -804,13 +894,13 @@ Row(
     SizedBox(width: 4),
     Text(
       'draft.snap_count'.tr(args: [fragmentCount]),
-      style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurfaceVariant),
+      style: TextStyle(fontSize: 14, color: theme.colorScheme.mutedForeground),
     ),
     if (draft.similarityScore != null) ...[
-      Text(' • ', style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
+      Text(' • ', style: TextStyle(color: theme.colorScheme.mutedForeground)),
       Text(
         'draft.similarity'.tr() + ' ${(draft.similarityScore! * 100).round()}%',
-        style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurfaceVariant),
+        style: TextStyle(fontSize: 14, color: theme.colorScheme.mutedForeground),
       ),
     ],
   ],
@@ -828,7 +918,7 @@ TextButton.icon(
       : 'draft.toggle_snaps_show'.tr(),
   ),
   style: TextButton.styleFrom(
-    foregroundColor: theme.colorScheme.onSurfaceVariant,
+    foregroundColor: theme.colorScheme.mutedForeground,
   ),
 )
 ```
@@ -840,7 +930,7 @@ Container(
   decoration: BoxDecoration(
     border: Border(
       left: BorderSide(
-        color: theme.colorScheme.outline,
+        color: theme.colorScheme.border,
         width: 2,
       ),
     ),
@@ -851,7 +941,7 @@ Container(
         margin: EdgeInsets.only(bottom: 8),
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceVariant,
+          color: theme.colorScheme.muted,
           borderRadius: BorderRadius.circular(4),
         ),
         child: Column(
@@ -866,7 +956,7 @@ Container(
             SizedBox(height: 4),
             Text(
               DateFormat('M월 d일 a h:mm').format(fragment.timestamp),
-              style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+              style: TextStyle(fontSize: 12, color: theme.colorScheme.mutedForeground),
             ),
           ],
         ),
@@ -967,7 +1057,7 @@ GestureDetector(
     padding: EdgeInsets.all(16),
     decoration: BoxDecoration(
       color: theme.colorScheme.surface,
-      border: Border.all(color: theme.colorScheme.outline),
+      border: Border.all(color: theme.colorScheme.border),
       borderRadius: BorderRadius.circular(8),
     ),
   ),
@@ -991,7 +1081,7 @@ Row(
       decoration: BoxDecoration(
         color: post.isPublic
           ? theme.colorScheme.primary.withValues(alpha: 0.1)
-          : theme.colorScheme.surfaceVariant,
+          : theme.colorScheme.muted,
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
@@ -1000,7 +1090,7 @@ Row(
           fontSize: 12,
           color: post.isPublic
             ? theme.colorScheme.primary
-            : theme.colorScheme.onSurfaceVariant,
+            : theme.colorScheme.mutedForeground,
         ),
       ),
     ),
@@ -1025,7 +1115,7 @@ Row(
   children: [
     Text(
       DateFormat('yyyy년 M월 d일').format(post.createdAt),
-      style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+      style: TextStyle(fontSize: 12, color: theme.colorScheme.mutedForeground),
     ),
     IconButton(
       icon: Icon(AppIcons.moreVert, size: 16),
@@ -1222,7 +1312,7 @@ trailing: (filter.query.isNotEmpty || filter.selectedTags.isNotEmpty)
           _searchController.clear();
           ref.read(fragmentFilterProvider.notifier).clearSearch();
         },
-        child: Icon(AppIcons.close, size: 16, color: colorScheme.onSurfaceVariant),
+        child: Icon(AppIcons.close, size: 16, color: theme.colorScheme.mutedForeground),
       )
     : null,
 
@@ -2122,8 +2212,10 @@ class _DraftTabContent extends StatelessWidget {
           return Center(child: Text('draft.empty_filter'.tr()));
         }
 
-        return ListView.builder(
+        return ListView.separated(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
           itemCount: filteredDrafts.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 12),
           itemBuilder: (context, index) {
             return DraftCard(draft: filteredDrafts[index]);
           },
@@ -2789,7 +2881,7 @@ Text(
 Text(
   'snap.empty_hint'.tr(),
   style: theme.textTheme.bodyMedium?.copyWith(
-    color: colorScheme.onSurfaceVariant,
+    color: theme.colorScheme.mutedForeground,
   ),
 )
 ```
@@ -2808,13 +2900,13 @@ Container(
       Icon(
         AppIcons.arrowUp,
         size: 12,
-        color: colorScheme.onSurfaceVariant,
+        color: theme.colorScheme.mutedForeground,
       ),
       const SizedBox(width: 8),
       Text(
         'snap.input_placeholder'.tr(),
         style: theme.textTheme.bodySmall?.copyWith(
-          color: colorScheme.onSurfaceVariant,
+          color: theme.colorScheme.mutedForeground,
         ),
       ),
     ],

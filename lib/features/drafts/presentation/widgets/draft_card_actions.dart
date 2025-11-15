@@ -74,18 +74,13 @@ class DraftCardActions extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           // More 버튼
-          Padding(
-            padding: const EdgeInsets.only(right: 4),
-            child: SizedBox(
-              width: 28,
-              height: 28,
-              child: PopupMenuButton<String>(
-                padding: EdgeInsets.zero,
-                icon: Icon(
-                  AppIcons.moreVert,
-                  size: 16,
-                  color: theme.colorScheme.mutedForeground,
-                ),
+          PopupMenuButton<String>(
+            padding: const EdgeInsets.all(4),
+            iconSize: 18,
+            icon: Icon(
+              AppIcons.moreVert,
+              color: theme.colorScheme.mutedForeground,
+            ),
                 onSelected: (value) {
                   switch (value) {
                     case 'feedback':
@@ -139,8 +134,6 @@ class DraftCardActions extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          ),
         ],
       );
     } else if (status == 'accepted') {
@@ -178,18 +171,13 @@ class DraftCardActions extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           // More 버튼
-          Padding(
-            padding: const EdgeInsets.only(right: 4),
-            child: SizedBox(
-              width: 28,
-              height: 28,
-              child: PopupMenuButton<String>(
-                padding: EdgeInsets.zero,
-                icon: Icon(
-                  AppIcons.moreVert,
-                  size: 16,
-                  color: theme.colorScheme.mutedForeground,
-                ),
+          PopupMenuButton<String>(
+            padding: const EdgeInsets.all(4),
+            iconSize: 18,
+            icon: Icon(
+              AppIcons.moreVert,
+              color: theme.colorScheme.mutedForeground,
+            ),
                 onSelected: (value) {
                   switch (value) {
                     case 'feedback':
@@ -243,8 +231,6 @@ class DraftCardActions extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          ),
         ],
       );
     } else if (status == 'rejected') {
@@ -266,18 +252,13 @@ class DraftCardActions extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           // More 버튼
-          Padding(
-            padding: const EdgeInsets.only(right: 4),
-            child: SizedBox(
-              width: 28,
-              height: 28,
-              child: PopupMenuButton<String>(
-                padding: EdgeInsets.zero,
-                icon: Icon(
-                  AppIcons.moreVert,
-                  size: 16,
-                  color: theme.colorScheme.mutedForeground,
-                ),
+          PopupMenuButton<String>(
+            padding: const EdgeInsets.all(4),
+            iconSize: 18,
+            icon: Icon(
+              AppIcons.moreVert,
+              color: theme.colorScheme.mutedForeground,
+            ),
                 onSelected: (value) {
                   switch (value) {
                     case 'feedback':
@@ -331,8 +312,6 @@ class DraftCardActions extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          ),
         ],
       );
     }

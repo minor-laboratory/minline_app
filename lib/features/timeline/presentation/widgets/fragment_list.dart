@@ -14,10 +14,7 @@ import 'fragment_card.dart';
 class FragmentList extends ConsumerStatefulWidget {
   final VoidCallback? onEnterSearchMode;
 
-  const FragmentList({
-    super.key,
-    this.onEnterSearchMode,
-  });
+  const FragmentList({super.key, this.onEnterSearchMode});
 
   @override
   ConsumerState<FragmentList> createState() => _FragmentListState();
@@ -95,13 +92,11 @@ class _FragmentListState extends ConsumerState<FragmentList> {
         final displayedFragments = allFragments.take(_displayLimit).toList();
         final hasMore = allFragments.length > _displayLimit;
 
-        return ListView.builder(
+        return ListView.separated(
           controller: _scrollController,
-          padding: const EdgeInsets.only(
-            top: 8,
-            bottom: 100, // 하단 입력바 여유 공간
-          ),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
           itemCount: displayedFragments.length + (hasMore ? 1 : 0),
+          separatorBuilder: (context, index) => const SizedBox(height: 12),
           itemBuilder: (context, index) {
             // 마지막 항목 + 더 많은 항목이 있으면 로딩 인디케이터
             if (index == displayedFragments.length && hasMore) {
@@ -169,7 +164,10 @@ class _FragmentListState extends ConsumerState<FragmentList> {
             child: Center(
               child: Container(
                 margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,

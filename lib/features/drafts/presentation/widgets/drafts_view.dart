@@ -13,10 +13,7 @@ import 'draft_card.dart';
 class DraftsView extends ConsumerStatefulWidget {
   final String analyzeMessage;
 
-  const DraftsView({
-    super.key,
-    this.analyzeMessage = '',
-  });
+  const DraftsView({super.key, this.analyzeMessage = ''});
 
   @override
   ConsumerState<DraftsView> createState() => _DraftsViewState();
@@ -213,8 +210,8 @@ class _DraftTabContentState extends State<_DraftTabContent> {
                     Text(
                       'draft.empty_hint'.tr(),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.mutedForeground,
-                          ),
+                        color: theme.colorScheme.mutedForeground,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -231,32 +228,26 @@ class _DraftTabContentState extends State<_DraftTabContent> {
           onRefresh: () async {
             widget.onRefresh();
           },
-          child: ListView.builder(
+          child: ListView.separated(
             controller: _scrollController,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
             itemCount: displayedDrafts.length + (hasMore ? 1 : 0),
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               if (index < displayedDrafts.length) {
                 final draft = displayedDrafts[index];
-                return DraftCard(
-                  draft: draft,
-                  onUpdate: widget.onRefresh,
-                );
+                return DraftCard(draft: draft, onUpdate: widget.onRefresh);
               } else {
                 return const Padding(
                   padding: EdgeInsets.all(16),
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  child: Center(child: CircularProgressIndicator()),
                 );
               }
             },
           ),
         );
       },
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) {
         final theme = ShadTheme.of(context);
         return Center(
@@ -279,8 +270,8 @@ class _DraftTabContentState extends State<_DraftTabContent> {
                 Text(
                   error.toString(),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.mutedForeground,
-                      ),
+                    color: theme.colorScheme.mutedForeground,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ],

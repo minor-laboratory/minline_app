@@ -256,47 +256,40 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
       appBar: AppBar(
         title: Text('profile.title'.tr()),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: SizedBox(
-              width: 28,
-              height: 28,
-              child: PopupMenuButton<String>(
-                padding: EdgeInsets.zero,
-                icon: Icon(
-                  AppIcons.moreVert,
-                  size: 16,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                tooltip: 'settings.advanced_settings'.tr(),
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                  PopupMenuItem<String>(
-                    value: 'withdrawal',
-                    child: Row(
-                      children: [
-                        Icon(
-                          AppIcons.delete,
-                          color: theme.colorScheme.destructive,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'withdrawal_title'.tr(),
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.destructive,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-                onSelected: (String value) {
-                  if (value == 'withdrawal') {
-                    context.push('/settings/account/withdrawal');
-                  }
-                },
-              ),
+          PopupMenuButton<String>(
+            padding: const EdgeInsets.all(4),
+            iconSize: 18,
+            icon: Icon(
+              AppIcons.moreVert,
+              color: theme.colorScheme.mutedForeground,
             ),
+            tooltip: 'settings.advanced_settings'.tr(),
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                value: 'withdrawal',
+                child: Row(
+                  children: [
+                    Icon(
+                      AppIcons.delete,
+                      color: theme.colorScheme.destructive,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'withdrawal_title'.tr(),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.destructive,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            onSelected: (String value) {
+              if (value == 'withdrawal') {
+                context.push('/settings/account/withdrawal');
+              }
+            },
           ),
         ],
       ),

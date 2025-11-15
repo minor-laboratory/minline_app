@@ -248,18 +248,13 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
             onPressed: _handleExport,
           ),
           // 더보기 메뉴
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: SizedBox(
-              width: 28,
-              height: 28,
-              child: PopupMenuButton<String>(
-                padding: EdgeInsets.zero,
-                icon: Icon(
-                  AppIcons.moreVert,
-                  size: 16,
-                  color: colorScheme.onSurfaceVariant,
-                ),
+          PopupMenuButton<String>(
+            padding: const EdgeInsets.all(4),
+            iconSize: 18,
+            icon: Icon(
+              AppIcons.moreVert,
+              color: ShadTheme.of(context).colorScheme.mutedForeground,
+            ),
                 onSelected: (value) {
                   switch (value) {
                     case 'regenerate':
@@ -313,8 +308,6 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                     ),
                   ),
                 ],
-              ),
-            ),
           ),
         ],
       ),

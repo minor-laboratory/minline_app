@@ -45,7 +45,7 @@ AI 기반 자동 조합 저널 앱 (Flutter 버전)
 **북랩 (Flutter 패턴)**:
 - [../minorlab_book/CLAUDE.md](../minorlab_book/CLAUDE.md) - **Flutter 전반** 참조 시
 - [../minorlab_book/lib/core/database/models/base.dart](../minorlab_book/lib/core/database/models/base.dart) - **Isar 모델** 구현 시
-- [../minorlab_book/lib/core/services/sync/](../minorlab_book/lib/core/services/sync/) - **동기화 서비스** 구현 시 (3-서비스 패턴)
+- [../minorlab_book/lib/features/sync/](../minorlab_book/lib/features/sync/) - **동기화 서비스** 구현 시 (3-서비스 패턴)
 - [../minorlab_book/lib/core/services/device_info_service.dart](../minorlab_book/lib/core/services/device_info_service.dart) - **디바이스 정보** 구현 시
 - [../minorlab_book/lib/core/services/share_handler_service.dart](../minorlab_book/lib/core/services/share_handler_service.dart) - **공유 기능** 구현 시
 
