@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:isar_community/isar.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -11,18 +10,13 @@ import '../../../models/fragment.dart';
 import '../../../models/post.dart';
 import '../../utils/logger.dart';
 
-part 'isar_watch_sync_service.g.dart';
-
 /// Isar watch를 활용하여 로컬 변경사항을 자동 감지하고
 /// Mutex를 통해 순차적으로 서버에 동기화하는 서비스
 ///
 /// Why: synced = false인 항목이 생기면 자동으로 서버에 업로드 (1초 디바운스)
-@riverpod
-IsarWatchSyncService isarWatchSyncService(Ref ref) {
-  return IsarWatchSyncService();
-}
-
 class IsarWatchSyncService {
+  static IsarWatchSyncService? _instance;
+
   final SupabaseClient _supabase = Supabase.instance.client;
 
   /// 순차 처리를 위한 Mutex
@@ -41,7 +35,12 @@ class IsarWatchSyncService {
   /// 서비스 활성화 상태
   bool _isActive = false;
 
-  IsarWatchSyncService();
+  IsarWatchSyncService._();
+
+  factory IsarWatchSyncService() {
+    _instance ??= IsarWatchSyncService._();
+    return _instance!;
+  }
 
   /// 동기화 서비스 시작
   Future<void> start() async {

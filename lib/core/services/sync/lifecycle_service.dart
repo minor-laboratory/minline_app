@@ -38,6 +38,7 @@ class LifecycleService with WidgetsBindingObserver {
   StreamSubscription<AuthState>? _authSubscription;
 
   // 동기화 서비스 참조 (싱글톤 인스턴스 보관)
+  IsarWatchSyncService? _isarWatchSyncService;
   SupabaseStreamService? _supabaseStreamService;
 
   /// 동기화 가능 조건
@@ -124,9 +125,10 @@ class LifecycleService with WidgetsBindingObserver {
     logger.i('[LifecycleService] User logged in - preparing sync services');
     _isLoggedIn = true;
 
-    // SupabaseStreamService 싱글톤 인스턴스 생성 및 저장
+    // 동기화 서비스 싱글톤 인스턴스 생성 및 저장
+    _isarWatchSyncService = IsarWatchSyncService();
     _supabaseStreamService = SupabaseStreamService();
-    logger.d('[LifecycleService] SupabaseStreamService instance created and stored');
+    logger.d('[LifecycleService] Sync service instances created and stored');
 
     _updateSyncServices();
   }
@@ -140,9 +142,10 @@ class LifecycleService with WidgetsBindingObserver {
     _stopAllServices();
 
     // 서비스 인스턴스 정리
+    _isarWatchSyncService = null;
     _supabaseStreamService?.dispose();
     _supabaseStreamService = null;
-    logger.d('[LifecycleService] SupabaseStreamService instance disposed');
+    logger.d('[LifecycleService] Sync service instances disposed');
   }
 
   /// 앱 생명주기 상태 변경 처리
@@ -214,9 +217,8 @@ class LifecycleService with WidgetsBindingObserver {
     _isServicesRunning = true; // 플래그 먼저 설정
     logger.i('[LifecycleService] Starting all sync services');
 
-    // IsarWatchSyncService 시작 (로컬 → 서버)
-    final isarWatchService = _ref!.read(isarWatchSyncServiceProvider);
-    isarWatchService.start().then((_) {
+    // IsarWatchSyncService 시작 (로컬 → 서버) - 저장된 인스턴스 사용
+    _isarWatchSyncService?.start().then((_) {
       logger.d('[LifecycleService] IsarWatchSyncService started');
     }).catchError((e, stack) {
       logger.e('[LifecycleService] Failed to start IsarWatchSyncService', e,
@@ -248,14 +250,9 @@ class LifecycleService with WidgetsBindingObserver {
     _isServicesRunning = false; // 플래그 먼저 설정
     logger.i('[LifecycleService] Stopping all sync services');
 
-    // IsarWatchSyncService 중지
-    final isarWatchService = _ref!.read(isarWatchSyncServiceProvider);
-    isarWatchService.stop().then((_) {
-      logger.d('[LifecycleService] IsarWatchSyncService stopped');
-    }).catchError((e, stack) {
-      logger.e(
-          '[LifecycleService] Failed to stop IsarWatchSyncService', e, stack);
-    });
+    // IsarWatchSyncService 중지 - 저장된 인스턴스 사용
+    _isarWatchSyncService?.stop();
+    logger.d('[LifecycleService] IsarWatchSyncService stopped');
 
     // SupabaseStreamService 중지 - 저장된 인스턴스 사용
     _supabaseStreamService?.stopListening();
@@ -296,6 +293,7 @@ class LifecycleService with WidgetsBindingObserver {
 
     // 서비스 중지 및 정리
     _stopAllServices();
+    _isarWatchSyncService = null;
     _supabaseStreamService?.dispose();
     _supabaseStreamService = null;
 
