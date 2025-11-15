@@ -250,7 +250,7 @@ class Base {
 
 ## 동기화 아키텍처
 
-**패턴**: 북랩 3-서비스 구조 동일 ([참조](../minorlab_book/lib/core/services/sync/))
+**패턴**: 북랩 3-서비스 구조 동일 ([참조](../minorlab_book/lib/features/sync/))
 1. **IsarWatchSyncService**: 로컬 변경 감지 → 업로드 (`@Riverpod(keepAlive: true)` Provider)
 2. **SupabaseStreamService**: Realtime 구독 → 다운로드 (`@Riverpod(keepAlive: true)` Provider)
 3. **LifecycleService**: 앱 생명주기 관리 (Singleton 패턴, `ref.read()`로 서비스 접근)

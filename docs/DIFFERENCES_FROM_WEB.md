@@ -24,7 +24,7 @@
 2. MiniLine 앱 열림 → Fragment 입력창에 URL 자동 입력
 3. 사용자가 내용 추가 후 저장
 
-**상세**: [features/share_handler/FEATURE.md](features/share_handler/FEATURE.md)
+**상세**: (TODO: features/share_handler/FEATURE.md 작성 예정)
 
 ### 2. 로컬 알림
 
@@ -37,7 +37,7 @@
 - 알림 내용: "오늘의 생각을 기록해보세요"
 - 탭 시 → Timeline 화면으로 이동
 
-**상세**: [features/local_notifications/FEATURE.md](features/local_notifications/FEATURE.md)
+**상세**: (TODO: features/local_notifications/FEATURE.md 작성 예정)
 
 ### 3. 푸시 알림 (FCM)
 
@@ -55,7 +55,7 @@
 - 사용자별 타임존 설정 확인
 - FCM 토큰으로 발송
 
-**상세**: [features/push_notifications/FEATURE.md](features/push_notifications/FEATURE.md)
+**상세**: (TODO: features/push_notifications/FEATURE.md 작성 예정)
 
 ### 4. 디바이스 관리
 
