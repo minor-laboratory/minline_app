@@ -601,7 +601,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                       InkWell(
                         onTap: () {
                           // Draft 화면으로 이동 (push로 현재 화면 위에 추가)
-                          context.push('/drafts');
+                          context.go('/?tab=1');
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(

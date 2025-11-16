@@ -284,6 +284,11 @@
     "confirm_remove": "Are you sure you want to remove the {tag} tag?",
     "confirm_hide": "Are you sure you want to hide the {tag} tag?"
   },
+  "share": {
+    "title": "Share",
+    "shared_images": "Shared Images",
+    "hint": "Save shared content from other apps as a Fragment"
+  },
   "sync": {
     "waiting": "Waiting to sync"
   },

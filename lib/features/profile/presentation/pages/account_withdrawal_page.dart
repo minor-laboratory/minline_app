@@ -161,8 +161,8 @@ class _AccountWithdrawalPageState extends ConsumerState<AccountWithdrawalPage> {
           ),
         );
 
-        // 타임라인으로 이동
-        context.go('/timeline');
+        // 메인 페이지로 이동
+        context.go('/');
       }
     } catch (e, stackTrace) {
       app_logger.logger.e('Withdrawal failed', e, stackTrace);

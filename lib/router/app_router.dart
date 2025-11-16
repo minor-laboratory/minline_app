@@ -12,6 +12,7 @@ import '../features/profile/presentation/pages/account_withdrawal_page.dart';
 import '../features/profile/presentation/pages/password_change_page.dart';
 import '../features/profile/presentation/pages/profile_detail_page.dart';
 import '../features/settings/presentation/pages/settings_page.dart';
+import '../features/share/presentation/pages/share_input_page.dart';
 import '../features/timeline/presentation/pages/tag_edit_page.dart';
 
 /// Navigator Key for ShareHandlerService
@@ -139,6 +140,13 @@ final appRouter = GoRouter(
           targetId: targetId,
         );
       },
+    ),
+
+    // Share Input (공유 받은 데이터 입력)
+    GoRoute(
+      path: '/share/input',
+      name: 'share_input',
+      builder: (context, state) => const ShareInputPage(),
     ),
   ],
 );

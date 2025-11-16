@@ -160,7 +160,7 @@ class FcmService {
       final context = router.navigatorKey.currentContext;
       if (context != null && context.mounted) {
         // Drafts 페이지로 이동 (나중에 Draft 상세 라우트 추가 시 변경)
-        GoRouter.of(context).go('/drafts');
+        GoRouter.of(context).go('/?tab=1');
       }
     }
   }

@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_handler/share_handler.dart'
     show ShareHandlerPlatform, SharedMedia;
 
+import '../providers/shared_media_provider.dart';
 import '../utils/logger.dart';
 
 /// 공유 수신 처리 서비스
 ///
 /// 역할:
 /// 1. 다른 앱에서 텍스트/이미지 공유 받기
-/// 2. Timeline 화면으로 이동하여 입력창에 pre-fill
+/// 2. ShareInputPage로 이동하여 공유 데이터 처리
 ///
 /// Lifecycle: @Riverpod(keepAlive: true) Provider로 관리
 class ShareHandlerService {
-  ShareHandlerService();
+  final Ref _ref;
+
+  ShareHandlerService(this._ref);
 
   /// 글로벌 Navigator Key (main.dart에서 설정)
   static GlobalKey<NavigatorState>? navigatorKey;
@@ -81,29 +85,12 @@ class ShareHandlerService {
   void _processSharedData(BuildContext context, SharedMedia media) {
     final router = GoRouter.of(context);
 
-    // 이미지가 있는 경우
-    if (media.attachments?.isNotEmpty == true) {
-      final imagePath = media.attachments!.first?.path;
-      if (imagePath != null && imagePath.isNotEmpty) {
-        logger.i('[ShareHandler] Navigating to timeline with image');
-        router.go('/timeline', extra: {
-          'imagePath': imagePath,
-          'content': media.content ?? '',
-        });
-        return;
-      }
-    }
+    // 공유 데이터를 Provider에 설정
+    _ref.read(sharedMediaProvider.notifier).setMedia(media);
 
-    // 텍스트만 있는 경우
-    if (media.content != null && media.content!.isNotEmpty) {
-      logger.i('[ShareHandler] Navigating to timeline with text');
-      router.go('/timeline', extra: {
-        'content': media.content,
-      });
-      return;
-    }
-
-    logger.w('[ShareHandler] No valid data in shared media');
+    // ShareInputPage로 이동
+    logger.i('[ShareHandler] Navigating to share input page');
+    router.go('/share/input');
   }
 
   /// 서비스 정리

@@ -285,6 +285,11 @@
     "confirm_remove": "{tag} 태그를 삭제하시겠습니까?",
     "confirm_hide": "{tag} 태그를 숨기시겠습니까?"
   },
+  "share": {
+    "title": "공유",
+    "shared_images": "공유받은 이미지",
+    "hint": "다른 앱에서 공유받은 내용을 Fragment로 저장합니다"
+  },
   "sync": {
     "waiting": "동기화 대기 중"
   },

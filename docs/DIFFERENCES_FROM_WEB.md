@@ -17,7 +17,40 @@
 
 **패키지**: `share_handler: ^0.0.25`
 
-**구현**: [../minorlab_book/lib/core/services/share_handler_service.dart](../minorlab_book/lib/core/services/share_handler_service.dart) 패턴 재사용
+**구현**: 북랩 패턴을 현대화
+- **북랩**: Singleton + static GlobalKey
+- **miniline_app**: `@Riverpod(keepAlive: true)` Provider + Ref 전달
+- **추가**: `SharedMediaProvider`로 공유 데이터 상태 관리
+
+**핵심 차이점**:
+```dart
+// 북랩 (Singleton)
+class ShareHandlerService {
+  static final ShareHandlerService _instance = ShareHandlerService._internal();
+  factory ShareHandlerService() => _instance;
+}
+
+// miniline_app (keepAlive Provider)
+@Riverpod(keepAlive: true)
+ShareHandlerService shareHandlerService(Ref ref) {
+  final service = ShareHandlerService(ref);
+  ref.onDispose(() => service.dispose());
+  return service;
+}
+
+// miniline_app 고유: 공유 데이터 Provider
+@Riverpod(keepAlive: true)
+class SharedMediaNotifier extends _$SharedMediaNotifier {
+  @override
+  SharedMedia? build() => null;
+  void setMedia(SharedMedia media) { state = media; }
+  void clear() { state = null; }
+}
+```
+
+**참조**:
+- 북랩 원본: [../minorlab_book/lib/core/services/share_handler_service.dart](../minorlab_book/lib/core/services/share_handler_service.dart)
+- miniline_app: `lib/core/services/share_handler_service.dart`, `lib/core/providers/shared_media_provider.dart`
 
 **시나리오**:
 1. Safari에서 URL 복사 → 공유 → MiniLine
