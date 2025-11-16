@@ -95,7 +95,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
         if (draft != null) {
           draft.status = status;
           draft.synced = false;
-          draft.refreshAt = DateTime.now();
+          draft.refreshAt = DateTime.now().toLocal();
           await isar.drafts.put(draft);
         }
       });
@@ -141,7 +141,7 @@ class _DraftCardState extends ConsumerState<DraftCard> {
         if (draft != null) {
           draft.deleted = true;
           draft.synced = false;
-          draft.refreshAt = DateTime.now();
+          draft.refreshAt = DateTime.now().toLocal();
           await isar.drafts.put(draft);
         }
       });

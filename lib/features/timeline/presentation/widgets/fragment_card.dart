@@ -81,7 +81,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
       await isar.writeTxn(() async {
         widget.fragment.content = _editController.text.trim();
         widget.fragment.synced = false;
-        widget.fragment.refreshAt = DateTime.now();
+        widget.fragment.refreshAt = DateTime.now().toLocal();
         await isar.fragments.put(widget.fragment);
       });
 
@@ -103,7 +103,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
       await isar.writeTxn(() async {
         widget.fragment.deleted = true;
         widget.fragment.synced = false;
-        widget.fragment.refreshAt = DateTime.now();
+        widget.fragment.refreshAt = DateTime.now().toLocal();
         await isar.fragments.put(widget.fragment);
       });
 
@@ -175,7 +175,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
           // ✅ Isar 리스트 수정: 새로운 리스트 생성하여 할당
           fragment.userTags = [...fragment.userTags, tag];
           fragment.synced = false;
-          fragment.refreshAt = DateTime.now();
+          fragment.refreshAt = DateTime.now().toLocal();
           await isar.fragments.put(fragment);
           logger.i('✅ 태그 추가 완료: $tag, 전체 태그: ${fragment.userTags}');
         } else {
@@ -206,7 +206,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
         // ✅ Isar 리스트 수정: 새로운 리스트 생성하여 할당
         fragment.userTags = fragment.userTags.where((t) => t != tag).toList();
         fragment.synced = false;
-        fragment.refreshAt = DateTime.now();
+        fragment.refreshAt = DateTime.now().toLocal();
         await isar.fragments.put(fragment);
       });
 
@@ -232,7 +232,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
         // ✅ Isar 리스트 수정: 새로운 리스트 생성하여 할당
         fragment.tags = fragment.tags.where((t) => t != tag).toList();
         fragment.synced = false;
-        fragment.refreshAt = DateTime.now();
+        fragment.refreshAt = DateTime.now().toLocal();
         await isar.fragments.put(fragment);
       });
 
@@ -277,7 +277,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
         widget.fragment.eventTime = eventTime;
         widget.fragment.eventTimeSource = eventTimeSource;
         widget.fragment.synced = false;
-        widget.fragment.refreshAt = DateTime.now();
+        widget.fragment.refreshAt = DateTime.now().toLocal();
         await isar.fragments.put(widget.fragment);
       });
 
