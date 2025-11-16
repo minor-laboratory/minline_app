@@ -77,11 +77,11 @@ class Draft extends Base {
     synced = json['synced'] ?? false;
     createdAt = json['created_at'] != null
         ? DateTime.parse(json['created_at']).toLocal()
-        : DateTime.now();
+        : DateTime.now().toLocal();
     updatedAt = json['updated_at'] != null
         ? DateTime.parse(json['updated_at']).toLocal()
-        : DateTime.now();
-    refreshAt = DateTime.now();
+        : DateTime.now().toLocal();
+    refreshAt = DateTime.now().toLocal();
     deleted = json['deleted'] ?? false;
 
     // 필드 초기화
