@@ -282,7 +282,9 @@
     "hide_tag": "숨기기",
     "remove_tag": "삭제",
     "click_to_filter": "클릭하여 필터링",
+    "confirm_remove_title": "태그 삭제 확인",
     "confirm_remove": "{tag} 태그를 삭제하시겠습니까?",
+    "confirm_hide_title": "태그 숨기기 확인",
     "confirm_hide": "{tag} 태그를 숨기시겠습니까?"
   },
   "share": {
@@ -365,7 +367,8 @@
     "logout_success": "로그아웃되었습니다",
     "logout_failed": "로그아웃 실패",
     "password_changed_success": "비밀번호가 변경되었습니다",
-    "password_set_success": "비밀번호가 설정되었습니다"
+    "password_set_success": "비밀번호가 설정되었습니다",
+    "copied_to_clipboard": "클립보드에 복사되었습니다"
   },
   "validation": {
     "required": "필수 입력 항목입니다",

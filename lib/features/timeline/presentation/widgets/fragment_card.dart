@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' as intl;
@@ -335,6 +336,16 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
     }
   }
 
+  /// 내용 복사
+  void _handleCopyContent() {
+    if (widget.fragment.content.isEmpty) return;
+
+    Clipboard.setData(ClipboardData(text: widget.fragment.content));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('messages.copied_to_clipboard'.tr())),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
@@ -495,23 +506,25 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
               ),
             ] else ...[
               // 첫 묵음: 내용 & 태그 영역
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 텍스트 내용
-                    if (widget.fragment.content.isNotEmpty) ...[
-                      Text(
-                        widget.fragment.content,
-                        style: TextStyle(
-                          fontSize: 16,
-                          height: 1.6,
-                          color: theme.colorScheme.foreground,
+              GestureDetector(
+                onLongPress: _handleCopyContent,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 텍스트 내용
+                      if (widget.fragment.content.isNotEmpty) ...[
+                        Text(
+                          widget.fragment.content,
+                          style: TextStyle(
+                            fontSize: 16,
+                            height: 1.6,
+                            color: theme.colorScheme.foreground,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
+                        const SizedBox(height: 12),
+                      ],
 
                     // 이미지
                     if (widget.fragment.mediaUrls.isNotEmpty) ...[
@@ -639,6 +652,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                     ],
                   ],
                 ),
+              ),
               ),
             ],
           ],

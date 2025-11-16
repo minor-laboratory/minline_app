@@ -281,7 +281,9 @@
     "hide_tag": "Hide",
     "remove_tag": "Remove",
     "click_to_filter": "Click to filter",
+    "confirm_remove_title": "Confirm Tag Removal",
     "confirm_remove": "Are you sure you want to remove the {tag} tag?",
+    "confirm_hide_title": "Confirm Tag Hide",
     "confirm_hide": "Are you sure you want to hide the {tag} tag?"
   },
   "share": {
@@ -364,7 +366,8 @@
     "logout_success": "Logged out successfully",
     "logout_failed": "Logout failed",
     "password_changed_success": "Password changed successfully",
-    "password_set_success": "Password set successfully"
+    "password_set_success": "Password set successfully",
+    "copied_to_clipboard": "Copied to clipboard"
   },
   "validation": {
     "required": "This field is required",
