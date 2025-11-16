@@ -307,7 +307,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
             body: {
               'id': widget.fragment.remoteID,
               'content': widget.fragment.content,
-              'timestamp': widget.fragment.timestamp.toIso8601String(),
+              'timestamp': widget.fragment.timestamp.toUtc().toIso8601String(),
               'mediaUrls': widget.fragment.mediaUrls,
             },
           )

@@ -157,9 +157,7 @@ Text('Text', style: TextStyle(color: theme.colorScheme.mutedForeground))
 
 ```
 lib/
-├── app/
-│   ├── app.dart                 # MaterialApp 설정
-│   └── app_providers.dart       # 전역 Provider
+├── app/                         # 앱 진입점 (현재 미사용, main.dart에서 직접 설정)
 │
 ├── core/
 │   ├── constants/               # 상수
@@ -225,13 +223,13 @@ lib/
 │   └── app_router.dart          # GoRouter 설정
 │
 └── shared/
-    ├── widgets/                 # 공통 위젯
-    │   ├── keyboard_animation_builder.dart  # 키보드 애니메이션
-    │   ├── standard_bottom_sheet.dart       # 북랩 패턴
-    │   ├── responsive_modal_sheet.dart      # 북랩 패턴
-    │   └── user_avatar_button.dart
-    └── theme/                   # 테마 설정
-        └── app_theme.dart       # minorlab_common 기반
+    └── widgets/                 # 공통 위젯
+        ├── keyboard_animation_builder.dart  # 키보드 애니메이션
+        ├── standard_bottom_sheet.dart       # 북랩 패턴
+        ├── responsive_modal_sheet.dart      # 북랩 패턴
+        └── user_avatar_button.dart
+
+# 테마: minorlab_common의 shadcn_theme.dart 직접 사용
 ```
 
 ## 데이터 모델
@@ -239,16 +237,18 @@ lib/
 **서버 스키마**: [../miniline/docs/SPEC_DATABASE_SCHEMA.md](../miniline/docs/SPEC_DATABASE_SCHEMA.md) 참조
 **Isar 모델 패턴**: [../minorlab_book/lib/core/database/models/base.dart](../minorlab_book/lib/core/database/models/base.dart) 참조
 
-**핵심**: 북랩 Base 패턴 재사용
+**핵심**: 북랩 Base 패턴 재사용 (lib/models/base.dart)
 ```dart
 // 모든 모델이 상속
-class Base {
-  Id id;                          // fastHash(remoteID)
-  @Index(unique: true) String remoteID;  // UUID
+abstract class Base {
+  Id get id => fastHash(remoteID);  // Isar ID (remoteID의 해시값)
+  @Index(unique: true) String remoteID;  // 원격 아이디 (UUID)
+  @Index() DateTime createdAt;    // 생성 시간
+  DateTime updatedAt;             // 수정 시간
   @Index() DateTime? refreshAt;   // UI 갱신 트리거
   @Index() bool synced = false;   // 동기화 상태
   @Index() bool deleted = false;  // 논리 삭제
-  DateTime? deletedAt;            // 서버 관리 (클라이언트 설정 금지)
+  // 주의: deletedAt은 서버에서만 관리 (클라이언트 코드에는 없음)
 }
 ```
 
@@ -257,19 +257,20 @@ class Base {
 **패턴**: 북랩 3-서비스 구조 동일 ([참조](../minorlab_book/lib/features/sync/))
 1. **IsarWatchSyncService**: 로컬 변경 감지 → 업로드 (`@Riverpod(keepAlive: true)` Provider)
 2. **SupabaseStreamService**: Realtime 구독 → 다운로드 (`@Riverpod(keepAlive: true)` Provider)
-3. **LifecycleService**: 앱 생명주기 관리 (Singleton 패턴, `ref.read()`로 서비스 접근)
+3. **LifecycleService**: 앱 생명주기 관리 (`@Riverpod(keepAlive: true)` Provider, Ref를 생성자로 전달)
 
 **중요**: 모든 동기화 서비스는 `keepAlive` Provider로 관리
 - Why: 앱 생명주기 동안 인스턴스 유지 (중복 생성 방지)
-- How: `@Riverpod(keepAlive: true)` 사용, LifecycleService에서 `ref.read()`로 접근
-- Singleton 패턴 제거됨 (Riverpod이 인스턴스 관리)
+- How: `@Riverpod(keepAlive: true)` 사용
+- LifecycleService: Ref를 생성자로 전달받아 다른 Provider 접근
+- Singleton 패턴 불필요 (Riverpod이 인스턴스 관리)
 
-**초기화 순서**:
-1. LifecycleService.initialize(ref) 호출 (main.dart)
+**초기화 순서** (main.dart):
+1. `ref.read(lifecycleServiceProvider).initialize()` 호출
 2. Auth 상태 확인: 이미 로그인되어 있으면 _onUserLoggedIn() 즉시 실행
 3. _updateSyncServices()에서 조건 확인 후 _startAllServices() 호출
-4. `ref.read(supabaseStreamServiceProvider).startListening()` 실행 (Provider를 통한 접근)
-5. `ref.read(isarWatchSyncServiceProvider).start()` 실행
+4. LifecycleService 내부에서 `_ref.read(supabaseStreamServiceProvider).startListening()` 실행
+5. LifecycleService 내부에서 `_ref.read(isarWatchSyncServiceProvider).start()` 실행
 
 **❌ 동기화 실패 시 저장 차단**
 ```dart
@@ -323,12 +324,8 @@ class MyWidget extends ConsumerWidget {
 
 **Service 패턴** (앱 생명주기 동안 유지):
 ```dart
-// 1. Service 클래스 (Singleton 패턴 - 선택 사항)
+// 1. Service 클래스 (Singleton 불필요)
 class MyService {
-  static final MyService _instance = MyService._internal();
-  factory MyService() => _instance;
-  MyService._internal();
-
   Future<void> start() async { /* ... */ }
   void dispose() { /* ... */ }
 }
@@ -341,18 +338,35 @@ MyService myService(Ref ref) {
   return service;
 }
 
-// 3. 사용 (LifecycleService 등)
-class LifecycleService {
-  WidgetRef? _ref;
-
-  void start() {
-    // Provider를 통해 접근 (인스턴스 재사용 보장)
-    _ref!.read(myServiceProvider).start();
+// 3. 사용 예시 1: ConsumerWidget
+class MyWidget extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.read(myServiceProvider).start();
+    return Container();
   }
+}
+
+// 4. 사용 예시 2: Ref를 받는 Service (LifecycleService 패턴)
+class MyOrchestratorService {
+  final Ref _ref;
+  MyOrchestratorService(this._ref);
+
+  void orchestrate() {
+    // 다른 서비스를 조율
+    _ref.read(myServiceProvider).start();
+  }
+}
+
+@Riverpod(keepAlive: true)
+MyOrchestratorService myOrchestratorService(Ref ref) {
+  return MyOrchestratorService(ref);
 }
 ```
 
-**중요**: keepAlive Provider는 앱 종료까지 인스턴스 유지 (Singleton 역할)
+**중요**:
+- `keepAlive: true` Provider는 앱 종료까지 인스턴스 유지 (Singleton 불필요)
+- Ref를 생성자로 받으면 다른 Provider 접근 가능 (LifecycleService 패턴)
 
 ### Isar
 
