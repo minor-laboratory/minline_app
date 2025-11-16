@@ -7,12 +7,14 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:share_handler/share_handler.dart' show SharedMedia;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/database/database_service.dart';
 import '../../../../core/providers/shared_media_provider.dart';
 import '../../../../core/services/media/media_service.dart';
+import '../../../../core/services/share_activity_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../models/fragment.dart';
@@ -22,7 +24,17 @@ import '../../../auth/widgets/login_required_bottom_sheet.dart';
 ///
 /// 다른 앱에서 공유받은 텍스트/이미지를 Fragment로 저장
 class ShareInputPage extends ConsumerStatefulWidget {
-  const ShareInputPage({super.key});
+  /// ShareActivity에서 직접 전달받은 데이터 (Method Channel)
+  final Map<String, dynamic>? directData;
+
+  /// ShareActivity에서 시작되었는지 여부
+  final bool isFromShareActivity;
+
+  const ShareInputPage({
+    super.key,
+    this.directData,
+    this.isFromShareActivity = false,
+  });
 
   @override
   ConsumerState<ShareInputPage> createState() => _ShareInputPageState();
@@ -44,32 +56,58 @@ class _ShareInputPageState extends ConsumerState<ShareInputPage> {
 
     // Provider 초기 데이터 및 변경 감지
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final initialMedia = ref.read(sharedMediaProvider);
-      if (initialMedia != null) {
-        // 텍스트 로드
-        if (initialMedia.content != null && initialMedia.content!.isNotEmpty) {
-          _contentController.text = initialMedia.content!;
-        }
-
-        // 공유받은 이미지를 _selectedImages에 추가
-        if (initialMedia.attachments?.isNotEmpty == true) {
-          final sharedImageFiles = initialMedia.attachments!
-              .where((attachment) => attachment?.path != null)
-              .map((attachment) => File(attachment!.path))
-              .toList();
-          _selectedImages.addAll(sharedImageFiles);
-        }
-
-        // UI 업데이트
-        if (mounted) {
-          setState(() {});
+      // ShareActivity에서 직접 전달받은 데이터 처리
+      if (widget.directData != null) {
+        _loadDirectData(widget.directData!);
+      } else {
+        // SharedMediaProvider에서 데이터 로드 (기존 방식)
+        final initialMedia = ref.read(sharedMediaProvider);
+        if (initialMedia != null) {
+          _loadProviderData(initialMedia);
         }
       }
 
-      if (_contentController.text.isEmpty) {
+      // ShareActivity에서 실행되면 항상 포커스 요청
+      if (widget.isFromShareActivity || _contentController.text.isEmpty) {
         _focusNode.requestFocus();
       }
     });
+  }
+
+  /// ShareActivity에서 전달받은 데이터 로드
+  void _loadDirectData(Map<String, dynamic> data) {
+    final type = data['type'] as String?;
+    final content = data['content'] as String?;
+
+    if (type == 'text' && content != null && content.isNotEmpty) {
+      _contentController.text = content;
+      if (mounted) setState(() {});
+    }
+    // TODO: 이미지 처리 (추후 구현)
+  }
+
+  /// SharedMediaProvider에서 데이터 로드
+  void _loadProviderData(SharedMedia? media) {
+    if (media == null) return;
+
+    // 텍스트 로드
+    if (media.content != null && media.content!.isNotEmpty) {
+      _contentController.text = media.content!;
+    }
+
+    // 공유받은 이미지를 _selectedImages에 추가
+    if (media.attachments?.isNotEmpty == true) {
+      final sharedImageFiles = media.attachments!
+          .where((attachment) => attachment?.path != null)
+          .map((attachment) => File(attachment!.path))
+          .toList();
+      _selectedImages.addAll(sharedImageFiles);
+    }
+
+    // UI 업데이트
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -237,9 +275,12 @@ class _ShareInputPageState extends ConsumerState<ShareInputPage> {
         ),
       );
 
-      // 이전 화면으로 이동 (없으면 홈으로)
+      // 이전 화면으로 이동 또는 ShareActivity 종료
       if (mounted) {
-        if (context.canPop()) {
+        if (widget.isFromShareActivity) {
+          // ShareActivity 종료
+          await ShareActivityService.closeShareActivity();
+        } else if (context.canPop()) {
           context.pop();
         } else {
           context.go('/');
@@ -264,6 +305,141 @@ class _ShareInputPageState extends ConsumerState<ShareInputPage> {
     );
   }
 
+  /// Bottom Sheet 스타일 콘텐츠 (ShareActivity용)
+  Widget _buildBottomSheetContent(ShadThemeData theme) {
+    return Scaffold(
+      backgroundColor: Colors.black.withAlpha(128), // 반투명 배경
+      body: Align(
+        alignment: Alignment.bottomCenter,
+        child: Container(
+          decoration: BoxDecoration(
+            color: theme.colorScheme.background,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(16),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 드래그 핸들
+              Container(
+                margin: const EdgeInsets.only(top: 8, bottom: 4),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.muted,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+
+              // 헤더
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: common.Spacing.md,
+                  vertical: common.Spacing.sm,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'share.title'.tr(),
+                        style: theme.textTheme.large.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(AppIcons.close),
+                      onPressed: _isLoading
+                          ? null
+                          : () async {
+                              ref.read(sharedMediaProvider.notifier).clear();
+                              await ShareActivityService.closeShareActivity();
+                            },
+                    ),
+                  ],
+                ),
+              ),
+
+              const Divider(height: 1),
+
+              // 콘텐츠
+              Padding(
+                padding: const EdgeInsets.all(common.Spacing.md),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                      // 이미지 프리뷰
+                      if (_hasImages) ...[
+                        _buildImagePreview(theme, ref.watch(sharedMediaProvider)),
+                        SizedBox(height: common.Spacing.sm + common.Spacing.xs),
+                      ],
+
+                      // 텍스트 입력
+                      ShadInput(
+                        controller: _contentController,
+                        focusNode: _focusNode,
+                        enabled: !_isLoading,
+                        placeholder: Text('snap.input_placeholder'.tr()),
+                        minLines: 3,
+                        maxLines: 5,
+                        keyboardType: TextInputType.multiline,
+                        onChanged: (value) {
+                          if (value.length > _maxLength) {
+                            _contentController.text =
+                                value.substring(0, _maxLength);
+                            _contentController.selection =
+                                TextSelection.fromPosition(
+                              TextPosition(offset: _maxLength),
+                            );
+                          }
+                          setState(() {});
+                        },
+                      ),
+
+                      SizedBox(height: common.Spacing.sm + common.Spacing.xs),
+
+                      // 액션 영역
+                      Row(
+                        children: [
+                          _buildImageButton(theme),
+                          SizedBox(width: common.Spacing.sm),
+                          _buildCharCounter(theme),
+                          const Spacer(),
+                          ShadButton(
+                            enabled: _isValid && !_isLoading,
+                            onPressed: _save,
+                            child: _isLoading
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(
+                                        width: common.Spacing.md,
+                                        height: common.Spacing.md,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: theme
+                                              .colorScheme.primaryForeground,
+                                        ),
+                                      ),
+                                      SizedBox(width: common.Spacing.sm),
+                                      Text('common.saving'.tr()),
+                                    ],
+                                  )
+                                : Text('common.save'.tr()),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
@@ -279,18 +455,29 @@ class _ShareInputPageState extends ConsumerState<ShareInputPage> {
       }
     });
 
+    // ShareActivity에서 실행될 때는 Bottom Sheet 스타일
+    if (widget.isFromShareActivity) {
+      return _buildBottomSheetContent(theme);
+    }
+
+    // 일반 실행 시 Scaffold
     return Scaffold(
       appBar: AppBar(
         title: Text('share.title'.tr()),
         leading: IconButton(
           icon: Icon(AppIcons.close),
-          onPressed: _isLoading ? null : () {
+          onPressed: _isLoading ? null : () async {
             logger.d('[ShareInputPage] Close button pressed');
-            // 공유 데이터 초기화
-            ref.read(sharedMediaProvider.notifier).clear();
 
-            // 이전 화면이 있으면 pop, 없으면 홈으로
-            if (context.canPop()) {
+            // 공유 데이터 초기화 (Provider 사용 시)
+            if (!widget.isFromShareActivity) {
+              ref.read(sharedMediaProvider.notifier).clear();
+            }
+
+            // ShareActivity 종료 또는 이전 화면으로
+            if (widget.isFromShareActivity) {
+              await ShareActivityService.closeShareActivity();
+            } else if (context.canPop()) {
               logger.d('[ShareInputPage] Popping to previous screen');
               context.pop();
             } else {

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,12 +10,14 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/database/database_service.dart';
+import 'core/services/share_activity_service.dart';
 import 'core/services/share_handler_provider.dart';
 import 'core/services/share_handler_service.dart';
 import 'core/services/sync/lifecycle_service_provider.dart';
 import 'core/utils/logger.dart';
 import 'env/app_env.dart';
 import 'features/settings/providers/settings_provider.dart';
+import 'features/share/presentation/pages/share_input_page.dart';
 import 'router/app_router.dart' as router;
 
 void main() async {
@@ -57,6 +61,10 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
+  bool _isCheckingShareActivity = true;
+  bool _isShareActivity = false;
+  Map<String, dynamic>? _sharedData;
+
   @override
   void initState() {
     super.initState();
@@ -64,20 +72,92 @@ class _MyAppState extends ConsumerState<MyApp> {
     // ShareHandlerService에 Navigator Key 설정 (app_router에서)
     ShareHandlerService.navigatorKey = router.navigatorKey;
 
-    // 초기화 완료 후 서비스 시작
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // LifecycleService 초기화 (Provider 패턴)
-      ref.read(lifecycleServiceProvider).initialize();
-      logger.i('[Main] LifecycleService initialized');
+    // ShareActivity 확인 (build 전에 완료)
+    _checkShareActivity();
+  }
 
-      // ShareHandlerService 초기화
-      ref.read(shareHandlerServiceProvider).initialize();
-      logger.i('[Main] ShareHandlerService initialized');
-    });
+  /// ShareActivity 여부 확인 및 데이터 로드
+  Future<void> _checkShareActivity() async {
+    final isShare = await ShareActivityService.isShareActivity();
+
+    if (isShare) {
+      logger.i('[Main] Started from ShareActivity');
+      final sharedData = await ShareActivityService.getSharedData();
+      logger.d('[Main] Shared data: $sharedData');
+
+      setState(() {
+        _sharedData = sharedData;
+        _isShareActivity = true;
+        _isCheckingShareActivity = false;
+      });
+    } else {
+      logger.i('[Main] Started from MainActivity');
+
+      setState(() {
+        _isCheckingShareActivity = false;
+      });
+
+      // 일반 서비스 초기화
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(lifecycleServiceProvider).initialize();
+        logger.i('[Main] LifecycleService initialized');
+
+        // Android만 ShareHandlerService 사용 (iOS는 커스텀 구현)
+        if (Platform.isAndroid) {
+          ref.read(shareHandlerServiceProvider).initialize();
+          logger.i('[Main] ShareHandlerService initialized (Android)');
+        } else {
+          logger.i('[Main] ShareHandlerService skipped (iOS uses custom implementation)');
+        }
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // ShareActivity 확인 중일 때 로딩 화면 표시 (빈 화면)
+    if (_isCheckingShareActivity) {
+      return const MaterialApp(
+        home: Scaffold(
+          body: SizedBox.shrink(),
+        ),
+      );
+    }
+
+    // ShareActivity일 때 전용 UI 표시
+    if (_isShareActivity && _sharedData != null) {
+      // 기본 Shadcn 테마 생성
+      final shadLightTheme = common.MinorLabShadTheme.lightTheme(
+        paletteId: 'zinc',
+        backgroundOption: common.BackgroundColorOption.defaultColor,
+      );
+      final shadDarkTheme = common.MinorLabShadTheme.darkTheme(
+        paletteId: 'zinc',
+        backgroundOption: common.BackgroundColorOption.defaultColor,
+      );
+
+      return ShadApp.custom(
+        themeMode: ThemeMode.system,
+        theme: shadLightTheme,
+        darkTheme: shadDarkTheme,
+        appBuilder: (appContext) {
+          final materialTheme = Theme.of(appContext);
+          return MaterialApp(
+            theme: materialTheme,
+            darkTheme: materialTheme,
+            themeMode: ThemeMode.system,
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            home: ShareInputPage(
+              directData: _sharedData,
+              isFromShareActivity: true,
+            ),
+          );
+        },
+      );
+    }
+
     final themeModeAsync = ref.watch(themeModeProvider);
     final colorThemeAsync = ref.watch(colorThemeProvider);
     final backgroundColorAsync = ref.watch(backgroundColorProvider);

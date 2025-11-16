@@ -3,6 +3,7 @@
         android:label="miniline_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <!-- 메인 Activity (일반 실행) -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -24,24 +25,36 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
 
-            <!-- 공유 수신을 위한 Intent Filter -->
-            <!-- 텍스트 공유 -->
-            <intent-filter>
+        <!-- 공유 수신 전용 Activity (투명 배경) -->
+        <activity
+            android:name=".ShareActivity"
+            android:exported="true"
+            android:theme="@style/ShareTheme"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+
+            <!-- 텍스트 공유 (최우선) -->
+            <intent-filter android:priority="999">
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
 
-            <!-- 이미지 공유 (단일) -->
-            <intent-filter>
+            <!-- 이미지 공유 (단일, 최우선) -->
+            <intent-filter android:priority="999">
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="image/*" />
             </intent-filter>
 
-            <!-- 이미지 공유 (다중) -->
-            <intent-filter>
+            <!-- 이미지 공유 (다중, 최우선) -->
+            <intent-filter android:priority="999">
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="image/*" />
