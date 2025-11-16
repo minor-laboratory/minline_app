@@ -22,12 +22,12 @@ class Fragment extends Base {
 
   /// 입력 시간 (사용자가 글을 입력한 시간)
   @Index()
-  DateTime timestamp = DateTime.now();
+  DateTime timestamp = DateTime.now().toLocal();
 
   /// 실제 사건 발생 시간 (AI가 분석하여 업데이트)
   @Index()
   @Name('event_time')
-  DateTime eventTime = DateTime.now();
+  DateTime eventTime = DateTime.now().toLocal();
 
   /// 시간 출처 및 형식
   /// - auto: 자동 설정 (eventTime = timestamp)
@@ -94,11 +94,11 @@ class Fragment extends Base {
     synced = json['synced'] ?? false;
     createdAt = json['created_at'] != null
         ? DateTime.parse(json['created_at']).toLocal()
-        : DateTime.now();
+        : DateTime.now().toLocal();
     updatedAt = json['updated_at'] != null
         ? DateTime.parse(json['updated_at']).toLocal()
-        : DateTime.now();
-    refreshAt = DateTime.now();
+        : DateTime.now().toLocal();
+    refreshAt = DateTime.now().toLocal();
     deleted = json['deleted'] ?? false;
 
     // 필드 초기화
@@ -110,10 +110,10 @@ class Fragment extends Base {
         [];
     timestamp = json['timestamp'] != null
         ? DateTime.parse(json['timestamp']).toLocal()
-        : DateTime.now();
+        : DateTime.now().toLocal();
     eventTime = json['event_time'] != null
         ? DateTime.parse(json['event_time']).toLocal()
-        : DateTime.now();
+        : DateTime.now().toLocal();
     eventTimeSource = json['event_time_source'] ?? 'auto';
     tags =
         (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??

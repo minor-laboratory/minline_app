@@ -91,7 +91,7 @@ abstract class Base {
         synced = json['synced'] ?? false,
         createdAt = DateTime.parse(json['created_at']).toLocal(),
         updatedAt = DateTime.parse(json['updated_at']).toLocal() {
-    refreshAt = DateTime.now();
+    refreshAt = DateTime.now().toLocal();
     deleted = json['deleted'] ?? false;
   }
 
