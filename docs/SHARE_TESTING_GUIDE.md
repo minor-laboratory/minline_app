@@ -24,9 +24,9 @@ MiniLine 앱의 텍스트/이미지 공유 기능을 테스트하는 방법을 �
    - `NSUserActivityTypes` - ShareMedia
    - `NSPhotoLibraryUsageDescription` - 사진 라이브러리 권한
 
-### ⚠️ iOS ShareExtension 필요
+### ✅ iOS ShareExtension 완료
 
-iOS에서 공유 기능을 완전히 사용하려면 **ShareExtension 타겟**을 Xcode에서 수동으로 추가해야 합니다.
+iOS ShareExtension이 이미 설정되어 있습니다. 추가 작업 불필요.
 
 ## Android 테스트 (즉시 가능)
 
@@ -72,89 +72,31 @@ flutter run -d <android-device>
 [ShareHandler] Navigating to timeline with text (또는 image)
 ```
 
-## iOS 테스트 (ShareExtension 추가 후)
+## iOS 테스트 (즉시 가능)
 
-### 1. ShareExtension 타겟 추가 (Xcode 필요)
+### 이미 완료된 설정
 
-#### 단계 1: Xcode에서 프로젝트 열기
+다음 항목들이 이미 설정되어 있습니다:
 
-```bash
-open ios/Runner.xcworkspace
-```
+1. ✅ ShareExtension 타겟 추가됨
+2. ✅ ShareViewController.swift 구현됨 (share_handler_ios_models 상속)
+3. ✅ Info.plist 설정됨 (텍스트, URL, 이미지 지원)
+4. ✅ MainInterface.storyboard 추가됨
+5. ✅ App Group 설정됨 (group.com.minorlab.miniline)
+   - Runner.entitlements
+   - ShareExtension.entitlements
+6. ✅ Podfile에 ShareExtension 타겟 추가됨
+7. ✅ lib/main.dart에서 iOS 공유 활성화됨 (Platform.isAndroid 제거)
 
-#### 단계 2: Share Extension 타겟 추가
+**추가 작업 필요 없음** - 바로 테스트 가능합니다.
 
-1. Xcode 프로젝트 네비게이터에서 Runner 프로젝트 선택
-2. 하단 "+" 버튼 클릭 → "Target" 추가
-3. "Share Extension" 템플릿 선택
-4. Product Name: `ShareExtension`
-5. Bundle ID: `com.minorlab.miniline.ShareExtension`
-6. "Finish" 클릭
-
-#### 단계 3: ShareViewController.swift 수정
-
-생성된 `ShareViewController.swift` 파일을 다음과 같이 수정:
-
-```swift
-import UIKit
-import share_handler_ios
-
-class ShareViewController: ShareHandlerIosViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-}
-```
-
-#### 단계 4: Info.plist 수정
-
-ShareExtension/Info.plist에서 `NSExtensionActivationRule` 수정:
-
-```xml
-<key>NSExtensionActivationRule</key>
-<dict>
-    <key>NSExtensionActivationSupportsText</key>
-    <true/>
-    <key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
-    <integer>1</integer>
-    <key>NSExtensionActivationSupportsImageWithMaxCount</key>
-    <integer>10</integer>
-</dict>
-```
-
-#### 단계 5: App Group 설정
-
-1. Runner 타겟 선택 → "Signing & Capabilities"
-2. "+ Capability" → "App Groups" 추가
-3. Group ID: `group.com.minorlab.miniline`
-4. ShareExtension 타겟에도 동일한 App Group 추가
-
-#### 단계 6: Podfile 수정
-
-`ios/Podfile`에 다음 추가:
-
-```ruby
-target 'ShareExtension' do
-  use_frameworks!
-  pod 'share_handler_ios_models', :path => '.symlinks/plugins/share_handler_ios/ios/Models'
-end
-```
-
-#### 단계 7: Pod 설치
-
-```bash
-cd ios
-pod install
-cd ..
-```
-
-### 2. iOS 빌드 및 실행
+### 1. iOS 빌드 및 실행
 
 ```bash
 flutter run -d <ios-device>
 ```
 
-### 3. iOS 테스트 방법
+### 2. iOS 테스트 방법
 
 #### 텍스트 공유
 1. Safari 앱에서 웹페이지 접속

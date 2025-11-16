@@ -476,35 +476,60 @@ lib/features/timeline/presentation/pages/
 
 ---
 
-## Phase 3: 앱 특화 기능 🟡 대부분 완료
+## Phase 3: 앱 특화 기능 ✅ 완료
 
-### 3.1 공유 수신 ⏳ 보류
+### 3.1 공유 수신 ✅ 완료
 
 **우선순위:** 높음 (앱의 차별점)
-**상태:** 서비스 파일 존재, 초기화 및 연동 미확인
+**상태:** iOS/Android 모두 구현 완료
+**완료일:** 2025-11-16
 
 **작업:**
 - [x] ShareHandlerService 작성
-- [ ] 텍스트 공유 수신 (테스트 필요)
-- [ ] 이미지 공유 수신 (테스트 필요)
-- [ ] Timeline으로 자동 이동 (코드 존재)
-- [ ] 입력창에 자동 입력 (코드 존재)
+- [x] ShareActivityService 작성 (Android ShareActivity 감지)
+- [x] ShareInputPage 구현 (공유 데이터 입력 페이지)
+- [x] iOS ShareExtension 설정
+  - [x] ShareViewController.swift (share_handler_ios_models 상속)
+  - [x] Info.plist (텍스트, URL, 이미지 지원)
+  - [x] MainInterface.storyboard 추가
+  - [x] App Group 설정 (group.com.minorlab.miniline)
+  - [x] Podfile에 ShareExtension 타겟 추가
+- [x] Android 설정
+  - [x] ShareActivity.kt 구현
+  - [x] AndroidManifest.xml 설정
+- [x] main.dart에서 iOS 공유 활성화 (Platform.isAndroid 제거)
+- [x] Timeline으로 자동 이동
+- [x] 입력창에 자동 입력
 
 **파일:**
 ```
 lib/core/services/share_handler_service.dart ✅
 lib/core/services/share_handler_provider.dart ✅
+lib/core/services/share_activity_service.dart ✅
+lib/features/share/presentation/pages/share_input_page.dart ✅
 lib/router/app_router.dart (navigatorKey) ✅
+lib/main.dart (iOS 활성화) ✅
+ios/ShareExtension/ ✅
+  ├── ShareViewController.swift
+  ├── Info.plist
+  ├── ShareExtension.entitlements
+  └── Base.lproj/MainInterface.storyboard
+ios/Podfile (ShareExtension 타겟) ✅
+android/app/src/main/kotlin/com/minorlab/miniline/ShareActivity.kt ✅
+android/app/src/main/AndroidManifest.xml ✅
 ```
 
 **참조:**
 - [../minorlab_book/lib/core/services/share_handler_service.dart](../minorlab_book/lib/core/services/share_handler_service.dart)
 - [docs/DIFFERENCES_FROM_WEB.md](DIFFERENCES_FROM_WEB.md) - 공유 수신 섹션
+- [docs/SHARE_TESTING_GUIDE.md](SHARE_TESTING_GUIDE.md) - 테스트 가이드
 
-**검증:** ⏳
-- Safari에서 URL 공유 → MiniLine 열림 (테스트 필요)
-- 갤러리에서 이미지 공유 → MiniLine 열림 (테스트 필요)
-- 입력창에 자동 입력 확인 (테스트 필요)
+**검증:** ✅
+- Android 텍스트 공유 동작 확인 ✅
+- Android 이미지 공유 동작 확인 ✅
+- iOS ShareExtension 설정 완료 ✅
+- iOS 공유 기능 코드 준비 완료 (실기기 테스트 필요)
+- ShareInputPage에서 Fragment 입력 확인 ✅
 
 ### 3.2 로컬 알림 ✅ 완료
 

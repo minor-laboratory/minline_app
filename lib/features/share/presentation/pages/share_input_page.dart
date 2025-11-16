@@ -575,6 +575,7 @@ class _ShareInputPageState extends ConsumerState<ShareInputPage> {
           return Padding(
             padding: const EdgeInsets.only(right: common.Spacing.sm),
             child: Stack(
+              clipBehavior: Clip.none,
               children: [
                 // 이미지
                 ClipRRect(

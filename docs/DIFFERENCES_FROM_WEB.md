@@ -52,12 +52,19 @@ class SharedMediaNotifier extends _$SharedMediaNotifier {
 - 북랩 원본: [../minorlab_book/lib/core/services/share_handler_service.dart](../minorlab_book/lib/core/services/share_handler_service.dart)
 - miniline_app: `lib/core/services/share_handler_service.dart`, `lib/core/providers/shared_media_provider.dart`
 
+**iOS 구현 상세:**
+- ShareExtension 타겟 추가
+- ShareViewController.swift (share_handler_ios_models 상속)
+- App Group 설정 (group.com.minorlab.miniline)
+- MainInterface.storyboard 사용
+- Info.plist: 텍스트, URL, 이미지, 파일 지원
+
 **시나리오**:
 1. Safari에서 URL 복사 → 공유 → MiniLine
-2. MiniLine 앱 열림 → Fragment 입력창에 URL 자동 입력
-3. 사용자가 내용 추가 후 저장
+2. MiniLine 앱 열림 → ShareInputPage로 이동
+3. 공유된 데이터 표시 → Fragment로 저장
 
-**상세**: (TODO: features/share_handler/FEATURE.md 작성 예정)
+**상세**: [docs/SHARE_TESTING_GUIDE.md](SHARE_TESTING_GUIDE.md)
 
 ### 2. 로컬 알림
 

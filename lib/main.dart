@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -100,15 +98,8 @@ class _MyAppState extends ConsumerState<MyApp> {
       // 일반 서비스 초기화
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(lifecycleServiceProvider).initialize();
-        logger.i('[Main] LifecycleService initialized');
-
-        // Android만 ShareHandlerService 사용 (iOS는 커스텀 구현)
-        if (Platform.isAndroid) {
-          ref.read(shareHandlerServiceProvider).initialize();
-          logger.i('[Main] ShareHandlerService initialized (Android)');
-        } else {
-          logger.i('[Main] ShareHandlerService skipped (iOS uses custom implementation)');
-        }
+        ref.read(shareHandlerServiceProvider).initialize();
+        logger.i('[Main] All services initialized');
       });
     }
   }
