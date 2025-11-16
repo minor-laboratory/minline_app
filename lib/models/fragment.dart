@@ -67,8 +67,8 @@ class Fragment extends Base {
     this.eventTimeSource = 'auto',
     this.tags = const [],
     this.userTags = const [],
-  })  : timestamp = timestamp ?? DateTime.now(),
-        eventTime = eventTime ?? (timestamp ?? DateTime.now()),
+  })  : timestamp = timestamp ?? DateTime.now().toLocal(),
+        eventTime = eventTime ?? (timestamp ?? DateTime.now().toLocal()),
         super.fromNew();
 
   @override

@@ -58,9 +58,9 @@ abstract class Base {
     DateTime? refreshAt,
     bool? synced,
     bool? deleted,
-  })  : refreshAt = refreshAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now(),
-        createdAt = createdAt ?? DateTime.now(),
+  })  : refreshAt = refreshAt ?? DateTime.now().toLocal(),
+        updatedAt = updatedAt ?? DateTime.now().toLocal(),
+        createdAt = createdAt ?? DateTime.now().toLocal(),
         synced = synced ?? false,
         deleted = deleted ?? false,
         remoteID = remoteID ?? const Uuid().v4();
@@ -69,9 +69,9 @@ abstract class Base {
     this.synced = false,
     this.deleted = false,
     String? previousRemoteID,
-  })  : refreshAt = DateTime.now(),
-        updatedAt = DateTime.now(),
-        createdAt = DateTime.now(),
+  })  : refreshAt = DateTime.now().toLocal(),
+        updatedAt = DateTime.now().toLocal(),
+        createdAt = DateTime.now().toLocal(),
         remoteID = previousRemoteID ?? const Uuid().v4();
 
   Map<String, dynamic> toJson() {
