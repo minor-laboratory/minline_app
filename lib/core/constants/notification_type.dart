@@ -6,7 +6,10 @@ enum NotificationType {
   draftCompletion('draft_completion'),
 
   /// Post 생성 알림
-  postCreation('post_creation');
+  postCreation('post_creation'),
+
+  /// 방해금지 시간 설정
+  quietHours('quiet_hours');
 
   const NotificationType(this.value);
   final String value;

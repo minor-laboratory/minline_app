@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../../core/constants/notification_type.dart';
 import '../../../core/utils/logger.dart';
 import 'settings_provider.dart';
 
@@ -145,7 +146,7 @@ class DraftNotificationSettings extends _$DraftNotificationSettings {
           .select()
           .eq('user_id', userId)
           .eq('app_name', 'miniline')
-          .eq('notification_type', 'draft_completion')
+          .eq('notification_type', NotificationType.draftCompletion.value)
           .maybeSingle();
 
       if (response == null) {
@@ -196,7 +197,7 @@ class DraftNotificationSettings extends _$DraftNotificationSettings {
         {
           'user_id': userId,
           'app_name': 'miniline',
-          'notification_type': 'draft_completion',
+          'notification_type': NotificationType.draftCompletion.value,
           'enabled': settings.enabled,
           'settings': {
             'allowed_start': settings.allowedStart,

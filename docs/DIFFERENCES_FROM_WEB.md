@@ -113,18 +113,58 @@ class SharedMediaNotifier extends _$SharedMediaNotifier {
 
 **상세**: [docs/PLAN.md](PLAN.md) Phase 3.3
 
-### 4. 디바이스 관리
+### 4. 디바이스 관리 ✅
 
 **설명**: 다중 기기 동기화를 위한 디바이스 정보 관리
 
 **패키지**: `device_info_plus: ^12.1.0`
 
 **기능**:
-- 디바이스 자동 등록
-- FCM 토큰 저장
-- 마지막 동기화 시간 추적
+- 디바이스 자동 등록 (앱 시작/포그라운드 진입 시)
+- FCM/APNS 토큰 저장
+- 로그인 시 디바이스 정보 갱신
 
-**구현**: [../minorlab_book/lib/core/services/device_info_service.dart](../minorlab_book/lib/core/services/device_info_service.dart) 패턴 재사용
+**구현 완료**:
+- DeviceInfoService: 북랩 패턴 재사용 ([../minorlab_book/lib/core/services/device_info_service.dart](../minorlab_book/lib/core/services/device_info_service.dart))
+- LifecycleService 통합: 자동 업데이트 로직
+
+**자동 업데이트 시점**:
+```dart
+// lib/core/services/sync/lifecycle_service.dart
+
+// 1. 앱 시작 시
+await _deviceInfoService.initialize();
+
+// 2. 로그인 시
+_deviceInfoService.refreshOnAppStart();
+
+// 3. 로그아웃 시
+_deviceInfoService.markDeviceInactiveOnLogout(); // is_active = false
+
+// 4. 포그라운드 진입 시 (resumed)
+_deviceInfoService.refreshOnForeground();
+
+// 5. dispose 시
+_deviceInfoService.dispose();
+```
+
+**중요**: miniline_app은 익명 로그인을 사용하지 않음 (지연 로그인 전략)
+- 상세: [docs/GUIDE_DELAYED_LOGIN_STRATEGY.md](GUIDE_DELAYED_LOGIN_STRATEGY.md)
+
+**서버 테이블**: `devices`
+```sql
+id: UUID (디바이스 고유 ID)
+user_id: UUID (사용자 ID)
+target: TEXT ('miniline' - 앱 구분자)
+platform: TEXT ('android', 'ios', 'web')
+app_version: TEXT ('1.0.0+1')
+notification_id: TEXT (FCM/APNS 토큰)
+info: JSONB ({ device_name, os_version, package_name, is_active })
+```
+
+**파일**:
+- `lib/core/services/device_info_service.dart`
+- `lib/core/services/sync/lifecycle_service.dart`
 
 ---
 

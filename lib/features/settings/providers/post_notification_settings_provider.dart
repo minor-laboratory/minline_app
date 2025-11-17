@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../../core/constants/notification_type.dart';
 import '../../../core/utils/logger.dart';
 import 'settings_provider.dart';
 
@@ -121,7 +122,7 @@ class PostNotificationSettings extends _$PostNotificationSettings {
           .select()
           .eq('user_id', userId)
           .eq('app_name', 'miniline')
-          .eq('notification_type', 'post_creation')
+          .eq('notification_type', NotificationType.postCreation.value)
           .maybeSingle();
 
       if (response == null) {
@@ -169,7 +170,7 @@ class PostNotificationSettings extends _$PostNotificationSettings {
         {
           'user_id': userId,
           'app_name': 'miniline',
-          'notification_type': 'post_creation',
+          'notification_type': NotificationType.postCreation.value,
           'enabled': settings.enabled,
           'settings': {
             'allowed_start': settings.allowedStart,

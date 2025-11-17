@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:go_router/go_router.dart';
 
@@ -87,16 +85,7 @@ class FcmService {
   /// FCM 토큰 가져오기
   Future<void> _getFcmToken() async {
     try {
-      if (Platform.isIOS) {
-        // iOS APNS 토큰 가져오기
-        final apnsToken = await _messaging.getAPNSToken();
-        if (apnsToken != null) {
-          logger.d('[FCM] APNS token: ${apnsToken.substring(0, 10)}...');
-          await _deviceInfoService.updateApnsToken(apnsToken);
-        }
-      }
-
-      // FCM 토큰 가져오기
+      // FCM 토큰 가져오기 (iOS는 자동으로 APNS 처리)
       _fcmToken = await _messaging.getToken();
       if (_fcmToken != null) {
         logger.i('[FCM] FCM token: ${_fcmToken!.substring(0, 20)}...');

@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/constants/notification_type.dart';
 import '../../../core/utils/logger.dart';
 import 'draft_notification_settings_provider.dart';
 import 'post_notification_settings_provider.dart';
@@ -100,7 +101,7 @@ class QuietHoursSettings extends _$QuietHoursSettings {
           .select()
           .eq('user_id', userId)
           .eq('app_name', 'miniline')
-          .eq('notification_type', 'quiet_hours')
+          .eq('notification_type', NotificationType.quietHours.value)
           .maybeSingle();
 
       if (response == null) {
@@ -199,7 +200,7 @@ class QuietHoursSettings extends _$QuietHoursSettings {
         {
           'user_id': userId,
           'app_name': 'miniline',
-          'notification_type': 'quiet_hours',
+          'notification_type': NotificationType.quietHours.value,
           'enabled': settings.enabled,
           'settings': {
             'quiet_start': settings.quietStart,

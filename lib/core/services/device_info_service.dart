@@ -32,6 +32,7 @@ class DeviceInfoService {
   bool _isInitialized = false;
   String? _cachedDeviceId;
   Map<String, dynamic>? _cachedDeviceInfo;
+  String? _cachedFcmToken; // FCM/APNS 토큰 캐시
 
   /// 서비스 초기화
   Future<void> initialize() async {
@@ -214,9 +215,12 @@ class DeviceInfoService {
       final deviceData = {
         'id': _cachedDeviceId!,
         'user_id': userId,
+        'target': 'miniline', // 앱 구분자
         'platform': _cachedDeviceInfo!['device_type'],
         'app_version': _cachedDeviceInfo!['app_version'],
         'info': infoData,
+        if (_cachedFcmToken != null)
+          'notification_id': _cachedFcmToken, // 캐시된 FCM/APNS 토큰 포함
       };
 
       // UPSERT 수행
@@ -255,18 +259,31 @@ class DeviceInfoService {
     }
   }
 
-  /// 로그아웃 시 처리
+  /// 로그아웃 시 디바이스 비활성화
   Future<void> markDeviceInactiveOnLogout() async {
-    logger.i('[DeviceInfo] Processing device info after logout');
+    logger.i('[DeviceInfo] Marking device inactive on logout');
 
     try {
-      _cachedDeviceId = null;
-      await _loadOrCreateDeviceId();
-      await updateDeviceInfoToServer();
+      // 로그아웃 전에 디바이스 ID가 있어야 함
+      if (_cachedDeviceId == null) {
+        logger.w('[DeviceInfo] No device ID to mark inactive');
+        return;
+      }
 
-      logger.i('[DeviceInfo] Device info updated after logout with new device ID');
+      // is_active를 false로 설정하여 디바이스 비활성화
+      await _supabase.from('devices').update({
+        'info': {
+          ..._cachedDeviceInfo ?? {},
+          'is_active': false,
+        },
+      }).eq('id', _cachedDeviceId!);
+
+      logger.i('[DeviceInfo] Device marked as inactive');
+
+      // 로그아웃 후 캐시 초기화
+      _cachedDeviceId = null;
     } catch (e, stackTrace) {
-      logger.e('[DeviceInfo] Failed to update device info after logout', e, stackTrace);
+      logger.e('[DeviceInfo] Failed to mark device inactive on logout', e, stackTrace);
     }
   }
 
@@ -293,56 +310,9 @@ class DeviceInfoService {
 
   /// FCM 토큰 업데이트
   Future<void> updateFcmToken(String fcmToken) async {
-    if (_cachedDeviceId == null) {
-      logger.w('[DeviceInfo] Cannot update FCM token - device ID not available');
-      return;
-    }
-
-    try {
-      final user = _supabase.auth.currentUser;
-      if (user == null) {
-        logger.w('[DeviceInfo] No user available - cannot update FCM token');
-        return;
-      }
-
-      logger.i('[DeviceInfo] Updating FCM token');
-
-      await _supabase
-          .from('devices')
-          .update({'notification_id': fcmToken})
-          .eq('id', _cachedDeviceId!);
-
-      logger.i('[DeviceInfo] FCM token updated successfully');
-    } catch (e, stackTrace) {
-      logger.e('[DeviceInfo] Failed to update FCM token', e, stackTrace);
-    }
-  }
-
-  /// APNS 토큰 업데이트 (iOS용)
-  Future<void> updateApnsToken(String apnsToken) async {
-    if (_cachedDeviceId == null) {
-      logger.w('[DeviceInfo] Cannot update APNS token - device ID not available');
-      return;
-    }
-
-    try {
-      final user = _supabase.auth.currentUser;
-      if (user == null) {
-        logger.w('[DeviceInfo] No user available - cannot update APNS token');
-        return;
-      }
-
-      logger.i('[DeviceInfo] Updating APNS token');
-
-      await _supabase
-          .from('devices')
-          .update({'notification_id': apnsToken})
-          .eq('id', _cachedDeviceId!);
-
-      logger.i('[DeviceInfo] APNS token updated successfully');
-    } catch (e, stackTrace) {
-      logger.e('[DeviceInfo] Failed to update APNS token', e, stackTrace);
-    }
+    logger.i('[DeviceInfo] Updating FCM token');
+    _cachedFcmToken = fcmToken;
+    await updateDeviceInfoToServer();
   }
 
   /// 서비스 정리
@@ -351,5 +321,6 @@ class DeviceInfoService {
     _isInitialized = false;
     _cachedDeviceId = null;
     _cachedDeviceInfo = null;
+    _cachedFcmToken = null;
   }
 }

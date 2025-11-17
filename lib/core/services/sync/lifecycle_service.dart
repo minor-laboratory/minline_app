@@ -11,6 +11,7 @@ import '../../../features/settings/providers/post_notification_settings_provider
 import '../../../features/settings/providers/settings_provider.dart';
 import '../../constants/notification_type.dart';
 import '../../utils/logger.dart';
+import '../device_info_service.dart';
 import 'isar_watch_sync_service_provider.dart';
 import 'supabase_stream_service_provider.dart';
 
@@ -21,12 +22,16 @@ import 'supabase_stream_service_provider.dart';
 /// 2. 네트워크 상태 변경 감지 및 처리
 /// 3. 인증 상태 변경 처리
 /// 4. 동기화 서비스들의 시작/중지 제어
+/// 5. 디바이스 정보 갱신 (앱 시작/포그라운드 진입 시)
 ///
 /// Lifecycle: @Riverpod(keepAlive: true) Provider로 관리
 class LifecycleService with WidgetsBindingObserver {
   final Ref _ref;
 
   LifecycleService(this._ref);
+
+  // 디바이스 정보 서비스
+  final DeviceInfoService _deviceInfoService = DeviceInfoService();
 
   // 서비스 상태
   bool _isInitialized = false;
@@ -62,6 +67,9 @@ class LifecycleService with WidgetsBindingObserver {
 
     // Auth 상태 감지 시작
     _startAuthMonitoring();
+
+    // 디바이스 정보 서비스 초기화
+    await _deviceInfoService.initialize();
 
     _isInitialized = true;
     logger.i('[LifecycleService] Initialized successfully');
@@ -127,6 +135,9 @@ class LifecycleService with WidgetsBindingObserver {
 
     // 알림 설정 초기화 (없으면 생성)
     _initializeNotificationSettings();
+
+    // 로그인 시 디바이스 정보 갱신
+    _deviceInfoService.refreshOnAppStart();
 
     // keepAlive Provider로 관리되므로 인스턴스 저장 불필요
     logger.d('[LifecycleService] Sync services will be accessed via Provider');
@@ -256,6 +267,9 @@ class LifecycleService with WidgetsBindingObserver {
     logger.i('[LifecycleService] User logged out - stopping sync services');
     _isLoggedIn = false;
 
+    // 로그아웃 시 디바이스 비활성화
+    _deviceInfoService.markDeviceInactiveOnLogout();
+
     // 모든 동기화 서비스 중지
     _stopAllServices();
 
@@ -273,6 +287,8 @@ class LifecycleService with WidgetsBindingObserver {
         _isInForeground = true;
         logger.i('[LifecycleService] App resumed - restarting services');
         _updateSyncServices();
+        // 포그라운드 진입 시 디바이스 정보 갱신
+        _deviceInfoService.refreshOnForeground();
         break;
 
       case AppLifecycleState.paused:
@@ -393,6 +409,9 @@ class LifecycleService with WidgetsBindingObserver {
 
     // 서비스 중지 (Provider가 lifecycle 관리)
     _stopAllServices();
+
+    // 디바이스 정보 서비스 정리
+    _deviceInfoService.dispose();
 
     _isInitialized = false;
     logger.i('[LifecycleService] Disposed');
