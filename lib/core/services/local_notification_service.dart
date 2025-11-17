@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../features/main/presentation/pages/main_page.dart';
-import '../../features/share/presentation/pages/share_input_page.dart';
+import '../../features/timeline/presentation/widgets/fragment_input_bar.dart';
 import '../../router/app_router.dart' as router;
 import '../utils/logger.dart';
 
@@ -262,30 +263,49 @@ class LocalNotificationService {
       MainPage.onTabChangeRequested!(0);
     } else {
       // 2. MainPage가 아닌 다른 화면 (설정, post 상세 등)
-      //    → ShareInputPage 모달 표시
-      logger.i('[LocalNotification] Showing share input modal (not on MainPage)');
-      _showShareInputModalGlobally(context);
+      //    → Fragment 입력 모달 표시
+      logger.i('[LocalNotification] Showing fragment input modal (not on MainPage)');
+      _showFragmentInputModal(context);
     }
   }
 
-  /// ShareInputPage를 전역 모달로 표시 (notification 탭 시)
-  void _showShareInputModalGlobally(BuildContext context) {
+  /// Fragment 입력 모달 표시 (notification 탭 시)
+  void _showFragmentInputModal(BuildContext context) {
+    final theme = ShadTheme.of(context);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.9,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        builder: (context, scrollController) => Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(common.Spacing.md),
-            ),
+      builder: (context) => Container(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.background,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(16),
           ),
-          child: const ShareInputPage(),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 상단 핸들
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: common.Spacing.sm),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.muted,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            // Fragment 입력바
+            const FragmentInputBar(
+              autoFocus: true,
+              dismissOnSave: true,
+            ),
+          ],
         ),
       ),
     );

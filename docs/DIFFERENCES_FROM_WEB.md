@@ -66,36 +66,52 @@ class SharedMediaNotifier extends _$SharedMediaNotifier {
 
 **상세**: [docs/SHARE_TESTING_GUIDE.md](SHARE_TESTING_GUIDE.md)
 
-### 2. 로컬 알림
+### 2. 로컬 알림 ✅
 
 **설명**: 사용자 설정 시간에 입력 리마인더 알림
 
-**패키지**: `flutter_local_notifications: ^19.4.2`
+**패키지**: `flutter_local_notifications: ^19.4.2`, `timezone: ^0.10.0`
 
-**설정**:
-- 사용자가 시간 선택 (예: 매일 오후 9시)
-- 알림 내용: "오늘의 생각을 기록해보세요"
-- 탭 시 → Timeline 화면으로 이동
+**구현 완료**:
+- 사용자가 시간 선택 (DailyReminderSheet)
+- 알림 내용: "스냅 작성 시간이에요" / "오늘 하루를 기록해보세요"
+- 알림 탭 시:
+  - Timeline 탭이면 입력창 포커스
+  - 다른 탭이면 Fragment 입력 모달 표시
+- FCM 포그라운드 메시지 → 로컬 알림 변환
+- Exact alarm 권한 처리 (Android 12+)
 
-**상세**: (TODO: features/local_notifications/FEATURE.md 작성 예정)
+**파일**:
+- `lib/core/services/local_notification_service.dart`
+- `lib/features/settings/presentation/widgets/daily_reminder_sheet.dart`
+- `lib/features/main/presentation/pages/main_page.dart` (탭 콜백)
 
-### 3. 푸시 알림 (FCM)
+**상세**: [docs/PLAN.md](PLAN.md) Phase 3.2
+
+### 3. 푸시 알림 (FCM) ✅
 
 **설명**: Draft 생성 완료 시 서버에서 발송
 
 **패키지**: `firebase_messaging: ^16.0.4`
 
-**발송 조건**:
+**구현 완료**:
+- FCM 토큰 저장 (디바이스 등록 시)
+- 포그라운드 메시지 → 로컬 알림 변환
+- 백그라운드 메시지 → 시스템 알림 표시
+- 알림 탭 시 → Drafts 페이지 이동 (payload: 'draft:{id}')
+- APNS 토큰 저장 (iOS)
+
+**발송 조건** (Edge Function 필요):
 1. Fragment 3개 이상 입력
 2. AI가 Draft 생성 완료
 3. 사용자 타임존 고려하여 발송
 
-**Edge Function**: `send-draft-notification`
-- pg_cron으로 배치 발송
-- 사용자별 타임존 설정 확인
-- FCM 토큰으로 발송
+**파일**:
+- `lib/core/services/fcm_service.dart`
+- `lib/core/services/local_notification_service.dart` (포그라운드 처리)
+- `lib/features/settings/presentation/widgets/draft_notification_sheet.dart`
 
-**상세**: (TODO: features/push_notifications/FEATURE.md 작성 예정)
+**상세**: [docs/PLAN.md](PLAN.md) Phase 3.3
 
 ### 4. 디바이스 관리
 
@@ -148,10 +164,9 @@ class Fragment extends Base {
 let syncQueue = $state([]);
 ```
 
-**앱**: Riverpod keepAlive Provider + Singleton 병행
+**앱**: Riverpod keepAlive Provider 통일
 ```dart
 // miniline_app/lib/core/services/sync/supabase_stream_service_provider.dart
-// 동기화 서비스는 keepAlive Provider로 관리
 @Riverpod(keepAlive: true)
 SupabaseStreamService supabaseStreamService(Ref ref) {
   final service = SupabaseStreamService();
@@ -167,17 +182,11 @@ IsarWatchSyncService isarWatchSyncService(Ref ref) {
   return service;
 }
 
-// miniline_app/lib/core/services/sync/lifecycle_service.dart
-// LifecycleService는 Singleton 패턴 유지 (ref.read()로 Provider 접근)
-class LifecycleService {
-  static final LifecycleService _instance = LifecycleService._internal();
-  factory LifecycleService() => _instance;
-  LifecycleService._internal();
-
-  void _startAllServices() {
-    _ref!.read(supabaseStreamServiceProvider).startListening();
-    _ref!.read(isarWatchSyncServiceProvider).start();
-  }
+// miniline_app/lib/core/services/sync/lifecycle_service_provider.dart
+// 북랩과 달리, miniline_app에서는 LifecycleService도 keepAlive Provider로 통일
+@Riverpod(keepAlive: true)
+LifecycleService lifecycleService(Ref ref) {
+  return LifecycleService(ref);
 }
 ```
 
@@ -189,8 +198,8 @@ class LifecycleService {
 **중요한 차이**:
 - **웹**: Svelte 5 Runes로 반응형 상태 관리
 - **앱**:
-  - 동기화 서비스: Riverpod keepAlive Provider로 관리
-  - LifecycleService: Singleton 패턴 유지 (앱 생명주기 동안 단일 인스턴스)
+  - 모든 동기화 서비스를 Riverpod keepAlive Provider로 통일 관리
+  - 북랩과 달리 LifecycleService도 Provider 패턴 (더 일관성 있음)
 
 ### 테마 시스템
 

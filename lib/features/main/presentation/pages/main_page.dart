@@ -13,7 +13,7 @@ import '../../../drafts/presentation/widgets/drafts_view.dart';
 import '../../../drafts/providers/drafts_provider.dart';
 import '../../../posts/presentation/widgets/posts_view.dart';
 import '../../../settings/providers/settings_provider.dart';
-import '../../../share/presentation/pages/share_input_page.dart';
+import '../../../timeline/presentation/widgets/fragment_input_bar.dart';
 import '../../../timeline/presentation/widgets/timeline_view.dart';
 import '../../../timeline/providers/fragments_provider.dart';
 
@@ -59,18 +59,29 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
 
     // Notification에서 탭 변경 요청 시 사용할 callback 설정
     MainPage.onTabChangeRequested = (index) {
-      if (!mounted || index < 0 || index > 2) return;
+      logger.d('[MainPage] Callback called: index=$index, mounted=$mounted');
+      if (!mounted || index < 0 || index > 2) {
+        logger.w('[MainPage] Early return: mounted=$mounted, index=$index');
+        return;
+      }
 
       // index 0 (타임라인) 요청 시
       if (index == 0) {
         if (_currentPageIndex == 0) {
-          // 이미 타임라인이면 → 입력창 포커스
-          logger.i('MainPage: Already on timeline, focusing input');
-          _timelineFocusTrigger?.call();
+          // 이미 타임라인 탭이면
+          if (_timelineFocusTrigger != null) {
+            // Timeline 모드 (입력창 있음) → 포커스
+            logger.i('MainPage: Timeline mode, focusing input');
+            _timelineFocusTrigger!.call();
+          } else {
+            // Calendar 모드 (입력창 없음) → 모달 표시
+            logger.i('MainPage: Calendar mode, showing fragment input modal');
+            _showFragmentInputModal();
+          }
         } else {
-          // 다른 탭이면 → ShareInputPage 모달로 표시
-          logger.i('MainPage: On different tab, showing share input modal');
-          _showShareInputModal();
+          // 다른 탭이면 → Fragment 입력 모달 표시
+          logger.i('MainPage: On different tab, showing fragment input modal');
+          _showFragmentInputModal();
         }
       } else {
         // 다른 탭으로 이동
@@ -188,26 +199,56 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
 
   void _toggleViewMode() {
     setState(() {
-      _viewMode = _viewMode == 'timeline' ? 'calendar' : 'timeline';
+      final newMode = _viewMode == 'timeline' ? 'calendar' : 'timeline';
+      _viewMode = newMode;
+
+      // Calendar 모드로 전환 시 trigger 초기화
+      // (FragmentInputBar가 dispose되므로 이전 trigger는 무효)
+      if (newMode == 'calendar') {
+        _timelineFocusTrigger = null;
+        logger.d('MainPage: Switched to calendar mode, cleared focus trigger');
+      }
+      // Timeline 모드로 전환 시 trigger는 FragmentInputBar의 initState에서 자동 재등록됨
     });
   }
 
-  /// ShareInputPage를 모달로 표시 (notification 탭 시)
-  void _showShareInputModal() {
+  /// Fragment 입력 모달 표시 (notification 탭 시)
+  void _showFragmentInputModal() {
+    final theme = ShadTheme.of(context);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.9,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        builder: (context, scrollController) => Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(common.Spacing.md)),
+      builder: (context) => Container(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.background,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(16),
           ),
-          child: const ShareInputPage(),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 상단 핸들
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: common.Spacing.sm),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.muted,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            // Fragment 입력바
+            const FragmentInputBar(
+              autoFocus: true,
+              dismissOnSave: true,
+            ),
+          ],
         ),
       ),
     );

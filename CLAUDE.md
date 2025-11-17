@@ -167,10 +167,10 @@ lib/
 │   │   ├── network_error_handler.dart  # 네트워크 에러 처리
 │   │   └── storage_utils.dart   # 스토리지 유틸
 │   └── services/                # 핵심 서비스
-│       ├── device_info_service.dart          # Singleton + keepAlive Provider
+│       ├── device_info_service.dart          # keepAlive Provider
 │       ├── device_info_provider.dart
-│       ├── share_handler_service.dart        # Singleton + keepAlive Provider
-│       ├── share_handler_provider.dart
+│       ├── share_handler_provider.dart       # keepAlive Provider
+│       ├── share_activity_service.dart       # Android 공유 감지
 │       ├── local_notification_service.dart   # Singleton (Provider 없음)
 │       ├── fcm_service.dart                  # Singleton (Provider 없음)
 │       ├── feedback_service.dart
@@ -180,7 +180,8 @@ lib/
 │           ├── isar_watch_sync_service_provider.dart
 │           ├── supabase_stream_service.dart           # keepAlive Provider
 │           ├── supabase_stream_service_provider.dart
-│           ├── lifecycle_service.dart                 # Singleton (ref.read() 사용)
+│           ├── lifecycle_service.dart                 # keepAlive Provider
+│           ├── lifecycle_service_provider.dart
 │           └── sync_metadata_service.dart
 │
 ├── models/                      # Isar 데이터 모델
@@ -209,11 +210,17 @@ lib/
 │   │   └── providers/
 │   ├── posts/                   # Posts 뷰
 │   │   ├── presentation/
+│   │   │   ├── pages/
+│   │   │   │   ├── post_create_page.dart
+│   │   │   │   └── post_detail_page.dart
 │   │   │   └── widgets/
 │   │   │       └── posts_view.dart
 │   │   └── providers/
 │   ├── auth/
-│   └── settings/
+│   ├── settings/
+│   ├── profile/
+│   ├── feedback/                # 피드백 신고
+│   └── share/                   # 공유 수신
 │
 ├── providers/                   # 전역 Provider
 │   ├── isar_provider.dart
@@ -258,6 +265,10 @@ abstract class Base {
 1. **IsarWatchSyncService**: 로컬 변경 감지 → 업로드 (`@Riverpod(keepAlive: true)` Provider)
 2. **SupabaseStreamService**: Realtime 구독 → 다운로드 (`@Riverpod(keepAlive: true)` Provider)
 3. **LifecycleService**: 앱 생명주기 관리 (`@Riverpod(keepAlive: true)` Provider, Ref를 생성자로 전달)
+
+**북랩과의 차이점**:
+- **북랩**: LifecycleService는 Singleton 패턴 (ref.read()로 Provider 접근)
+- **miniline_app**: LifecycleService도 keepAlive Provider로 관리 (더 일관된 패턴)
 
 **중요**: 모든 동기화 서비스는 `keepAlive` Provider로 관리
 - Why: 앱 생명주기 동안 인스턴스 유지 (중복 생성 방지)

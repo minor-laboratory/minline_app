@@ -21,10 +21,14 @@ import '../../../auth/widgets/login_required_bottom_sheet.dart';
 /// Timeline 화면 하단 고정 입력바 (채팅 앱 스타일)
 class FragmentInputBar extends ConsumerStatefulWidget {
   final void Function(VoidCallback)? onRegisterFocusTrigger;
+  final bool autoFocus;
+  final bool dismissOnSave;
 
   const FragmentInputBar({
     super.key,
     this.onRegisterFocusTrigger,
+    this.autoFocus = false,
+    this.dismissOnSave = false,
   });
 
   @override
@@ -54,6 +58,15 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
       }
     });
     logger.d('[FragmentInputBar] initState - callback registered');
+
+    // 자동 포커스 (모달에서 사용 시)
+    if (widget.autoFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _focusNode.requestFocus();
+        }
+      });
+    }
   }
 
   @override
@@ -215,6 +228,25 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
       // 키보드 내리기
       if (mounted) {
         FocusScope.of(context).unfocus();
+      }
+
+      // 모달에서 사용 시: 성공 메시지 표시 후 닫기
+      if (mounted && widget.dismissOnSave) {
+        // 성공 메시지 표시
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('common.saved'.tr()),
+            duration: const Duration(milliseconds: 800),
+            backgroundColor: ShadTheme.of(context).colorScheme.primary,
+          ),
+        );
+
+        // 짧은 delay 후 모달 닫기
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted && Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
+        });
       }
     } catch (e, stack) {
       logger.e('Failed to save fragment', e, stack);
