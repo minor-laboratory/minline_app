@@ -29,11 +29,14 @@ class SettingsPage extends ConsumerStatefulWidget {
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
   String _appVersion = '';
+  bool _dailyReminderEnabled = false;
+  TimeOfDay? _dailyReminderTime;
 
   @override
   void initState() {
     super.initState();
     _loadAppVersion();
+    _loadDailyReminderSettings();
   }
 
   Future<void> _loadAppVersion() async {
@@ -41,6 +44,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     setState(() {
       _appVersion = '${packageInfo.version} (${packageInfo.buildNumber})';
     });
+  }
+
+  Future<void> _loadDailyReminderSettings() async {
+    final prefs = await ref.read(sharedPreferencesProvider.future);
+    final enabled = prefs.getBool('daily_reminder_enabled') ?? false;
+    final hour = prefs.getInt('daily_reminder_hour') ?? 20;
+    final minute = prefs.getInt('daily_reminder_minute') ?? 0;
+
+    if (mounted) {
+      setState(() {
+        _dailyReminderEnabled = enabled;
+        _dailyReminderTime = TimeOfDay(hour: hour, minute: minute);
+      });
+    }
   }
 
   Future<void> _handleLogout() async {
@@ -219,14 +236,16 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
-  void _showDailyReminderSettings() {
-    StandardBottomSheet.show(
+  Future<void> _showDailyReminderSettings() async {
+    await StandardBottomSheet.show(
       context: context,
       title: 'settings.daily_reminder'.tr(),
       content: const DailyReminderSheet(),
       isDraggable: true,
       isDismissible: true,
     );
+    // Sheet가 닫힌 후 설정 다시 로드
+    await _loadDailyReminderSettings();
   }
 
   void _showDraftNotificationSettings() {
@@ -333,6 +352,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       ref.read(autoFocusInputProvider.notifier).setAutoFocusInput(value);
                     },
                   ),
+                  onTap: () {
+                    ref.read(autoFocusInputProvider.notifier).setAutoFocusInput(!enabled);
+                  },
                 ),
                 loading: () => ListTile(
                   leading: Icon(AppIcons.edit),
@@ -366,7 +388,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ListTile(
             leading: Icon(AppIcons.notification),
             title: Text('settings.daily_reminder'.tr()),
-            subtitle: Text('settings.daily_reminder_description'.tr()),
+            subtitle: Text(
+              _dailyReminderEnabled && _dailyReminderTime != null
+                  ? _dailyReminderTime!.format(context)
+                  : 'settings.daily_reminder_description'.tr(),
+            ),
             trailing: Icon(AppIcons.chevronRight, size: 20),
             onTap: _showDailyReminderSettings,
           ),

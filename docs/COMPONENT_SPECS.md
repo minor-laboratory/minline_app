@@ -1628,7 +1628,7 @@ final tag = await context.push<String>('/tag/edit/:fragmentId');
 
 ---
 
-## 7. PostCreatePage (글 생성 화면)
+## 6.1 PostCreatePage (글 생성 화면)
 
 ### 기본 정보
 
@@ -1801,7 +1801,7 @@ data: {"type": "error", "message": "free_limit_exceeded"}
 
 ---
 
-## 7. PostDetailPage (공개글 상세)
+## 6.2 PostDetailPage (공개글 상세)
 
 ### 기본 정보
 
@@ -2168,7 +2168,7 @@ else
 
 ---
 
-## 7. ShadTabs (탭 버튼 패턴)
+## 6.3 ShadTabs (탭 버튼 패턴)
 
 > 북랩 앱과 동일한 탭 패턴 (ShadTabs 사용, 컨텐츠는 수동 관리)
 
@@ -2280,7 +2280,7 @@ class _DraftTabContent extends StatelessWidget {
 
 ---
 
-## 8. StandardBottomSheet (공통 바텀시트 패턴)
+## 7. StandardBottomSheet (공통 바텀시트 패턴)
 
 > 북랩 앱과 동일한 바텀시트 패턴 (Wolt Modal Sheet 기반)
 
@@ -2602,7 +2602,91 @@ void _showThemeSettings() {
 
 ---
 
-## 8. 알림 설정 (Notification Settings)
+## 8. UX 설정 (User Experience Settings)
+
+> 앱 전용 기능 (웹 버전에는 다른 방식으로 구현)
+
+**언제 읽어야 하는가:**
+- Settings UX 섹션 구현 시
+- 입력 자동 활성화 기능 구현 시
+
+### 8.1 앱 시작시 입력 활성화 (Auto-focus Input)
+
+**파일:** `lib/features/settings/presentation/pages/settings_page.dart`
+
+**UI 구조:**
+```dart
+Consumer(
+  builder: (context, ref, child) {
+    final autoFocusAsync = ref.watch(autoFocusInputProvider);
+
+    return autoFocusAsync.when(
+      data: (enabled) => ListTile(
+        leading: Icon(AppIcons.edit),
+        title: Text('settings.auto_focus_input'.tr()),
+        subtitle: Text('settings.auto_focus_input_description'.tr()),
+        trailing: ShadSwitch(
+          value: enabled,
+          onChanged: (value) {
+            ref.read(autoFocusInputProvider.notifier).setAutoFocusInput(value);
+          },
+        ),
+        onTap: () {
+          // 전체 영역 클릭 가능 (토글 반전)
+          ref.read(autoFocusInputProvider.notifier).setAutoFocusInput(!enabled);
+        },
+      ),
+      loading: () => ListTile(...),  // 로딩 상태
+      error: (_, __) => ListTile(...),  // 에러 상태
+    );
+  },
+)
+```
+
+**동작:**
+- 전체 ListTile 영역 클릭 가능 (`onTap`)
+- ShadSwitch 클릭도 동일하게 동작
+- Provider를 통해 즉시 설정 저장 및 반영
+
+**데이터 저장:**
+```dart
+// lib/features/settings/providers/settings_provider.dart
+@riverpod
+class AutoFocusInput extends _$AutoFocusInput {
+  @override
+  FutureOr<bool> build() async {
+    final prefs = await ref.watch(sharedPreferencesProvider.future);
+    return prefs.getBool('auto_focus_input') ?? true;  // 기본값: true
+  }
+
+  Future<void> setAutoFocusInput(bool enabled) async {
+    final prefs = await ref.read(sharedPreferencesProvider.future);
+    await prefs.setBool('auto_focus_input', enabled);
+    state = AsyncValue.data(enabled);
+  }
+}
+```
+
+**MainPage 연동:**
+```dart
+// lib/features/main/presentation/pages/main_page.dart
+void _handleAppResumed() async {
+  final enabled = await ref.read(autoFocusInputProvider.future);
+  if (enabled && _timelineFocusTrigger != null) {
+    _timelineFocusTrigger!.call();  // 입력창 포커스
+  }
+}
+```
+
+**번역 키:**
+```
+settings.auto_focus_input: "앱 시작시 입력 활성화"
+settings.auto_focus_input_description: "타임라인 화면에서 자동으로 입력창 활성화"
+```
+
+---
+
+## 9. 알림 설정 (Notification Settings)
 
 > 앱 전용 기능 (웹 버전 없음)
 
@@ -2610,7 +2694,7 @@ void _showThemeSettings() {
 - Settings 알림 UI 구현 시
 - 알림 설정 저장/로드 구현 시
 
-### 7.1 DailyReminderSheet (일일 리마인더 설정)
+### 9.1 DailyReminderSheet (일일 리마인더 설정)
 
 **파일:** `lib/features/settings/presentation/widgets/daily_reminder_sheet.dart`
 
@@ -2644,6 +2728,31 @@ if (enabled) {
 }
 ```
 
+**SettingsPage에서의 표시:**
+```dart
+// lib/features/settings/presentation/pages/settings_page.dart
+ListTile(
+  leading: Icon(AppIcons.notification),
+  title: Text('settings.daily_reminder'.tr()),
+  subtitle: Text(
+    _dailyReminderEnabled && _dailyReminderTime != null
+        ? _dailyReminderTime!.format(context)  // "오후 8:00"
+        : 'settings.daily_reminder_description'.tr(),  // "매일 정해진 시간에 알림"
+  ),
+  trailing: Icon(AppIcons.chevronRight, size: 20),
+  onTap: _showDailyReminderSettings,
+)
+```
+
+**Sheet 닫힌 후 동작:**
+```dart
+Future<void> _showDailyReminderSettings() async {
+  await StandardBottomSheet.show(...);
+  // Sheet가 닫힌 후 설정 다시 로드
+  await _loadDailyReminderSettings();
+}
+```
+
 **UI 요소:**
 - 헤더 높이: 56dp
 - 아이콘 크기: 24dp
@@ -2651,7 +2760,7 @@ if (enabled) {
 - SwitchListTile (Material Design)
 - TimeOfDay 선택 → TimePicker
 
-### 7.2 DraftNotificationSheet (Draft 완성 알림 설정)
+### 9.2 DraftNotificationSheet (Draft 완성 알림 설정)
 
 **파일:** `lib/features/settings/presentation/widgets/draft_notification_sheet.dart`
 
@@ -2701,7 +2810,7 @@ common.notifications_off: "알림 꺼짐"
 
 ---
 
-## 9. Isar Stream Provider 패턴 (watchLazy)
+## 10. Isar Stream Provider 패턴 (watchLazy)
 
 > Riverpod Stream Provider에서 Isar watchLazy() 사용 패턴
 
@@ -2957,7 +3066,7 @@ List<Fragment> filterAndSort(List<Fragment> fragments, FragmentFilterState filte
 
 ---
 
-## 10. Empty State (빈 상태 화면)
+## 11. Empty State (빈 상태 화면)
 
 > Fragment 목록이 비어있을 때 표시되는 화면
 

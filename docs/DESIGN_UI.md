@@ -425,6 +425,9 @@ onPaste: (event) {
 - 토글 (ON/OFF)
 - 시간 선택 (TimePicker)
 - 반복: 매일
+- subtitle: 설정된 시간 표시
+  - 활성화 + 시간 설정됨: `_dailyReminderTime!.format(context)` (예: "오후 8:00")
+  - 비활성화 또는 미설정: `'settings.daily_reminder_description'.tr()` ("매일 정해진 시간에 알림")
 
 **Draft 완성 알림:**
 - 토글 (ON/OFF)
@@ -588,7 +591,9 @@ FragmentCard(
 
 **입력 자동 활성화**:
 - 앱 시작 시 자동으로 입력창 포커스 (설정 가능)
-- Settings → 입력 자동 활성화 토글
+- Settings → UX → "앱 시작시 입력 활성화" 토글
+  - 전체 영역 클릭 가능 (ListTile onTap)
+  - ShadSwitch로 설정 즉시 반영
 - 앱 재시작/포그라운드 진입 시 적용
 
 **KeyboardAnimationBuilder**:
