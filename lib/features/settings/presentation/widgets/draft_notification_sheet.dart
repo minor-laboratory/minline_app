@@ -55,10 +55,13 @@ class _DraftNotificationSheetState
   }
 
   Future<void> _saveSettings() async {
+    final currentSettings = await ref.read(draftNotificationSettingsProvider.future);
+
     final settings = NotificationSettingsData(
       enabled: _enabled,
       allowedStart: _formatTime(_startTime),
       allowedEnd: _formatTime(_endTime),
+      timezone: currentSettings.timezone, // 기존 timezone 유지
     );
 
     await ref

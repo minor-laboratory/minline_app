@@ -103,6 +103,7 @@ class NotificationsPage extends ConsumerWidget {
                   enabled: value,
                   allowedStart: draft.allowedStart,
                   allowedEnd: draft.allowedEnd,
+                  timezone: draft.timezone,
                 );
                 await ref
                     .read(draftNotificationSettingsProvider.notifier)
@@ -133,6 +134,7 @@ class NotificationsPage extends ConsumerWidget {
                   enabled: value,
                   allowedStart: post.allowedStart,
                   allowedEnd: post.allowedEnd,
+                  timezone: post.timezone,
                 );
                 await ref
                     .read(postNotificationSettingsProvider.notifier)

@@ -4,7 +4,12 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:timezone/timezone.dart' as tz;
 
+import '../../../features/settings/providers/draft_notification_settings_provider.dart';
+import '../../../features/settings/providers/post_notification_settings_provider.dart';
+import '../../../features/settings/providers/settings_provider.dart';
+import '../../constants/notification_type.dart';
 import '../../utils/logger.dart';
 import 'isar_watch_sync_service_provider.dart';
 import 'supabase_stream_service_provider.dart';
@@ -120,10 +125,130 @@ class LifecycleService with WidgetsBindingObserver {
     logger.i('[LifecycleService] User logged in - preparing sync services');
     _isLoggedIn = true;
 
+    // 알림 설정 초기화 (없으면 생성)
+    _initializeNotificationSettings();
+
     // keepAlive Provider로 관리되므로 인스턴스 저장 불필요
     logger.d('[LifecycleService] Sync services will be accessed via Provider');
 
     _updateSyncServices();
+  }
+
+  /// 알림 설정 초기화
+  ///
+  /// 서버에서 데이터를 가져와 SharedPreferences 캐시에 저장
+  /// 이후 Provider가 캐시에서 바로 읽을 수 있도록 함
+  ///
+  /// Race Condition 방지:
+  /// - 이 메서드에서 한 번에 INSERT (Provider는 INSERT 안함)
+  /// - Provider는 캐시에서만 읽음
+  Future<void> _initializeNotificationSettings() async {
+    try {
+      final supabase = Supabase.instance.client;
+      final userId = supabase.auth.currentUser?.id;
+
+      if (userId == null) return;
+
+      // 서버에서 알림 설정 조회
+      final response = await supabase
+          .from('user_notification_settings')
+          .select()
+          .eq('user_id', userId)
+          .eq('app_name', 'miniline');
+
+      final prefs = await _ref.read(sharedPreferencesProvider.future);
+
+      // 설정 값 준비
+      Map<String, dynamic>? draftSettings;
+      Map<String, dynamic>? postSettings;
+
+      if (response.isNotEmpty) {
+        // 서버에서 데이터 가져오기
+        logger.d('[LifecycleService] Notification settings exist - loading from server');
+
+        final draftList = response.where(
+          (item) => item['notification_type'] == NotificationType.draftCompletion.value,
+        ).toList();
+        if (draftList.isNotEmpty) {
+          draftSettings = draftList.first;
+        }
+
+        final postList = response.where(
+          (item) => item['notification_type'] == NotificationType.postCreation.value,
+        ).toList();
+        if (postList.isNotEmpty) {
+          postSettings = postList.first;
+        }
+      } else {
+        // 데이터 없으면 INSERT 후 기본값 사용
+        logger.d('[LifecycleService] No settings found - inserting default settings');
+
+        final timezone = tz.local.name; // IANA 형식 (예: "Asia/Seoul")
+
+        // QuietHours 기본값(23:00-08:00)의 역전 = Allowed Time (08:00-23:00)
+        // Draft와 Post 모두 동일한 allowed time 사용
+        const defaultAllowedStart = '08:00';
+        const defaultAllowedEnd = '23:00';
+
+        // INSERT용 데이터 준비 (캐시 저장에도 재사용)
+        draftSettings = {
+          'user_id': userId,
+          'app_name': 'miniline',
+          'notification_type': NotificationType.draftCompletion.value,
+          'enabled': true,
+          'settings': {
+            'allowed_start': defaultAllowedStart,
+            'allowed_end': defaultAllowedEnd,
+            'timezone': timezone,
+          },
+        };
+
+        postSettings = {
+          'user_id': userId,
+          'app_name': 'miniline',
+          'notification_type': NotificationType.postCreation.value,
+          'enabled': true,
+          'settings': {
+            'allowed_start': defaultAllowedStart,
+            'allowed_end': defaultAllowedEnd,
+            'timezone': timezone,
+          },
+        };
+
+        // 서버에 INSERT (객체 재사용)
+        await supabase.from('user_notification_settings').insert([
+          draftSettings,
+          postSettings,
+        ]);
+
+        logger.i('[LifecycleService] Notification settings initialized (timezone: $timezone)');
+      }
+
+      // 캐시에 한 번에 저장 (서버 또는 기본값)
+      await Future.wait([
+        if (draftSettings != null) ...[
+          prefs.setBool('draft_notification_enabled', draftSettings['enabled'] as bool),
+          prefs.setString('draft_notification_start', draftSettings['settings']['allowed_start'] as String),
+          prefs.setString('draft_notification_end', draftSettings['settings']['allowed_end'] as String),
+          prefs.setString('draft_notification_timezone', draftSettings['settings']['timezone'] as String),
+        ],
+        if (postSettings != null) ...[
+          prefs.setBool('post_notification_enabled', postSettings['enabled'] as bool),
+          prefs.setString('post_notification_start', postSettings['settings']['allowed_start'] as String),
+          prefs.setString('post_notification_end', postSettings['settings']['allowed_end'] as String),
+          prefs.setString('post_notification_timezone', postSettings['settings']['timezone'] as String),
+        ],
+      ]);
+
+      logger.d('[LifecycleService] Settings saved to cache');
+
+      // Provider refresh → 캐시에서 읽음 (INSERT 안함)
+      logger.d('[LifecycleService] Invalidating providers to load from cache');
+      _ref.invalidate(draftNotificationSettingsProvider);
+      _ref.invalidate(postNotificationSettingsProvider);
+    } catch (e, stack) {
+      logger.e('[LifecycleService] Failed to initialize notification settings', e, stack);
+    }
   }
 
   /// 사용자 로그아웃 시

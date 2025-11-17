@@ -127,7 +127,20 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
 
       // SSE 스트림 파싱
       String? postId;
-      final data = response.data as String;
+
+      // ByteStream을 String으로 변환
+      String data;
+      if (response.data is String) {
+        data = response.data as String;
+      } else if (response.data is ByteStream) {
+        // Stream을 모두 읽어서 String으로 변환
+        final stream = response.data as ByteStream;
+        final bytes = await stream.toBytes();
+        data = utf8.decode(bytes);
+      } else {
+        throw Exception('Unexpected response type: ${response.data.runtimeType}');
+      }
+
       final lines = data.split('\n');
 
       for (final line in lines) {

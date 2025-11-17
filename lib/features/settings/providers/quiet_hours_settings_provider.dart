@@ -166,8 +166,18 @@ class QuietHoursSettings extends _$QuietHoursSettings {
     await _saveToCache(settings);
 
     // 3. 수신 가능 시간대 계산
-    final allowedStart = settings.quietEnd;
-    final allowedEnd = settings.quietStart;
+    final String allowedStart;
+    final String allowedEnd;
+
+    if (settings.enabled) {
+      // 방해금지 ON → QuietHours의 역전
+      allowedStart = settings.quietEnd;
+      allowedEnd = settings.quietStart;
+    } else {
+      // 방해금지 OFF → 24시간 수신 가능
+      allowedStart = '00:00';
+      allowedEnd = '23:59';
+    }
 
     // 4. Draft/Post 설정 연쇄 업데이트
     await ref
@@ -185,16 +195,19 @@ class QuietHoursSettings extends _$QuietHoursSettings {
 
       if (userId == null) return;
 
-      await supabase.from('user_notification_settings').upsert({
-        'user_id': userId,
-        'app_name': 'miniline',
-        'notification_type': 'quiet_hours',
-        'enabled': settings.enabled,
-        'settings': {
-          'quiet_start': settings.quietStart,
-          'quiet_end': settings.quietEnd,
+      await supabase.from('user_notification_settings').upsert(
+        {
+          'user_id': userId,
+          'app_name': 'miniline',
+          'notification_type': 'quiet_hours',
+          'enabled': settings.enabled,
+          'settings': {
+            'quiet_start': settings.quietStart,
+            'quiet_end': settings.quietEnd,
+          },
         },
-      });
+        onConflict: 'user_id,app_name,notification_type',
+      );
     } catch (e) {
       logger.e('Failed to save quiet hours to server', e);
     }
