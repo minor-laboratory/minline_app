@@ -79,11 +79,33 @@ class _ShareInputPageState extends ConsumerState<ShareInputPage> {
     final type = data['type'] as String?;
     final content = data['content'] as String?;
 
+    // 텍스트 처리
     if (type == 'text' && content != null && content.isNotEmpty) {
       _contentController.text = content;
       if (mounted) setState(() {});
     }
-    // TODO: 이미지 처리 (추후 구현)
+
+    // 이미지 처리
+    if ((type == 'image' || type == 'images') && data['imagePaths'] != null) {
+      final imagePaths = (data['imagePaths'] as List).cast<String?>();
+      logger.i('[ShareInputPage] Received ${imagePaths.length} image(s) from ShareActivity');
+
+      // ShareActivity.kt에서 content:// URI를 임시 파일로 복사한 경로를 받음
+      for (final path in imagePaths) {
+        if (path != null && path.isNotEmpty) {
+          final file = File(path);
+          if (file.existsSync()) {
+            _selectedImages.add(file);
+            logger.d('[ShareInputPage] Added image: $path');
+          } else {
+            logger.w('[ShareInputPage] Image file not found: $path');
+          }
+        }
+      }
+
+      // UI 업데이트
+      if (mounted) setState(() {});
+    }
   }
 
   /// SharedMediaProvider에서 데이터 로드

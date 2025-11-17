@@ -83,20 +83,62 @@ class ShareActivity : FlutterActivity() {
                 // 이미지 공유 (단일)
                 else if (type?.startsWith("image/") == true) {
                     val imageUri = intent.getParcelableExtra<android.net.Uri>(Intent.EXTRA_STREAM)
-                    data["type"] = "image"
-                    data["images"] = listOf(imageUri?.toString())
+                    if (imageUri != null) {
+                        val imagePath = copyUriToTempFile(imageUri)
+                        data["type"] = "image"
+                        data["imagePaths"] = if (imagePath != null) listOf(imagePath) else emptyList()
+                    }
                 }
             }
             Intent.ACTION_SEND_MULTIPLE -> {
                 // 이미지 공유 (다중)
                 if (type?.startsWith("image/") == true) {
                     val imageUris = intent.getParcelableArrayListExtra<android.net.Uri>(Intent.EXTRA_STREAM)
-                    data["type"] = "images"
-                    data["images"] = imageUris?.map { it.toString() }
+                    if (imageUris != null) {
+                        val imagePaths = imageUris.mapNotNull { copyUriToTempFile(it) }
+                        data["type"] = "images"
+                        data["imagePaths"] = imagePaths
+                    }
                 }
             }
         }
 
         return data
+    }
+
+    /**
+     * content:// URI를 임시 파일로 복사
+     */
+    private fun copyUriToTempFile(uri: android.net.Uri): String? {
+        try {
+            val inputStream = contentResolver.openInputStream(uri) ?: return null
+
+            // 파일 확장자 추출 (MIME type 기반)
+            val mimeType = contentResolver.getType(uri)
+            val extension = when {
+                mimeType?.startsWith("image/jpeg") == true -> "jpg"
+                mimeType?.startsWith("image/jpg") == true -> "jpg"
+                mimeType?.startsWith("image/png") == true -> "png"
+                mimeType?.startsWith("image/gif") == true -> "gif"
+                mimeType?.startsWith("image/webp") == true -> "webp"
+                else -> "jpg" // 기본값
+            }
+
+            // 임시 파일 생성
+            val tempDir = cacheDir
+            val fileName = "shared_image_${System.currentTimeMillis()}.$extension"
+            val tempFile = java.io.File(tempDir, fileName)
+
+            // 파일 복사
+            tempFile.outputStream().use { output ->
+                inputStream.copyTo(output)
+            }
+            inputStream.close()
+
+            return tempFile.absolutePath
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
     }
 }
