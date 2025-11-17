@@ -99,7 +99,7 @@ class SharedMediaNotifier extends _$SharedMediaNotifier {
 - 포그라운드 메시지 → 로컬 알림 변환
 - 백그라운드 메시지 → 시스템 알림 표시
 - 알림 탭 시 → Drafts 페이지 이동 (payload: 'draft:{id}')
-- APNS 토큰 저장 (iOS)
+- iOS는 Firebase가 자동으로 APNS 토큰 처리 (별도 저장 불필요)
 
 **발송 조건** (Edge Function 필요):
 1. Fragment 3개 이상 입력
@@ -121,7 +121,7 @@ class SharedMediaNotifier extends _$SharedMediaNotifier {
 
 **기능**:
 - 디바이스 자동 등록 (앱 시작/포그라운드 진입 시)
-- FCM/APNS 토큰 저장
+- FCM 토큰 자동 캐싱 및 UPSERT 포함 (iOS APNS는 Firebase 자동 처리)
 - 로그인 시 디바이스 정보 갱신
 
 **구현 완료**:
