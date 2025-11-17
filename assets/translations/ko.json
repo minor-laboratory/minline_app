@@ -2,7 +2,7 @@
   "timeline": {
     "title": "타임라인",
     "calendar": "달력",
-    "fragments": "Fragments",
+    "fragments": "토막글",
     "empty_title": "아직 Fragment가 없습니다",
     "empty_message": "아래에서 짧은 생각을 입력해보세요",
     "empty_subtitle": "짧은 생각을 입력하면 AI가 자동으로 연결합니다",

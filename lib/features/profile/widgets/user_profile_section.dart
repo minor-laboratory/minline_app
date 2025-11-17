@@ -28,72 +28,103 @@ class UserProfileSection extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: common.Spacing.lg),
-      child: ShadCard(
-        padding: const EdgeInsets.all(common.Spacing.lg),
-        child: Column(
-          children: [
-            // 프로필 이미지 (클릭 가능)
-            InkWell(
-              onTap: isLoggedIn
-                  ? () => context.push('/profile')
-                  : () => context.push('/auth'),
-              borderRadius: BorderRadius.circular(common.BorderRadii.full),
-              child: userProfileAsync.when(
-                data: (profile) => _buildProfileAvatar(
-                  context,
-                  colorScheme,
-                  profile,
-                  currentUser,
-                ),
-                loading: () => SizedBox(
-                  width: 96,
-                  height: 96,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: colorScheme.primary,
-                  ),
-                ),
-                error: (_, __) => _buildProfileAvatar(
-                  context,
-                  colorScheme,
-                  null,
-                  currentUser,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: isLoggedIn
+            ? () => context.push('/profile')
+            : () => context.push('/auth'),
+        child: ShadCard(
+          padding: const EdgeInsets.all(common.Spacing.lg),
+          child: Column(
+            children: [
+              // 프로필 이미지 + 이름
+              Padding(
+                padding: const EdgeInsets.all(common.Spacing.sm),
+                child: Column(
+                  children: [
+                    // 프로필 이미지
+                    userProfileAsync.when(
+                      data: (profile) => _buildProfileAvatar(
+                        context,
+                        colorScheme,
+                        profile,
+                        currentUser,
+                      ),
+                      loading: () => SizedBox(
+                        width: 96,
+                        height: 96,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                      error: (_, __) => _buildProfileAvatar(
+                        context,
+                        colorScheme,
+                        null,
+                        currentUser,
+                      ),
+                    ),
+
+                    const SizedBox(height: common.Spacing.md),
+
+                    // 이름 표시 (chevron 포함)
+                    userProfileAsync.when(
+                      data: (profile) {
+                        final userName = isLoggedIn
+                            ? (profile?['name'] ??
+                                currentUser.email.split('@')[0] ??
+                                'common.user'.tr())
+                            : 'auth.guest'.tr();
+
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              userName,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(width: common.Spacing.xs),
+                            Icon(
+                              AppIcons.chevronRight,
+                              size: 16,
+                              color: colorScheme.mutedForeground,
+                            ),
+                          ],
+                        );
+                      },
+                      loading: () => Container(
+                        height: 20,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(common.BorderRadii.xs),
+                        ),
+                      ),
+                      error: (_, __) => Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            isLoggedIn ? 'common.user'.tr() : 'auth.guest'.tr(),
+                            style: theme.textTheme.titleMedium,
+                          ),
+                          const SizedBox(width: common.Spacing.xs),
+                          Icon(
+                            AppIcons.chevronRight,
+                            size: 16,
+                            color: colorScheme.mutedForeground,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-
-            const SizedBox(height: common.Spacing.md),
-
-            // 이름 표시
-            userProfileAsync.when(
-              data: (profile) {
-                final userName = isLoggedIn
-                    ? (profile?['name'] ??
-                        currentUser.email.split('@')[0] ??
-                        'common.user'.tr())
-                    : 'auth.guest'.tr();
-
-                return Text(
-                  userName,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textAlign: TextAlign.center,
-                );
-              },
-              loading: () => Container(
-                height: 20,
-                width: 100,
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(common.BorderRadii.xs),
-                ),
-              ),
-              error: (_, __) => Text(
-                isLoggedIn ? 'common.user'.tr() : 'auth.guest'.tr(),
-                style: theme.textTheme.titleMedium,
-              ),
-            ),
 
             const SizedBox(height: common.Spacing.lg),
 
@@ -120,8 +151,9 @@ class UserProfileSection extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildStatistics(
     BuildContext context,

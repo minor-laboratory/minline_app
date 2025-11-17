@@ -133,3 +133,27 @@ class AutoFocusInputNotifier extends _$AutoFocusInputNotifier {
     await prefs.setBool(_key, enabled);
   }
 }
+
+/// 마지막 탭 인덱스 Provider (홈 화면 탭 위치 저장)
+@riverpod
+class LastTabIndexNotifier extends _$LastTabIndexNotifier {
+  static const String _key = 'last_tab_index';
+
+  @override
+  Future<int> build() async {
+    final prefs = await ref.watch(sharedPreferencesProvider.future);
+    return prefs.getInt(_key) ?? 0; // 기본값: 0 (타임라인)
+  }
+
+  Future<void> setLastTabIndex(int index) async {
+    // 범위 검증 (0: Timeline, 1: Drafts, 2: Posts)
+    if (index < 0 || index > 2) {
+      return;
+    }
+
+    state = AsyncValue.data(index);
+
+    final prefs = await ref.read(sharedPreferencesProvider.future);
+    await prefs.setInt(_key, index);
+  }
+}

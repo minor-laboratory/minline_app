@@ -21,12 +21,12 @@ import '../../../timeline/providers/fragments_provider.dart';
 ///
 /// Timeline/Drafts/Posts 페이지를 PageView로 관리
 class MainPage extends ConsumerStatefulWidget {
-  final int initialTab;
+  final int? initialTab;
 
   /// Notification에서 탭 변경 요청 시 사용하는 callback
   static void Function(int)? onTabChangeRequested;
 
-  const MainPage({super.key, this.initialTab = 0});
+  const MainPage({super.key, this.initialTab});
 
   @override
   ConsumerState<MainPage> createState() => _MainPageState();
@@ -52,10 +52,12 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
   @override
   void initState() {
     super.initState();
-    _currentPageIndex = widget.initialTab;
-    _pageController = PageController(initialPage: widget.initialTab);
+
+    // 탭 인덱스 초기화: initialTab이 있으면 사용, 없으면 기본값 0
+    _currentPageIndex = widget.initialTab ?? 0;
+    _pageController = PageController(initialPage: _currentPageIndex);
+
     WidgetsBinding.instance.addObserver(this);
-    logger.i('MainPage initialized with tab: ${widget.initialTab}');
 
     // Notification에서 탭 변경 요청 시 사용할 callback 설정
     MainPage.onTabChangeRequested = (index) {
@@ -93,8 +95,22 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
       }
     };
 
-    // 앱 시작 시에도 자동 포커스 체크
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // 저장된 탭 인덱스 로드 및 Auto focus 처리
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // initialTab이 없을 때만 저장된 값 로드
+      if (widget.initialTab == null) {
+        final savedIndex = await ref.read(lastTabIndexProvider.future);
+
+        if (mounted && savedIndex != _currentPageIndex && savedIndex >= 0 && savedIndex <= 2) {
+          setState(() {
+            _currentPageIndex = savedIndex;
+          });
+          _pageController.jumpToPage(savedIndex);
+          logger.i('MainPage restored to saved tab: $savedIndex');
+        }
+      }
+
+      // 앱 시작 시에도 자동 포커스 체크
       _handleAppResumed();
     });
   }
@@ -102,12 +118,12 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
   @override
   void didUpdateWidget(MainPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.initialTab != widget.initialTab) {
+    if (oldWidget.initialTab != widget.initialTab && widget.initialTab != null) {
       logger.i('MainPage tab changed: ${oldWidget.initialTab} -> ${widget.initialTab}');
       setState(() {
-        _currentPageIndex = widget.initialTab;
+        _currentPageIndex = widget.initialTab!;
       });
-      _pageController.jumpToPage(widget.initialTab);
+      _pageController.jumpToPage(widget.initialTab!);
     }
   }
 
@@ -170,6 +186,9 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
       }
     });
     _pageController.jumpToPage(index);
+
+    // 탭 위치 저장
+    ref.read(lastTabIndexProvider.notifier).setLastTabIndex(index);
   }
 
   void _onPageChanged(int index) {
@@ -180,6 +199,9 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
         _exitSearchMode();
       }
     });
+
+    // 탭 위치 저장
+    ref.read(lastTabIndexProvider.notifier).setLastTabIndex(index);
   }
 
   // Timeline: 검색 모드
@@ -357,7 +379,7 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
                         ? 'timeline.title'.tr()
                         : 'timeline.calendar'.tr(),
                   ),
-                  const SizedBox(width: common.Spacing.sm - common.Spacing.xs),
+                  const SizedBox(width: common.Spacing.sm),
                   GestureDetector(
                     onTap: _currentPageIndex == 0 ? _toggleViewMode : null,
                     child: Icon(

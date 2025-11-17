@@ -29,7 +29,7 @@ class UserAvatarButton extends ConsumerWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: theme.colorScheme.border.withValues(alpha: 0.2),
+            color: theme.colorScheme.border.withValues(alpha: 0.5),
             width: 1,
           ),
         ),
