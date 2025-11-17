@@ -8,6 +8,15 @@ import '../../../../core/utils/app_icons.dart';
 import '../../providers/settings_provider.dart';
 
 /// 테마 설정 시트
+///
+/// **특수 케이스**: 이 시트는 StandardBottomSheet 패턴을 따르지 않음
+/// - 이유: 사용자가 테마를 변경할 때 배경색이 실시간으로 바뀌어야 함
+/// - 부모에서 ResponsiveModalSheet + Consumer로 동적 배경색 적용
+/// - 이 위젯 자체도 Consumer로 theme providers를 watch하여 즉시 반영
+///
+/// **참조**:
+/// - 부모 호출: `settings_page.dart` _showThemeSettings()
+/// - 문서: `docs/COMPONENT_SPECS.md` - 특수 케이스: 테마 설정 모달
 class ThemeSettingsSheet extends ConsumerWidget {
   const ThemeSettingsSheet({super.key});
 

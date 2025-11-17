@@ -5,6 +5,11 @@ import 'package:minorlab_common/minorlab_common.dart' as common;
 /// Wolt Modal Sheet를 활용한 반응형 모달 시트 헬퍼 유틸리티
 ///
 /// 모바일에서는 Bottom Sheet로, 타블렛에서는 Dialog로 자동 표시
+///
+/// **일반 사용**: StandardBottomSheet.show() 사용 권장
+/// **특수 케이스**: 동적 배경색이 필요한 경우 (테마 설정 모달)만 직접 사용
+/// - 테마 설정 모달은 topBar와 child를 Consumer로 감싸서 실시간 배경색 반영
+/// - 참조: `docs/COMPONENT_SPECS.md` - 특수 케이스: 테마 설정 모달
 class ResponsiveModalSheet {
   /// 반응형 모달 시트 표시
   ///

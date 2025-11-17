@@ -15,6 +15,11 @@ import 'responsive_modal_sheet.dart';
 /// - 표준화된 헤더, 컨텐츠, 푸터 레이아웃
 /// - 일관된 디자인 시스템 적용
 /// - 다양한 사용 사례에 대한 프리셋 제공
+///
+/// ⚠️ 특수 케이스 (StandardBottomSheet 사용 불가):
+/// - 테마 설정 모달: 사용자가 테마 변경 시 배경색이 실시간으로 바뀌어야 함
+/// - 해결: ResponsiveModalSheet + Consumer로 동적 배경색 적용
+/// - 참조: `docs/COMPONENT_SPECS.md` - 특수 케이스: 테마 설정 모달
 class StandardBottomSheet {
   /// 🚀 표준 Bottom Sheet 표시 (Wolt Modal Sheet 기반)
   static Future<T?> show<T>({

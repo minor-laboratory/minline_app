@@ -6,8 +6,10 @@ import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 import '../../../../core/utils/app_icons.dart';
+import '../../../../shared/widgets/responsive_modal_sheet.dart';
 import '../../../../shared/widgets/standard_bottom_sheet.dart';
 import '../../../auth/data/auth_repository.dart';
 import '../../../profile/widgets/user_profile_section.dart';
@@ -74,12 +76,136 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   void _showThemeSettings() {
-    StandardBottomSheet.show(
+    // 테마 설정 sheet는 특수 케이스: 동적 배경색 지원을 위해 직접 WoltModalSheet 사용
+    // topBar와 child 모두 Consumer로 감싸서 테마 변경 시 실시간 배경색 반영
+    final materialTheme = Theme.of(context);
+
+    ResponsiveModalSheet.show(
       context: context,
-      title: 'settings.theme'.tr(),
-      content: const ThemeSettingsSheet(),
-      isDraggable: true,
-      isDismissible: true,
+      pages: [
+        WoltModalSheetPage(
+          hasTopBarLayer: true,
+          isTopBarLayerAlwaysVisible: true,
+          surfaceTintColor: Colors.transparent,
+          // topBar: Consumer로 동적 배경색 적용
+          topBar: Consumer(
+            builder: (context, ref, child) {
+              final themeModeAsync = ref.watch(themeModeProvider);
+              final colorThemeAsync = ref.watch(colorThemeProvider);
+              final backgroundColorAsync = ref.watch(backgroundColorProvider);
+
+              return themeModeAsync.when(
+                data: (themeMode) => colorThemeAsync.when(
+                  data: (colorTheme) => backgroundColorAsync.when(
+                    data: (backgroundOption) {
+                      final shadLightTheme = common.MinorLabShadTheme.lightTheme(
+                        paletteId: colorTheme,
+                        backgroundOption: backgroundOption,
+                      );
+                      final shadDarkTheme = common.MinorLabShadTheme.darkTheme(
+                        paletteId: colorTheme,
+                        backgroundOption: backgroundOption,
+                      );
+
+                      final brightness = MediaQuery.of(context).platformBrightness;
+                      final currentShadTheme = themeMode == ThemeMode.dark
+                          ? shadDarkTheme
+                          : themeMode == ThemeMode.light
+                              ? shadLightTheme
+                              : (brightness == Brightness.dark ? shadDarkTheme : shadLightTheme);
+
+                      final cardColor = currentShadTheme.colorScheme.card;
+
+                      return Container(
+                        width: double.infinity,
+                        color: cardColor,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: common.Spacing.md,
+                          vertical: common.Spacing.md,
+                        ),
+                        child: Text(
+                          'settings.theme'.tr(),
+                          style: materialTheme.textTheme.titleLarge,
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    },
+                    loading: () => Container(
+                      padding: const EdgeInsets.all(common.Spacing.md),
+                      child: const Center(child: CircularProgressIndicator()),
+                    ),
+                    error: (_, __) => Container(
+                      padding: const EdgeInsets.all(common.Spacing.md),
+                      child: Center(child: Text('common.error'.tr())),
+                    ),
+                  ),
+                  loading: () => Container(
+                    padding: const EdgeInsets.all(common.Spacing.md),
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+                  error: (_, __) => Container(
+                    padding: const EdgeInsets.all(common.Spacing.md),
+                    child: Center(child: Text('common.error'.tr())),
+                  ),
+                ),
+                loading: () => Container(
+                  padding: const EdgeInsets.all(common.Spacing.md),
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+                error: (_, __) => Container(
+                  padding: const EdgeInsets.all(common.Spacing.md),
+                  child: Center(child: Text('common.error'.tr())),
+                ),
+              );
+            },
+          ),
+          // child: Consumer로 동적 배경색 적용
+          child: Consumer(
+            builder: (context, ref, child) {
+              final themeModeAsync = ref.watch(themeModeProvider);
+              final colorThemeAsync = ref.watch(colorThemeProvider);
+              final backgroundColorAsync = ref.watch(backgroundColorProvider);
+
+              return themeModeAsync.when(
+                data: (themeMode) => colorThemeAsync.when(
+                  data: (colorTheme) => backgroundColorAsync.when(
+                    data: (backgroundOption) {
+                      final shadLightTheme = common.MinorLabShadTheme.lightTheme(
+                        paletteId: colorTheme,
+                        backgroundOption: backgroundOption,
+                      );
+                      final shadDarkTheme = common.MinorLabShadTheme.darkTheme(
+                        paletteId: colorTheme,
+                        backgroundOption: backgroundOption,
+                      );
+
+                      final brightness = MediaQuery.of(context).platformBrightness;
+                      final currentShadTheme = themeMode == ThemeMode.dark
+                          ? shadDarkTheme
+                          : themeMode == ThemeMode.light
+                              ? shadLightTheme
+                              : (brightness == Brightness.dark ? shadDarkTheme : shadLightTheme);
+
+                      final cardColor = currentShadTheme.colorScheme.card;
+
+                      return Container(
+                        color: cardColor,
+                        child: const ThemeSettingsSheet(),
+                      );
+                    },
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (_, __) => Center(child: Text('common.error'.tr())),
+                  ),
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (_, __) => Center(child: Text('common.error'.tr())),
+                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (_, __) => Center(child: Text('common.error'.tr())),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 

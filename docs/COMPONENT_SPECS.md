@@ -2485,6 +2485,121 @@ class LanguageSettingsSheet extends ConsumerWidget {
 3. **mainAxisSize**: Column의 mainAxisSize는 MainAxisSize.min 사용 (자동 높이)
 4. **SingleChildScrollView**: 컨텐츠가 길 경우 스크롤 가능하도록 감싸기
 
+### 특수 케이스: 테마 설정 모달 (동적 배경색)
+
+**문제**: 테마 설정 모달은 사용자가 테마를 변경할 때 배경색이 실시간으로 바뀌어야 함
+
+**❌ StandardBottomSheet 사용 (배경색 고정):**
+```dart
+void _showThemeSettings() {
+  StandardBottomSheet.show(
+    context: context,
+    title: 'settings.theme'.tr(),
+    content: const ThemeSettingsSheet(),
+  );
+}
+// 문제: 모달이 열릴 때의 배경색으로 고정됨
+// 사용자가 테마 변경 시 배경색이 업데이트되지 않음
+```
+
+**✅ ResponsiveModalSheet + Consumer 직접 사용 (동적 배경색):**
+```dart
+void _showThemeSettings() {
+  ResponsiveModalSheet.show(
+    context: context,
+    pages: [
+      WoltModalSheetPage(
+        hasTopBarLayer: true,
+        isTopBarLayerAlwaysVisible: true,
+        surfaceTintColor: Colors.transparent,
+
+        // topBar: Consumer로 동적 배경색 적용
+        topBar: Consumer(
+          builder: (context, ref, child) {
+            final themeModeAsync = ref.watch(themeModeProvider);
+            final colorThemeAsync = ref.watch(colorThemeProvider);
+            final backgroundColorAsync = ref.watch(backgroundColorProvider);
+
+            return themeModeAsync.when(
+              data: (themeMode) => colorThemeAsync.when(
+                data: (colorTheme) => backgroundColorAsync.when(
+                  data: (backgroundOption) {
+                    // 현재 설정에 맞는 테마 생성
+                    final shadLightTheme = common.MinorLabShadTheme.lightTheme(
+                      paletteId: colorTheme,
+                      backgroundOption: backgroundOption,
+                    );
+                    final shadDarkTheme = common.MinorLabShadTheme.darkTheme(
+                      paletteId: colorTheme,
+                      backgroundOption: backgroundOption,
+                    );
+
+                    final brightness = MediaQuery.of(context).platformBrightness;
+                    final currentShadTheme = themeMode == ThemeMode.dark
+                        ? shadDarkTheme
+                        : themeMode == ThemeMode.light
+                            ? shadLightTheme
+                            : (brightness == Brightness.dark ? shadDarkTheme : shadLightTheme);
+
+                    final cardColor = currentShadTheme.colorScheme.card;
+
+                    return Container(
+                      width: double.infinity,
+                      color: cardColor,  // 동적 배경색 적용
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: common.Spacing.md,
+                        vertical: common.Spacing.md,
+                      ),
+                      child: Text(
+                        'settings.theme'.tr(),
+                        style: Theme.of(context).textTheme.titleLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
+                  loading: () => Container(
+                    padding: const EdgeInsets.all(common.Spacing.md),
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+                  error: (_, __) => Container(
+                    padding: const EdgeInsets.all(common.Spacing.md),
+                    child: Center(child: Text('common.error'.tr())),
+                  ),
+                ),
+                loading: () => Container(...),
+                error: (_, __) => Container(...),
+              ),
+              loading: () => Container(...),
+              error: (_, __) => Container(...),
+            );
+          },
+        ),
+
+        // child: Consumer로 동적 배경색 적용 (동일한 패턴)
+        child: Consumer(
+          builder: (context, ref, child) {
+            // topBar와 동일한 로직으로 배경색 계산
+            return Container(
+              color: cardColor,
+              child: const ThemeSettingsSheet(),
+            );
+          },
+        ),
+      ),
+    ],
+  );
+}
+```
+
+**왜 이렇게 해야 하는가?**
+1. **StandardBottomSheet의 한계**: 모달이 열릴 때 배경색이 한 번만 계산됨 (Consumer 외부)
+2. **테마 설정의 특수성**: 사용자가 테마/색상을 변경하면 즉시 모달 배경색이 바뀌어야 함
+3. **Riverpod 반응성**: Consumer로 theme providers를 watch하면 변경 시 자동 rebuild
+
+**적용 대상**: 테마 설정 모달만 이 패턴 사용 (다른 모든 모달은 StandardBottomSheet 사용)
+
+**참조**: `lib/features/settings/presentation/pages/settings_page.dart` _showThemeSettings() 메서드
+
 ---
 
 ## 8. 알림 설정 (Notification Settings)
