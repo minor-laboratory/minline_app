@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// Draft 완성 알림 설정 바텀 시트
 class DraftNotificationSheet extends ConsumerStatefulWidget {
@@ -43,6 +44,7 @@ class _DraftNotificationSheetState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final shadTheme = ShadTheme.of(context);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -54,7 +56,7 @@ class _DraftNotificationSheetState
             child: Text(
               'settings.draft_notifications_description'.tr(),
               style: textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+                color: shadTheme.colorScheme.mutedForeground,
               ),
             ),
           ),

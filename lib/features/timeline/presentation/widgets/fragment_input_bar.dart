@@ -349,7 +349,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
               children: [
                 // 이미지
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(common.BorderRadii.md),
                   child: Image.file(
                     _selectedImages[index],
                     width: 80,
@@ -394,12 +394,12 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
       onTap: _isLoading ? null : _pickImages,
       child: Container(
         height: 32,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: common.Spacing.sm),
         decoration: BoxDecoration(
           color: _isLoading
               ? theme.colorScheme.muted
               : theme.colorScheme.secondary,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(common.BorderRadii.xl),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -435,10 +435,10 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
 
     return Container(
       height: 32,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: common.Spacing.sm),
       decoration: BoxDecoration(
         color: theme.colorScheme.muted,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(common.BorderRadii.xl),
       ),
       child: Center(
         child: Text(

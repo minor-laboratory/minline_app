@@ -37,7 +37,7 @@ class UserProfileSection extends ConsumerWidget {
               onTap: isLoggedIn
                   ? () => context.push('/profile')
                   : () => context.push('/auth'),
-              borderRadius: BorderRadius.circular(48),
+              borderRadius: BorderRadius.circular(common.BorderRadii.full),
               child: userProfileAsync.when(
                 data: (profile) => _buildProfileAvatar(
                   context,
@@ -86,7 +86,7 @@ class UserProfileSection extends ConsumerWidget {
                 width: 100,
                 decoration: BoxDecoration(
                   color: colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(common.BorderRadii.xs),
                 ),
               ),
               error: (_, __) => Text(
@@ -146,7 +146,7 @@ class UserProfileSection extends ConsumerWidget {
               ),
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(common.BorderRadii.md),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -155,7 +155,7 @@ class UserProfileSection extends ConsumerWidget {
                   Icon(
                     AppIcons.sparkles,
                     size: 18,
-                    color: colorScheme.onSurfaceVariant,
+                    color: colorScheme.mutedForeground,
                   ),
                   const SizedBox(height: common.Spacing.xs),
                   fragmentCountAsync.when(
@@ -176,7 +176,7 @@ class UserProfileSection extends ConsumerWidget {
                   Text(
                     'timeline.fragments'.tr(),
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                      color: colorScheme.mutedForeground,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,
@@ -201,7 +201,7 @@ class UserProfileSection extends ConsumerWidget {
               ),
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(common.BorderRadii.md),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -210,7 +210,7 @@ class UserProfileSection extends ConsumerWidget {
                   Icon(
                     AppIcons.drafts,
                     size: 18,
-                    color: colorScheme.onSurfaceVariant,
+                    color: colorScheme.mutedForeground,
                   ),
                   const SizedBox(height: common.Spacing.xs),
                   draftCountsAsync.when(
@@ -231,7 +231,7 @@ class UserProfileSection extends ConsumerWidget {
                   Text(
                     'drafts.title'.tr(),
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                      color: colorScheme.mutedForeground,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,
@@ -256,7 +256,7 @@ class UserProfileSection extends ConsumerWidget {
               ),
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(common.BorderRadii.md),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -265,7 +265,7 @@ class UserProfileSection extends ConsumerWidget {
                   Icon(
                     AppIcons.posts,
                     size: 18,
-                    color: colorScheme.onSurfaceVariant,
+                    color: colorScheme.mutedForeground,
                   ),
                   const SizedBox(height: common.Spacing.xs),
                   postCountAsync.when(
@@ -286,7 +286,7 @@ class UserProfileSection extends ConsumerWidget {
                   Text(
                     'posts.title'.tr(),
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                      color: colorScheme.mutedForeground,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,

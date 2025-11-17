@@ -281,7 +281,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                       Text(
                         _draft!.reason!,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          color: ShadTheme.of(context).colorScheme.mutedForeground,
                         ),
                       ),
                     ],
@@ -408,9 +408,9 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                           '${_progress.toInt()}%',
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
-                                color: Theme.of(
+                                color: ShadTheme.of(
                                   context,
-                                ).colorScheme.onSurfaceVariant,
+                                ).colorScheme.mutedForeground,
                               ),
                         ),
                       ],
@@ -452,7 +452,7 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                     child: Text(
                       'post.preview_placeholder'.tr(),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        color: ShadTheme.of(context).colorScheme.mutedForeground,
                       ),
                     ),
                   ),

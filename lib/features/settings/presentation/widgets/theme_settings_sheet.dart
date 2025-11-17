@@ -230,7 +230,7 @@ class _BackgroundColorCard extends StatelessWidget {
                   : ShadTheme.of(context).colorScheme.border,
               width: isSelected ? 2 : 1,
             ),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(common.BorderRadii.md),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -293,7 +293,7 @@ class _ThemeModeCard extends StatelessWidget {
                   : ShadTheme.of(context).colorScheme.border,
               width: isSelected ? 2 : 1,
             ),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(common.BorderRadii.md),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -350,7 +350,7 @@ class _ColorCard extends StatelessWidget {
                 : theme.colorScheme.border,
             width: isSelected ? 2 : 1,
           ),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(common.BorderRadii.md),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

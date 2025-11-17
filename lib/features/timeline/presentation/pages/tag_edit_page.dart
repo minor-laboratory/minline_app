@@ -51,6 +51,7 @@ class _TagEditPageState extends State<TagEditPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final shadTheme = ShadTheme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -77,7 +78,7 @@ class _TagEditPageState extends State<TagEditPage> {
             Text(
               'tag.add_tag_description'.tr(),
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+                color: shadTheme.colorScheme.mutedForeground,
               ),
             ),
             SizedBox(height: common.Spacing.md),
@@ -107,14 +108,14 @@ class _TagEditPageState extends State<TagEditPage> {
                   Icon(
                     AppIcons.info,
                     size: 16,
-                    color: colorScheme.onSurfaceVariant,
+                    color: shadTheme.colorScheme.mutedForeground,
                   ),
                   SizedBox(width: common.Spacing.sm),
                   Expanded(
                     child: Text(
                       'tag.hint'.tr(),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                        color: shadTheme.colorScheme.mutedForeground,
                       ),
                     ),
                   ),

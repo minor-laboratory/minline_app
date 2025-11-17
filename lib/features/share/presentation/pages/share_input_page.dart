@@ -323,12 +323,12 @@ class _ShareInputPageState extends ConsumerState<ShareInputPage> {
             children: [
               // 드래그 핸들
               Container(
-                margin: const EdgeInsets.only(top: 8, bottom: 4),
+                margin: const EdgeInsets.only(top: common.Spacing.sm, bottom: common.Spacing.xs),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
                   color: theme.colorScheme.muted,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(common.BorderRadii.xs),
                 ),
               ),
 
@@ -579,7 +579,7 @@ class _ShareInputPageState extends ConsumerState<ShareInputPage> {
               children: [
                 // 이미지
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(common.BorderRadii.md),
                   child: Image.file(
                     _selectedImages[index],
                     width: 80,
@@ -624,12 +624,12 @@ class _ShareInputPageState extends ConsumerState<ShareInputPage> {
       onTap: _isLoading ? null : _pickImages,
       child: Container(
         height: 32,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: common.Spacing.sm),
         decoration: BoxDecoration(
           color: _isLoading
               ? theme.colorScheme.muted
               : theme.colorScheme.secondary,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(common.BorderRadii.xl),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -667,10 +667,10 @@ class _ShareInputPageState extends ConsumerState<ShareInputPage> {
       alignment: Alignment.centerLeft,
       child: Container(
         height: 32,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: common.Spacing.sm),
         decoration: BoxDecoration(
           color: theme.colorScheme.muted,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(common.BorderRadii.xl),
         ),
         child: Center(
           child: Text(

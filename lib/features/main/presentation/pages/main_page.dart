@@ -240,7 +240,7 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
               height: 4,
               decoration: BoxDecoration(
                 color: theme.colorScheme.muted,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(common.BorderRadii.xs),
               ),
             ),
             // Fragment 입력바
@@ -442,7 +442,7 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
                           ),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(9999),
+                            borderRadius: BorderRadius.circular(common.BorderRadii.full),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,

@@ -10,6 +10,7 @@ import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/constants/brand_colors.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../core/utils/storage_utils.dart';
@@ -257,7 +258,7 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
         title: Text('profile.title'.tr()),
         actions: [
           PopupMenuButton<String>(
-            padding: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(common.Spacing.xs),
             iconSize: 18,
             icon: Icon(
               AppIcons.moreVert,
@@ -446,7 +447,7 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
       final provider = providers.first.toString();
       if (provider == 'google') {
         providerType = 'google';
-        providerColor = const Color(0xFF4285F4);
+        providerColor = BrandColors.googleBlue;
       } else if (provider == 'apple') {
         providerType = 'apple';
         providerColor = theme.colorScheme.onSurface;

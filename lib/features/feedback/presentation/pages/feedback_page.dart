@@ -112,7 +112,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
             Text(
               'feedback.select_or_describe'.tr(),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                color: ShadTheme.of(context).colorScheme.mutedForeground,
               ),
             ),
             const SizedBox(height: common.Spacing.lg),

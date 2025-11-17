@@ -255,14 +255,14 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
 
               return InkWell(
                 onTap: () => _onDateClick(date),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(common.BorderRadii.md),
                 child: Container(
                   decoration: BoxDecoration(
                     color: isSelected ? theme.colorScheme.primary : null,
                     border: !isSelected && isToday
                         ? Border.all(color: theme.colorScheme.primary, width: 2)
                         : null,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(common.BorderRadii.md),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

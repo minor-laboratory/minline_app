@@ -466,7 +466,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
             // 편집 모드
             if (_isEditing) ...[
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(common.Spacing.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -478,7 +478,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                       autofocus: true,
                       keyboardType: TextInputType.multiline,
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: common.Spacing.sm + common.Spacing.xs),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -486,7 +486,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                           onPressed: _isLoading ? null : _cancelEdit,
                           child: Text('common.cancel'.tr()),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: common.Spacing.sm),
                         ShadButton(
                           onPressed: _isLoading ? null : _handleUpdate,
                           child: _isLoading
@@ -509,7 +509,12 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
               GestureDetector(
                 onLongPress: _handleCopyContent,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                  padding: EdgeInsets.fromLTRB(
+                    common.Spacing.md,
+                    common.Spacing.md,
+                    common.Spacing.md,
+                    common.Spacing.sm + common.Spacing.xs,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -523,19 +528,19 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                             color: theme.colorScheme.foreground,
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: common.Spacing.sm + common.Spacing.xs),
                       ],
 
                     // 이미지
                     if (widget.fragment.mediaUrls.isNotEmpty) ...[
                       Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
+                        spacing: common.Spacing.sm,
+                        runSpacing: common.Spacing.sm,
                         children: widget.fragment.mediaUrls.map((url) {
                           return GestureDetector(
                             onTap: () => _showImageViewer(url),
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(common.BorderRadii.md),
                               child: CachedNetworkImage(
                                 imageUrl: url,
                                 width: 128,
@@ -566,7 +571,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                           );
                         }).toList(),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: common.Spacing.sm + common.Spacing.xs),
                     ],
 
                     // 이벤트 시간 & 태그
@@ -586,7 +591,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                                 size: 14,
                                 color: theme.colorScheme.primary,
                               ),
-                              const SizedBox(width: 6),
+                              SizedBox(width: common.Spacing.xs + 2),
                               Text(
                                 _formatEventTime(
                                   context,
@@ -603,14 +608,14 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                         ),
 
                         // 태그 (접기/펼치기 기능 포함)
-                        const SizedBox(height: 8),
+                        const SizedBox(height: common.Spacing.sm),
                         _buildTagsSection(context),
                       ],
                     ),
 
                     // Draft 연결 정보
                     if (widget.draft != null) ...[
-                      const SizedBox(height: 12),
+                      SizedBox(height: common.Spacing.sm + common.Spacing.xs),
                       InkWell(
                         onTap: () {
                           // Draft 화면으로 이동 (push로 현재 화면 위에 추가)
@@ -618,14 +623,14 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
+                            horizontal: common.Spacing.sm,
+                            vertical: common.Spacing.xs,
                           ),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.primary.withValues(
                               alpha: 0.1,
                             ),
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(common.BorderRadii.sm),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -635,7 +640,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                                 size: 12,
                                 color: theme.colorScheme.primary,
                               ),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: common.Spacing.xs),
                               Text(
                                 'draft.linked_to'.tr(
                                   namedArgs: {'title': widget.draft!.title},
@@ -738,8 +743,8 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
     final hiddenCount = allTags.length - maxVisibleTags;
 
     return Wrap(
-      spacing: 4,
-      runSpacing: 4,
+      spacing: common.Spacing.xs,
+      runSpacing: common.Spacing.xs,
       children: [
         // AI 태그
         ...widget.fragment.tags
@@ -776,10 +781,13 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: common.Spacing.sm,
+          vertical: common.Spacing.xs,
+        ),
         decoration: BoxDecoration(
           color: theme.colorScheme.muted.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(common.BorderRadii.sm),
         ),
         child: Text(
           _showAllTags
@@ -802,16 +810,19 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
     return GestureDetector(
       onTap: () => widget.onTagClick?.call(tag),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: common.Spacing.sm,
+          vertical: common.Spacing.xs,
+        ),
         decoration: BoxDecoration(
           color: theme.colorScheme.muted,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(common.BorderRadii.sm),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(AppIcons.sparkles, size: 12, color: theme.colorScheme.primary),
-            const SizedBox(width: 4),
+            const SizedBox(width: common.Spacing.xs),
             Text(
               tag,
               style: TextStyle(
@@ -819,7 +830,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                 color: theme.colorScheme.mutedForeground,
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: common.Spacing.xs),
             GestureDetector(
               onTap: () => _showHideAiTagSheet(tag),
               child: Icon(
@@ -856,10 +867,13 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
     return GestureDetector(
       onTap: () => widget.onTagClick?.call(tag),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: common.Spacing.sm,
+          vertical: common.Spacing.xs,
+        ),
         decoration: BoxDecoration(
           color: theme.colorScheme.primary,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(common.BorderRadii.sm),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -869,7 +883,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
               size: 12,
               color: theme.colorScheme.primaryForeground,
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: common.Spacing.xs),
             Text(
               tag,
               style: TextStyle(
@@ -877,7 +891,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                 color: theme.colorScheme.primaryForeground,
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: common.Spacing.xs),
             GestureDetector(
               onTap: () => _showRemoveUserTagSheet(tag),
               child: Icon(
@@ -913,10 +927,13 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
     return GestureDetector(
       onTap: _showAddTagPage,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: common.Spacing.sm,
+          vertical: common.Spacing.xs,
+        ),
         decoration: BoxDecoration(
           color: theme.colorScheme.muted.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(common.BorderRadii.sm),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -926,7 +943,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
               size: 12,
               color: theme.colorScheme.mutedForeground,
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: common.Spacing.xs),
             Text(
               'tag.add_tag'.tr(),
               style: TextStyle(
@@ -1032,10 +1049,10 @@ class _EventTimePickerSheetState extends State<_EventTimePickerSheet> {
 
     return Container(
       padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+        left: common.Spacing.md,
+        right: common.Spacing.md,
+        top: common.Spacing.md,
+        bottom: MediaQuery.of(context).viewInsets.bottom + common.Spacing.md,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -1046,7 +1063,7 @@ class _EventTimePickerSheetState extends State<_EventTimePickerSheet> {
             'time.event_time'.tr(),
             style: Theme.of(context).textTheme.titleLarge,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: common.Spacing.md),
 
           // 시간 포함 스위치
           SwitchListTile(
@@ -1058,7 +1075,7 @@ class _EventTimePickerSheetState extends State<_EventTimePickerSheet> {
               });
             },
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: common.Spacing.sm),
 
           // 날짜 선택
           ListTile(
@@ -1088,7 +1105,7 @@ class _EventTimePickerSheetState extends State<_EventTimePickerSheet> {
             ),
           ],
 
-          const SizedBox(height: 16),
+          const SizedBox(height: common.Spacing.md),
 
           // 저장/취소 버튼
           Row(
@@ -1099,7 +1116,7 @@ class _EventTimePickerSheetState extends State<_EventTimePickerSheet> {
                 onPressed: () => Navigator.of(context).pop(),
                 child: Text('common.cancel'.tr()),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: common.Spacing.sm),
               ShadButton(
                 enabled: !_isLoading,
                 onPressed: _handleSave,

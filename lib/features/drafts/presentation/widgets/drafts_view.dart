@@ -41,7 +41,7 @@ class _DraftsViewState extends ConsumerState<DraftsView>
             padding: const EdgeInsets.all(common.Spacing.md),
             decoration: BoxDecoration(
               color: ShadTheme.of(context).colorScheme.muted,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(common.BorderRadii.lg),
             ),
             child: Text(
               widget.analyzeMessage,

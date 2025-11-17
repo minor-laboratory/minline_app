@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
 import '../../../../models/draft.dart';
@@ -158,6 +159,7 @@ class _FragmentListState extends ConsumerState<FragmentList> {
   Widget _buildEmptyState(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final shadTheme = ShadTheme.of(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -182,7 +184,7 @@ class _FragmentListState extends ConsumerState<FragmentList> {
                       colorScheme.surfaceContainerHighest,
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(common.Spacing.md),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -215,7 +217,7 @@ class _FragmentListState extends ConsumerState<FragmentList> {
                     Text(
                       'snap.empty_hint'.tr(),
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                        color: shadTheme.colorScheme.mutedForeground,
                       ),
                     ),
                     SizedBox(height: common.Spacing.md),
@@ -227,7 +229,7 @@ class _FragmentListState extends ConsumerState<FragmentList> {
                       ),
                       decoration: BoxDecoration(
                         color: colorScheme.surface.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(common.Spacing.xl),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -235,13 +237,13 @@ class _FragmentListState extends ConsumerState<FragmentList> {
                           Icon(
                             AppIcons.arrowUp,
                             size: common.Spacing.sm + common.Spacing.xs,
-                            color: colorScheme.onSurfaceVariant,
+                            color: shadTheme.colorScheme.mutedForeground,
                           ),
                           SizedBox(width: common.Spacing.sm),
                           Text(
                             'snap.input_placeholder'.tr(),
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
+                              color: shadTheme.colorScheme.mutedForeground,
                             ),
                           ),
                         ],

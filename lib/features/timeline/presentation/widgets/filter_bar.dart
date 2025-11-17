@@ -87,7 +87,7 @@ class _FilterBarState extends ConsumerState<FilterBar> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(9999),
+                                    borderRadius: BorderRadius.circular(common.BorderRadii.full),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,

@@ -227,7 +227,7 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(common.Spacing.lg),
           child: Form(
             key: _formKey,
             child: Column(
@@ -242,7 +242,7 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                         AppIcons.info,
                         color: ShadTheme.of(context).colorScheme.primary,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: common.Spacing.sm),
                       Text(
                         _hasExistingPassword == true
                             ? 'settings.change_password_description'.tr()
@@ -253,7 +253,7 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: common.Spacing.lg),
 
                 // 현재 비밀번호 (기존 비밀번호가 있는 사용자만)
                 if (_hasExistingPassword == true) ...[
@@ -307,7 +307,10 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                           ),
                           if (errorText != null && value.isEmpty)
                             Padding(
-                              padding: const EdgeInsets.only(top: 8, left: 12),
+                              padding: EdgeInsets.only(
+                                top: common.Spacing.sm,
+                                left: common.Spacing.sm + common.Spacing.xs,
+                              ),
                               child: Text(
                                 errorText,
                                 style: TextStyle(
@@ -322,7 +325,7 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                       );
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: common.Spacing.md),
                 ],
 
                 // 새 비밀번호
@@ -349,12 +352,15 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                           ),
                           obscureText: _obscureNewPassword,
                           enabled: !_isLoading,
-                          leading: const Padding(
-                            padding: EdgeInsets.only(left: 12, right: 8),
+                          leading: Padding(
+                            padding: EdgeInsets.only(
+                              left: common.Spacing.sm + common.Spacing.xs,
+                              right: common.Spacing.sm,
+                            ),
                             child: Icon(AppIcons.passwordOutline, size: 20),
                           ),
                           trailing: Padding(
-                            padding: const EdgeInsets.only(right: 4),
+                            padding: const EdgeInsets.only(right: common.Spacing.xs),
                             child: ShadButton.ghost(
                               width: 40,
                               height: 40,
@@ -376,7 +382,10 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                         ),
                         if (errorText != null && value.isNotEmpty)
                           Padding(
-                            padding: const EdgeInsets.only(top: 8, left: 12),
+                            padding: EdgeInsets.only(
+                              top: common.Spacing.sm,
+                              left: common.Spacing.sm + common.Spacing.xs,
+                            ),
                             child: Text(
                               errorText,
                               style: TextStyle(
@@ -389,7 +398,7 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                     );
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: common.Spacing.md),
 
                 // 비밀번호 확인
                 Builder(
@@ -411,12 +420,15 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                           placeholder: Text('auth.confirmPassword'.tr()),
                           obscureText: _obscureConfirmPassword,
                           enabled: !_isLoading,
-                          leading: const Padding(
-                            padding: EdgeInsets.only(left: 12, right: 8),
+                          leading: Padding(
+                            padding: EdgeInsets.only(
+                              left: common.Spacing.sm + common.Spacing.xs,
+                              right: common.Spacing.sm,
+                            ),
                             child: Icon(AppIcons.passwordOutline, size: 20),
                           ),
                           trailing: Padding(
-                            padding: const EdgeInsets.only(right: 4),
+                            padding: const EdgeInsets.only(right: common.Spacing.xs),
                             child: ShadButton.ghost(
                               width: 40,
                               height: 40,
@@ -439,7 +451,10 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                         ),
                         if (errorText != null && value.isNotEmpty)
                           Padding(
-                            padding: const EdgeInsets.only(top: 8, left: 12),
+                            padding: EdgeInsets.only(
+                              top: common.Spacing.sm,
+                              left: common.Spacing.sm + common.Spacing.xs,
+                            ),
                             child: Text(
                               errorText,
                               style: TextStyle(
@@ -453,7 +468,7 @@ class _PasswordChangePageState extends ConsumerState<PasswordChangePage> {
                   },
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: common.Spacing.xl),
 
                 // 확인 버튼
                 ShadButton(

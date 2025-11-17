@@ -231,7 +231,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
           ),
           // 더보기 메뉴
           PopupMenuButton<String>(
-            padding: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(common.Spacing.xs),
             iconSize: 18,
             icon: Icon(
               AppIcons.moreVert,
@@ -335,7 +335,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                 Text(
                   DateFormat('yyyy-MM-dd').format(_post!.createdAt),
                   style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+                    color: ShadTheme.of(context).colorScheme.mutedForeground,
                   ),
                 ),
               ],
