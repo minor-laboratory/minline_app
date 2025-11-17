@@ -13,6 +13,7 @@ import '../../../drafts/presentation/widgets/drafts_view.dart';
 import '../../../drafts/providers/drafts_provider.dart';
 import '../../../posts/presentation/widgets/posts_view.dart';
 import '../../../settings/providers/settings_provider.dart';
+import '../../../share/presentation/pages/share_input_page.dart';
 import '../../../timeline/presentation/widgets/timeline_view.dart';
 import '../../../timeline/providers/fragments_provider.dart';
 
@@ -21,6 +22,9 @@ import '../../../timeline/providers/fragments_provider.dart';
 /// Timeline/Drafts/Posts 페이지를 PageView로 관리
 class MainPage extends ConsumerStatefulWidget {
   final int initialTab;
+
+  /// Notification에서 탭 변경 요청 시 사용하는 callback
+  static void Function(int)? onTabChangeRequested;
 
   const MainPage({super.key, this.initialTab = 0});
 
@@ -53,6 +57,31 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
     WidgetsBinding.instance.addObserver(this);
     logger.i('MainPage initialized with tab: ${widget.initialTab}');
 
+    // Notification에서 탭 변경 요청 시 사용할 callback 설정
+    MainPage.onTabChangeRequested = (index) {
+      if (!mounted || index < 0 || index > 2) return;
+
+      // index 0 (타임라인) 요청 시
+      if (index == 0) {
+        if (_currentPageIndex == 0) {
+          // 이미 타임라인이면 → 입력창 포커스
+          logger.i('MainPage: Already on timeline, focusing input');
+          _timelineFocusTrigger?.call();
+        } else {
+          // 다른 탭이면 → ShareInputPage 모달로 표시
+          logger.i('MainPage: On different tab, showing share input modal');
+          _showShareInputModal();
+        }
+      } else {
+        // 다른 탭으로 이동
+        setState(() {
+          _currentPageIndex = index;
+        });
+        _pageController.jumpToPage(index);
+        logger.i('MainPage tab changed by notification: $index');
+      }
+    };
+
     // 앱 시작 시에도 자동 포커스 체크
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _handleAppResumed();
@@ -73,6 +102,7 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
 
   @override
   void dispose() {
+    MainPage.onTabChangeRequested = null;
     WidgetsBinding.instance.removeObserver(this);
     _pageController.dispose();
     _searchController.dispose();
@@ -160,6 +190,27 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
     setState(() {
       _viewMode = _viewMode == 'timeline' ? 'calendar' : 'timeline';
     });
+  }
+
+  /// ShareInputPage를 모달로 표시 (notification 탭 시)
+  void _showShareInputModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.9,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) => Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(common.Spacing.md)),
+          ),
+          child: const ShareInputPage(),
+        ),
+      ),
+    );
   }
 
   // Draft: 분석 실행

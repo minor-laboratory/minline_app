@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/services/local_notification_service.dart';
 import '../../../../core/utils/app_icons.dart';
+import '../../../../core/utils/logger.dart';
 
 /// 일일 리마인더 시간 설정 바텀 시트
 class DailyReminderSheet extends ConsumerStatefulWidget {
@@ -19,6 +21,7 @@ class DailyReminderSheet extends ConsumerStatefulWidget {
 class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
   bool _enabled = false;
   TimeOfDay _selectedTime = const TimeOfDay(hour: 20, minute: 0);
+  Set<int> _selectedWeekdays = {1, 2, 3, 4, 5, 6, 7}; // 월~일
 
   @override
   void initState() {
@@ -31,30 +34,96 @@ class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
     final enabled = prefs.getBool('daily_reminder_enabled') ?? false;
     final hour = prefs.getInt('daily_reminder_hour') ?? 20;
     final minute = prefs.getInt('daily_reminder_minute') ?? 0;
+    final weekdaysList = prefs.getStringList('daily_reminder_weekdays');
+    final weekdays = weekdaysList?.map(int.parse).toSet() ?? {1, 2, 3, 4, 5, 6, 7};
 
     if (mounted) {
       setState(() {
         _enabled = enabled;
         _selectedTime = TimeOfDay(hour: hour, minute: minute);
+        _selectedWeekdays = weekdays;
       });
     }
   }
 
   Future<void> _saveSettings() async {
+    final messenger = ScaffoldMessenger.of(context);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('daily_reminder_enabled', _enabled);
     await prefs.setInt('daily_reminder_hour', _selectedTime.hour);
     await prefs.setInt('daily_reminder_minute', _selectedTime.minute);
+    await prefs.setStringList('daily_reminder_weekdays', _selectedWeekdays.map((e) => e.toString()).toList());
 
     if (_enabled) {
-      await LocalNotificationService().scheduleDailyReminder(
-        hour: _selectedTime.hour,
-        minute: _selectedTime.minute,
-        title: 'timeline.title'.tr(),
-        body: 'common.input_placeholder'.tr(),
-      );
+
+      try {
+        // 1. 기본 알림 권한 확인
+        final hasPermission = await LocalNotificationService().hasPermission();
+        if (!hasPermission) {
+          final granted = await LocalNotificationService().requestPermission();
+          if (!granted) {
+            // 권한 거부 시 처리
+            if (!mounted) return;
+            setState(() => _enabled = false);
+            await prefs.setBool('daily_reminder_enabled', false);
+
+            messenger.showSnackBar(
+              SnackBar(
+                content: Text('settings.notification_permission_required'.tr()),
+                action: SnackBarAction(
+                  label: 'common.ok'.tr(),
+                  onPressed: () {},
+                ),
+              ),
+            );
+            return;
+          }
+        }
+
+        // 2. 알림 스케줄링 (USE_EXACT_ALARM은 자동 부여되므로 권한 체크 불필요)
+        await LocalNotificationService().scheduleDailyReminder(
+          hour: _selectedTime.hour,
+          minute: _selectedTime.minute,
+          title: 'settings.daily_reminder_notification_title'.tr(),
+          body: 'settings.daily_reminder_notification_body'.tr(),
+          weekdays: _selectedWeekdays,
+        );
+
+        if (!mounted) return;
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('settings.reminder_enabled'.tr()),
+          ),
+        );
+      } catch (e, stack) {
+        logger.e('[DailyReminder] Failed to schedule', e, stack);
+
+        if (!mounted) return;
+        setState(() => _enabled = false);
+        await prefs.setBool('daily_reminder_enabled', false);
+
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('settings.reminder_failed'.tr()),
+            action: SnackBarAction(
+              label: 'common.retry'.tr(),
+              onPressed: () {
+                setState(() => _enabled = true);
+                _saveSettings();
+              },
+            ),
+          ),
+        );
+      }
     } else {
       await LocalNotificationService().cancelDailyReminder();
+
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('settings.reminder_disabled'.tr()),
+        ),
+      );
     }
   }
 
@@ -65,9 +134,7 @@ class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
     );
 
     if (picked != null && mounted) {
-      setState(() {
-        _selectedTime = picked;
-      });
+      setState(() => _selectedTime = picked);
       await _saveSettings();
     }
   }
@@ -75,6 +142,7 @@ class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final shadTheme = ShadTheme.of(context);
     final textTheme = theme.textTheme;
 
     return Column(
@@ -87,7 +155,7 @@ class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
             child: Text(
               'settings.daily_reminder_description'.tr(),
               style: textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+                color: shadTheme.colorScheme.mutedForeground,
               ),
             ),
           ),
@@ -97,6 +165,31 @@ class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
             title: Text('common.enable'.tr()),
             value: _enabled,
             onChanged: (value) async {
+              if (value) {
+                // ON으로 변경 시: 이전 값 확인
+                final prefs = await SharedPreferences.getInstance();
+                final hasPreviousTime = prefs.containsKey('daily_reminder_hour');
+
+                if (!hasPreviousTime) {
+                  // 최초: 현재 시간 기준 5분 단위로 올림
+                  final now = TimeOfDay.now();
+                  final roundedMinute = ((now.minute ~/ 5) + 1) * 5;
+
+                  if (roundedMinute >= 60) {
+                    _selectedTime = TimeOfDay(
+                      hour: (now.hour + 1) % 24,
+                      minute: roundedMinute % 60,
+                    );
+                  } else {
+                    _selectedTime = TimeOfDay(
+                      hour: now.hour,
+                      minute: roundedMinute,
+                    );
+                  }
+                }
+                // 이전 값이 있으면 _loadSettings()에서 로드된 값 사용
+              }
+
               setState(() {
                 _enabled = value;
               });
@@ -123,6 +216,64 @@ class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
                 ],
               ),
               onTap: _selectTime,
+            ),
+
+            // 요일 선택
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: common.Spacing.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'settings.repeat_on'.tr(),
+                    style: textTheme.bodySmall?.copyWith(
+                      color: shadTheme.colorScheme.mutedForeground,
+                    ),
+                  ),
+                  const SizedBox(height: common.Spacing.sm),
+                  Wrap(
+                    spacing: common.Spacing.sm,
+                    children: List.generate(7, (index) {
+                      final weekday = index + 1;
+                      final isSelected = _selectedWeekdays.contains(weekday);
+
+                      return FilterChip(
+                        label: Text('settings.weekday_$weekday'.tr()),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          setState(() {
+                            if (selected) {
+                              _selectedWeekdays.add(weekday);
+                            } else {
+                              if (_selectedWeekdays.length > 1) {
+                                _selectedWeekdays.remove(weekday);
+                              }
+                            }
+                          });
+                          _saveSettings();
+                        },
+                      );
+                    }),
+                  ),
+                ],
+              ),
+            ),
+
+            // 테스트 버튼
+            const SizedBox(height: common.Spacing.md),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: common.Spacing.md),
+              child: ShadButton.outline(
+                onPressed: () async {
+                  final messenger = ScaffoldMessenger.of(context);
+                  await LocalNotificationService().showTestNotification();
+                  if (!mounted) return;
+                  messenger.showSnackBar(
+                    SnackBar(content: Text('테스트 알림 전송됨')),
+                  );
+                },
+                child: Text('테스트 알림 보내기'),
+              ),
             ),
         ],
 

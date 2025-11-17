@@ -8,6 +8,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/database/database_service.dart';
+import 'core/services/local_notification_service.dart';
 import 'core/services/share_activity_service.dart';
 import 'core/services/share_handler_provider.dart';
 import 'core/services/share_handler_service.dart';
@@ -96,7 +97,8 @@ class _MyAppState extends ConsumerState<MyApp> {
       });
 
       // 일반 서비스 초기화
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await LocalNotificationService().initialize();
         ref.read(lifecycleServiceProvider).initialize();
         ref.read(shareHandlerServiceProvider).initialize();
         logger.i('[Main] All services initialized');

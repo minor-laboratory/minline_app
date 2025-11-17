@@ -11,6 +11,11 @@ import UIKit
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    // flutter_local_notifications: 포그라운드 알림 지원
+    if #available(iOS 10.0, *) {
+      UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
+    }
+
     GeneratedPluginRegistrant.register(with: self)
 
     // Method Channel 설정
