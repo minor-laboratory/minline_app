@@ -110,7 +110,8 @@ class FcmService {
 
   /// 포그라운드 알림 처리
   ///
-  /// 서버에서 방해금지 시간을 체크하므로, 클라이언트는 받은 알림을 즉시 표시만 함
+  /// 서버에서 사용자 언어로 번역된 메시지를 받아 표시
+  /// (백그라운드/종료 상태에서도 동일한 메시지 사용 - iOS 호환)
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     logger.i('[FCM] Received foreground message');
     logger.d('[FCM] Title: ${message.notification?.title}');

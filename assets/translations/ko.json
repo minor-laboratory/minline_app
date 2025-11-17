@@ -463,5 +463,12 @@
       "wrong_tone": "톤이 맞지 않아요",
       "too_short": "너무 짧아요"
     }
+  },
+  "notification": {
+    "draft_created": {
+      "title": "새로운 초안이 생성되었습니다",
+      "single": "새로운 초안 1개가 생성되었습니다",
+      "multiple": "새로운 초안 {}개가 생성되었습니다"
+    }
   }
 }

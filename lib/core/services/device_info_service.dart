@@ -202,6 +202,10 @@ class DeviceInfoService {
 
       logger.i('[DeviceInfo] Updating device info for ${isAnonymous ? 'anonymous' : 'logged-in'} user');
 
+      // 현재 앱 언어 가져오기 (기본값: 한국어)
+      // Platform.localeName은 'ko_KR' 형식이므로 앞 2자리만 사용
+      final languageCode = Platform.localeName.split('_').first; // 'ko' or 'en'
+
       // info 필드에 저장할 JSON 데이터
       final infoData = {
         'device_name': isAnonymous
@@ -210,6 +214,7 @@ class DeviceInfoService {
         'os_version': _cachedDeviceInfo!['os_version'],
         'package_name': _cachedDeviceInfo!['package_name'],
         'is_active': true,
+        'language': languageCode, // 사용자 언어 추가
       };
 
       final deviceData = {
