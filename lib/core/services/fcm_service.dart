@@ -1,15 +1,12 @@
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../router/app_router.dart' as router;
 import '../utils/logger.dart';
 import 'device_info_service.dart';
 import 'local_notification_service.dart';
-import 'pending_notifications_service.dart';
 
 /// Firebase Cloud Messaging 서비스
 ///
@@ -123,6 +120,8 @@ class FcmService {
   }
 
   /// 포그라운드 알림 처리
+  ///
+  /// 서버에서 방해금지 시간을 체크하므로, 클라이언트는 받은 알림을 즉시 표시만 함
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     logger.i('[FCM] Received foreground message');
     logger.d('[FCM] Title: ${message.notification?.title}');
@@ -141,73 +140,12 @@ class FcmService {
       payload = 'draft:${message.data['draft_id']}';
     }
 
-    // 알림 타입 확인
-    final notificationType = message.data['notification_type'] as String?;
-
-    // 방해금지 시간 체크
-    final shouldDelay = await _shouldDelayNotification(notificationType);
-
-    if (shouldDelay) {
-      // 방해금지 시간대 → 대기 목록에 추가
-      logger.i('[FCM] Adding notification to pending queue (quiet hours)');
-      await PendingNotificationsService().addPendingNotification(
-        title: title,
-        body: body,
-        payload: message.data,
-      );
-    } else {
-      // 즉시 표시
-      LocalNotificationService().showFcmNotification(
-        title: title,
-        body: body,
-        payload: payload,
-      );
-    }
-  }
-
-  /// 알림을 지연시켜야 하는지 확인 (방해금지 시간대 체크)
-  Future<bool> _shouldDelayNotification(String? notificationType) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final now = TimeOfDay.now();
-      final currentMinutes = now.hour * 60 + now.minute;
-
-      String? allowedStart;
-      String? allowedEnd;
-
-      // 알림 타입에 따라 설정 로드
-      if (notificationType == 'draft_completion') {
-        allowedStart = prefs.getString('draft_notification_start');
-        allowedEnd = prefs.getString('draft_notification_end');
-      } else if (notificationType == 'post_notification') {
-        allowedStart = prefs.getString('post_notification_start');
-        allowedEnd = prefs.getString('post_notification_end');
-      }
-
-      // 설정이 없으면 즉시 표시
-      if (allowedStart == null || allowedEnd == null) {
-        return false;
-      }
-
-      // 허용 시간대 파싱
-      final startParts = allowedStart.split(':');
-      final endParts = allowedEnd.split(':');
-      final startMinutes = int.parse(startParts[0]) * 60 + int.parse(startParts[1]);
-      final endMinutes = int.parse(endParts[0]) * 60 + int.parse(endParts[1]);
-
-      // 자정을 넘어가는 경우 (예: 08:00 ~ 23:00의 역 = 23:00 ~ 08:00 방해금지)
-      if (startMinutes > endMinutes) {
-        // 현재 시간이 허용 범위 밖이면 지연
-        return currentMinutes < startMinutes && currentMinutes >= endMinutes;
-      } else {
-        // 현재 시간이 허용 범위 안이면 즉시 표시
-        return currentMinutes < startMinutes || currentMinutes >= endMinutes;
-      }
-    } catch (e, stack) {
-      logger.e('[FCM] Failed to check quiet hours', e, stack);
-      // 에러 발생 시 즉시 표시 (안전한 기본값)
-      return false;
-    }
+    // 즉시 표시 (서버에서 방해금지 시간 이미 체크됨)
+    LocalNotificationService().showFcmNotification(
+      title: title,
+      body: body,
+      payload: payload,
+    );
   }
 
   /// 백그라운드/종료 상태에서 알림 탭 처리
