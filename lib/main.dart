@@ -1,4 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -8,7 +11,9 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/database/database_service.dart';
+import 'core/services/fcm_service.dart';
 import 'core/services/local_notification_service.dart';
+import 'firebase_options.dart';
 import 'core/services/share_activity_service.dart';
 import 'core/services/share_handler_provider.dart';
 import 'core/services/share_handler_service.dart';
@@ -28,6 +33,26 @@ void main() async {
 
   // Isar Database 초기화 (로컬 데이터베이스)
   await DatabaseService.instance.init();
+
+  // Firebase 초기화 (FCM, Crashlytics 사용)
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  logger.i('Firebase initialized successfully');
+
+  // Crashlytics 초기화 (릴리즈 빌드에서 에러 추적)
+  if (kReleaseMode) {
+    // Flutter 프레임워크 에러를 Crashlytics로 전송
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+    // 비동기 에러를 Crashlytics로 전송
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+
+    logger.i('Crashlytics initialized for release mode');
+  }
 
   // MinorLab Common SupabaseService 초기화 (내부에서 Supabase도 초기화됨)
   await common.SupabaseService.initialize(
@@ -99,6 +124,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       // 일반 서비스 초기화
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await LocalNotificationService().initialize();
+        await FcmService().initialize(); // FCM 초기화 (토큰 가져오기)
         ref.read(lifecycleServiceProvider).initialize();
         ref.read(shareHandlerServiceProvider).initialize();
         logger.i('[Main] All services initialized');

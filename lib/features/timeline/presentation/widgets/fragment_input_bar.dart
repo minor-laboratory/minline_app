@@ -270,66 +270,70 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
-    return SafeArea(
-      child: Container(
-        padding: const EdgeInsets.all(common.Spacing.md),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.card,
-          border: Border(
-            top: BorderSide(color: theme.colorScheme.border.withValues(alpha: 0.2)),
-          ),
+    return Container(
+      padding: EdgeInsets.only(
+        left: common.Spacing.md,
+        right: common.Spacing.md,
+        top: common.Spacing.md,
+        bottom: bottomPadding + common.Spacing.md,
+      ),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.muted,
+        border: Border(
+          top: BorderSide(color: theme.colorScheme.border.withValues(alpha: 0.2)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 이미지 프리뷰
-            if (_selectedImages.isNotEmpty) ...[
-              _buildImagePreview(theme),
-              SizedBox(height: common.Spacing.sm + common.Spacing.xs),
-            ],
-
-            // 텍스트 입력
-            ShadInput(
-              controller: _contentController,
-              focusNode: _focusNode,
-              enabled: !_isLoading,
-              placeholder: Text('snap.input_placeholder'.tr()),
-              minLines: 1, // 기본 1줄
-              maxLines: 3, // 최대 3줄
-              keyboardType: TextInputType.multiline,
-              onChanged: (value) {
-                // 300자 제한
-                if (value.length > _maxLength) {
-                  _contentController.text = value.substring(0, _maxLength);
-                  _contentController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: _maxLength),
-                  );
-                }
-                setState(() {});
-              },
-            ),
-
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 이미지 프리뷰
+          if (_selectedImages.isNotEmpty) ...[
+            _buildImagePreview(theme),
             SizedBox(height: common.Spacing.sm + common.Spacing.xs),
-
-            // 액션 영역
-            Row(
-              children: [
-                // 이미지 추가 버튼
-                _buildImageButton(theme),
-                SizedBox(width: common.Spacing.sm),
-
-                // 글자수 표시
-                _buildCharCounter(theme),
-
-                const Spacer(),
-
-                // 저장 버튼
-                _buildSaveButton(theme),
-              ],
-            ),
           ],
-        ),
+
+          // 텍스트 입력
+          ShadInput(
+            controller: _contentController,
+            focusNode: _focusNode,
+            enabled: !_isLoading,
+            placeholder: Text('snap.input_placeholder'.tr()),
+            minLines: 1, // 기본 1줄
+            maxLines: 3, // 최대 3줄
+            keyboardType: TextInputType.multiline,
+            onChanged: (value) {
+              // 300자 제한
+              if (value.length > _maxLength) {
+                _contentController.text = value.substring(0, _maxLength);
+                _contentController.selection = TextSelection.fromPosition(
+                  TextPosition(offset: _maxLength),
+                );
+              }
+              setState(() {});
+            },
+          ),
+
+          SizedBox(height: common.Spacing.sm + common.Spacing.xs),
+
+          // 액션 영역
+          Row(
+            children: [
+              // 이미지 추가 버튼
+              _buildImageButton(theme),
+              SizedBox(width: common.Spacing.sm),
+
+              // 글자수 표시
+              _buildCharCounter(theme),
+
+              const Spacer(),
+
+              // 저장 버튼
+              _buildSaveButton(theme),
+            ],
+          ),
+        ],
       ),
     );
   }

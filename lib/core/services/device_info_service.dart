@@ -224,7 +224,9 @@ class DeviceInfoService {
       };
 
       // UPSERT 수행
-      await _supabase.from('devices').upsert(deviceData);
+      logger.d('[DeviceInfo] Upserting device data: $deviceData');
+      final response = await _supabase.from('devices').upsert(deviceData).select();
+      logger.d('[DeviceInfo] Upsert response: $response');
 
       logger.i('[DeviceInfo] Device info updated successfully');
     } catch (e, stackTrace) {
