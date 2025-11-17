@@ -8,6 +8,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import '../../../../core/services/local_notification_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
+import '../../providers/quiet_hours_settings_provider.dart';
 
 /// 일일 리마인더 시간 설정 바텀 시트
 class DailyReminderSheet extends ConsumerStatefulWidget {
@@ -139,11 +140,39 @@ class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
     }
   }
 
+  /// 선택한 시간이 방해금지 시간대에 포함되는지 확인
+  bool _isInQuietHours(TimeOfDay time, QuietHoursData quietHours) {
+    if (!quietHours.enabled) return false;
+
+    final selectedMinutes = time.hour * 60 + time.minute;
+
+    // 방해금지 시간 파싱
+    final startParts = quietHours.quietStart.split(':');
+    final endParts = quietHours.quietEnd.split(':');
+    final startMinutes = int.parse(startParts[0]) * 60 + int.parse(startParts[1]);
+    final endMinutes = int.parse(endParts[0]) * 60 + int.parse(endParts[1]);
+
+    // 자정을 넘어가는 경우 (예: 23:00 ~ 08:00)
+    if (startMinutes > endMinutes) {
+      return selectedMinutes >= startMinutes || selectedMinutes < endMinutes;
+    } else {
+      return selectedMinutes >= startMinutes && selectedMinutes < endMinutes;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final shadTheme = ShadTheme.of(context);
     final textTheme = theme.textTheme;
+
+    // 방해금지 시간 확인
+    final quietHoursAsync = ref.watch(quietHoursSettingsProvider);
+    final hasQuietHoursConflict = quietHoursAsync.when(
+      data: (quietHours) => _isInQuietHours(_selectedTime, quietHours),
+      loading: () => false,
+      error: (_, __) => false,
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -258,6 +287,40 @@ class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
                 ],
               ),
             ),
+
+            // 방해금지 시간 경고
+            if (hasQuietHoursConflict) ...[
+              const SizedBox(height: common.Spacing.md),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: common.Spacing.md),
+                child: Container(
+                  padding: const EdgeInsets.all(common.Spacing.sm),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.errorContainer,
+                    borderRadius: BorderRadius.circular(common.BorderRadii.md),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        AppIcons.warning,
+                        size: 16,
+                        color: theme.colorScheme.onErrorContainer,
+                      ),
+                      const SizedBox(width: common.Spacing.sm),
+                      Expanded(
+                        child: Text(
+                          'settings.daily_reminder_quiet_hours_warning'.tr(),
+                          style: textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onErrorContainer,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
 
             // 테스트 버튼
             const SizedBox(height: common.Spacing.md),

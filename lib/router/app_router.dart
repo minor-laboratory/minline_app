@@ -11,6 +11,7 @@ import '../features/posts/presentation/pages/post_detail_page.dart';
 import '../features/profile/presentation/pages/account_withdrawal_page.dart';
 import '../features/profile/presentation/pages/password_change_page.dart';
 import '../features/profile/presentation/pages/profile_detail_page.dart';
+import '../features/settings/presentation/pages/notifications_page.dart';
 import '../features/settings/presentation/pages/settings_page.dart';
 import '../features/share/presentation/pages/share_input_page.dart';
 import '../features/timeline/presentation/pages/tag_edit_page.dart';
@@ -99,6 +100,11 @@ final appRouter = GoRouter(
       name: 'settings',
       builder: (context, state) => const SettingsPage(),
       routes: [
+        // 알림 설정
+        GoRoute(
+          path: 'notifications',
+          builder: (context, state) => const NotificationsPage(),
+        ),
         // 프로필 비밀번호 변경
         GoRoute(
           path: 'profile/password',

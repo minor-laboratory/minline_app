@@ -14,8 +14,6 @@ import '../../../../shared/widgets/standard_bottom_sheet.dart';
 import '../../../auth/data/auth_repository.dart';
 import '../../../profile/widgets/user_profile_section.dart';
 import '../../providers/settings_provider.dart';
-import '../widgets/daily_reminder_sheet.dart';
-import '../widgets/draft_notification_sheet.dart';
 import '../widgets/language_settings_sheet.dart';
 import '../widgets/theme_settings_sheet.dart';
 
@@ -29,14 +27,11 @@ class SettingsPage extends ConsumerStatefulWidget {
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
   String _appVersion = '';
-  bool _dailyReminderEnabled = false;
-  TimeOfDay? _dailyReminderTime;
 
   @override
   void initState() {
     super.initState();
     _loadAppVersion();
-    _loadDailyReminderSettings();
   }
 
   Future<void> _loadAppVersion() async {
@@ -44,20 +39,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     setState(() {
       _appVersion = '${packageInfo.version} (${packageInfo.buildNumber})';
     });
-  }
-
-  Future<void> _loadDailyReminderSettings() async {
-    final prefs = await ref.read(sharedPreferencesProvider.future);
-    final enabled = prefs.getBool('daily_reminder_enabled') ?? false;
-    final hour = prefs.getInt('daily_reminder_hour') ?? 20;
-    final minute = prefs.getInt('daily_reminder_minute') ?? 0;
-
-    if (mounted) {
-      setState(() {
-        _dailyReminderEnabled = enabled;
-        _dailyReminderTime = TimeOfDay(hour: hour, minute: minute);
-      });
-    }
   }
 
   Future<void> _handleLogout() async {
@@ -236,28 +217,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
-  Future<void> _showDailyReminderSettings() async {
-    await StandardBottomSheet.show(
-      context: context,
-      title: 'settings.daily_reminder'.tr(),
-      content: const DailyReminderSheet(),
-      isDraggable: true,
-      isDismissible: true,
-    );
-    // Sheet가 닫힌 후 설정 다시 로드
-    await _loadDailyReminderSettings();
-  }
-
-  void _showDraftNotificationSettings() {
-    StandardBottomSheet.show(
-      context: context,
-      title: 'settings.draft_notifications'.tr(),
-      content: const DraftNotificationSheet(),
-      isDraggable: true,
-      isDismissible: true,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
@@ -387,22 +346,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
           ListTile(
             leading: Icon(AppIcons.notification),
-            title: Text('settings.daily_reminder'.tr()),
-            subtitle: Text(
-              _dailyReminderEnabled && _dailyReminderTime != null
-                  ? _dailyReminderTime!.format(context)
-                  : 'settings.daily_reminder_description'.tr(),
-            ),
+            title: Text('settings.notifications'.tr()),
+            subtitle: Text('settings.notifications_description'.tr()),
             trailing: Icon(AppIcons.chevronRight, size: 20),
-            onTap: _showDailyReminderSettings,
-          ),
-
-          ListTile(
-            leading: Icon(AppIcons.notification),
-            title: Text('settings.draft_notifications'.tr()),
-            subtitle: Text('settings.draft_notifications_description'.tr()),
-            trailing: Icon(AppIcons.chevronRight, size: 20),
-            onTap: _showDraftNotificationSettings,
+            onTap: () => context.push('/settings/notifications'),
           ),
 
           ShadSeparator.horizontal(
