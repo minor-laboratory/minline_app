@@ -275,7 +275,7 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
       child: Container(
         padding: const EdgeInsets.all(common.Spacing.md),
         decoration: BoxDecoration(
-          color: theme.colorScheme.background,
+          color: theme.colorScheme.card,
           border: Border(
             top: BorderSide(color: theme.colorScheme.border.withValues(alpha: 0.2)),
           ),
