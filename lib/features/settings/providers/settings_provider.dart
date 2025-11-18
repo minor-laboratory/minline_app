@@ -143,7 +143,7 @@ class AutoFocusInputNotifier extends _$AutoFocusInputNotifier {
     // Analytics 로그
     await AnalyticsService.logEvent(
       name: 'auto_focus_input_changed',
-      parameters: {'enabled': enabled},
+      parameters: {'enabled': enabled.toString()},
     );
   }
 }

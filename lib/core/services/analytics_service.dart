@@ -68,7 +68,7 @@ class AnalyticsService {
       name: 'fragment_added',
       parameters: {
         'fragment_id': fragmentId,
-        'has_image': hasImage,
+        'has_image': hasImage.toString(),
         if (contentLength != null) 'content_length': contentLength,
       },
     );
@@ -185,7 +185,7 @@ class AnalyticsService {
       name: 'share_received',
       parameters: {
         'content_type': contentType,
-        'has_image': hasImage,
+        'has_image': hasImage.toString(),
       },
     );
   }

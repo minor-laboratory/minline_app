@@ -12,6 +12,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/database/database_service.dart';
+import '../../../../core/database/isar_helpers.dart';
 import '../../../../core/services/analytics_service.dart';
 import '../../../../core/services/feedback_service.dart';
 import '../../../../core/utils/app_icons.dart';
@@ -74,7 +75,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
         // viewed = false → true 업데이트
         if (post != null && !post.viewed) {
           post.viewed = true;
-          await isar.writeTxn(() => isar.posts.put(post));
+          await isar.putWithSync(isar.posts, post);
         }
       }
     } catch (e, stack) {
@@ -97,8 +98,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     if (confirmed == true && mounted) {
       try {
         final isar = DatabaseService.instance.isar;
-        _post!.deleted = true;
-        await isar.writeTxn(() => isar.posts.put(_post!));
+        await isar.deleteWithSync(isar.posts, _post!);
 
         // Analytics 로그
         await AnalyticsService.logPostDeleted(_post!.remoteID);

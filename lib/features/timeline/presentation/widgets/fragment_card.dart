@@ -11,6 +11,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/database/database_service.dart';
+import '../../../../core/database/isar_helpers.dart';
 import '../../../../core/services/analytics_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
@@ -80,12 +81,8 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
 
     try {
       final isar = DatabaseService.instance.isar;
-      await isar.writeTxn(() async {
-        widget.fragment.content = _editController.text.trim();
-        widget.fragment.synced = false;
-        widget.fragment.refreshAt = DateTime.now().toLocal();
-        await isar.fragments.put(widget.fragment);
-      });
+      widget.fragment.content = _editController.text.trim();
+      await isar.putWithSync(isar.fragments, widget.fragment);
 
       // Analytics 로그
       await AnalyticsService.logFragmentEdited(
@@ -108,12 +105,7 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
 
     try {
       final isar = DatabaseService.instance.isar;
-      await isar.writeTxn(() async {
-        widget.fragment.deleted = true;
-        widget.fragment.synced = false;
-        widget.fragment.refreshAt = DateTime.now().toLocal();
-        await isar.fragments.put(widget.fragment);
-      });
+      await isar.deleteWithSync(isar.fragments, widget.fragment);
 
       // Analytics 로그
       await AnalyticsService.logFragmentDeleted(widget.fragment.remoteID);

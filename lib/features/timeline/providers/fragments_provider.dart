@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/database/database_service.dart';
+import '../../../core/providers/isar_stream_helpers.dart';
 import '../../../core/utils/logger.dart';
 import '../../../models/fragment.dart';
 import '../../settings/providers/settings_provider.dart';
@@ -33,32 +34,13 @@ Future<List<Fragment>> fragments(Ref ref) async {
 ///
 /// Isar watch로 실시간 변경 감지
 @riverpod
-Stream<List<Fragment>> fragmentsStream(Ref ref) async* {
-  final isar = DatabaseService.instance.isar;
-
-  // 초기값 먼저 방출
-  final initialFragments = await isar.fragments
-      .filter()
-      .deletedEqualTo(false)
-      .findAll();
-
-  initialFragments.sort((a, b) => (b.refreshAt ?? DateTime.now())
-      .compareTo(a.refreshAt ?? DateTime.now()));
-
-  yield initialFragments;
-
-  // watchLazy로 변경 이벤트만 감지
-  await for (final _ in isar.fragments.watchLazy()) {
-    final fragments = await isar.fragments
-        .filter()
-        .deletedEqualTo(false)
-        .findAll();
-
-    fragments.sort((a, b) => (b.refreshAt ?? DateTime.now())
-        .compareTo(a.refreshAt ?? DateTime.now()));
-
-    yield fragments;
-  }
+Stream<List<Fragment>> fragmentsStream(Ref ref) {
+  return IsarStreamHelpers.watchCollection<Fragment>(
+    collection: DatabaseService.instance.isar.fragments,
+    filter: (collection) => collection.filter().deletedEqualTo(false),
+    sort: (a, b) => (b.refreshAt ?? DateTime.now())
+        .compareTo(a.refreshAt ?? DateTime.now()),
+  );
 }
 
 /// Fragment 개수 Provider

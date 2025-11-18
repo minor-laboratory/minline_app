@@ -6,6 +6,7 @@ import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/database/database_service.dart';
+import '../../../../core/database/isar_helpers.dart';
 import '../../../../core/services/analytics_service.dart';
 import '../../../../core/services/feedback_service.dart';
 import '../../../../core/utils/app_icons.dart';
@@ -72,15 +73,12 @@ class _DraftCardState extends ConsumerState<DraftCard> {
     if (widget.draft.viewed) return;
 
     final isar = DatabaseService.instance.isar;
+    final draft = await isar.drafts.get(widget.draft.id);
 
-    await isar.writeTxn(() async {
-      final draft = await isar.drafts.get(widget.draft.id);
-      if (draft != null) {
-        draft.viewed = true;
-        draft.synced = false; // 서버 동기화 필요
-        await isar.drafts.put(draft);
-      }
-    });
+    if (draft != null) {
+      draft.viewed = true;
+      await isar.putWithSync(isar.drafts, draft);
+    }
   }
 
   Future<void> _updateStatus(String status) async {
@@ -90,16 +88,12 @@ class _DraftCardState extends ConsumerState<DraftCard> {
 
     try {
       final isar = DatabaseService.instance.isar;
+      final draft = await isar.drafts.get(widget.draft.id);
 
-      await isar.writeTxn(() async {
-        final draft = await isar.drafts.get(widget.draft.id);
-        if (draft != null) {
-          draft.status = status;
-          draft.synced = false;
-          draft.refreshAt = DateTime.now().toLocal();
-          await isar.drafts.put(draft);
-        }
-      });
+      if (draft != null) {
+        draft.status = status;
+        await isar.putWithSync(isar.drafts, draft);
+      }
 
       widget.onUpdate?.call();
     } catch (e) {

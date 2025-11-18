@@ -2,6 +2,7 @@ import 'package:isar_community/isar.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/database/database_service.dart';
+import '../../../core/providers/isar_stream_helpers.dart';
 import '../../../models/draft.dart';
 
 part 'drafts_provider.g.dart';
@@ -42,28 +43,12 @@ class DraftFilter extends _$DraftFilter {
 
 /// Draft 리스트 Stream Provider (필터 적용 전)
 @riverpod
-Stream<List<Draft>> draftsStream(Ref ref) async* {
-  final isar = DatabaseService.instance.isar;
-
-  // 초기값 먼저 방출
-  final initialDrafts = await isar.drafts
-      .filter()
-      .deletedEqualTo(false)
-      .findAll();
-
-  initialDrafts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-  yield initialDrafts;
-
-  // watchLazy로 변경 이벤트만 감지
-  await for (final _ in isar.drafts.watchLazy()) {
-    final drafts = await isar.drafts
-        .filter()
-        .deletedEqualTo(false)
-        .findAll();
-
-    drafts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    yield drafts;
-  }
+Stream<List<Draft>> draftsStream(Ref ref) {
+  return IsarStreamHelpers.watchCollection<Draft>(
+    collection: DatabaseService.instance.isar.drafts,
+    filter: (collection) => collection.filter().deletedEqualTo(false),
+    sort: (a, b) => b.createdAt.compareTo(a.createdAt),
+  );
 }
 
 /// 필터링된 Draft 리스트
