@@ -166,6 +166,8 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
       return;
     }
 
+    if (!mounted) return;
+
     setState(() => _isLoading = true);
 
     try {

@@ -193,11 +193,10 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     }
 
     // 피드백 페이지로 이동
-    if (mounted) {
-      await context.push<bool>(
-        '/feedback/post/${_post!.remoteID}',
-      );
-    }
+    // ignore: use_build_context_synchronously
+    await context.push<bool>(
+      '/feedback/post/${_post!.remoteID}',
+    );
   }
 
   String _getTemplateLabel(String template) {
