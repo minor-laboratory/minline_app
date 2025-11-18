@@ -169,6 +169,8 @@ class _DraftCardState extends ConsumerState<DraftCard> {
       '/feedback/draft/${widget.draft.remoteID}',
     );
 
+    if (!mounted) return;
+
     if (result == true) {
       _checkFeedback();
     }
