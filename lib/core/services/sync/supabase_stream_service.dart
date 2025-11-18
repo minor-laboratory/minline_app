@@ -8,6 +8,7 @@ import '../../../models/draft.dart';
 import '../../../models/fragment.dart';
 import '../../../models/post.dart';
 import '../../utils/logger.dart';
+import '../../utils/network_error_handler.dart';
 import 'sync_metadata_service.dart';
 
 /// Supabase Database Stream 기반 실시간 동기화 서비스
@@ -31,6 +32,13 @@ class SupabaseStreamService {
 
   /// 서비스 활성화 상태
   bool _isListening = false;
+
+  /// 재연결 상태
+  bool _isReconnecting = false;
+  int _reconnectAttempts = 0;
+  Timer? _reconnectTimer;
+  static const int _maxReconnectAttempts = 5;
+  static const int _baseReconnectDelaySeconds = 2;
 
   SupabaseStreamService();
 
@@ -71,8 +79,7 @@ class SupabaseStreamService {
         .gt('updated_at', fragmentLastSync.toIso8601String())
         .listen(
           (data) => _handleFragmentUpdate(data),
-          onError: (error, stack) =>
-              logger.e('Fragment stream error', error, stack),
+          onError: (error, stack) => _handleStreamError(error, stack),
         );
 
     // Draft stream 구독
@@ -82,7 +89,7 @@ class SupabaseStreamService {
         .gt('updated_at', draftLastSync.toIso8601String())
         .listen(
           (data) => _handleDraftUpdate(data),
-          onError: (error, stack) => logger.e('Draft stream error', error, stack),
+          onError: (error, stack) => _handleStreamError(error, stack),
         );
 
     // Post stream 구독
@@ -92,7 +99,7 @@ class SupabaseStreamService {
         .gt('updated_at', postLastSync.toIso8601String())
         .listen(
           (data) => _handlePostUpdate(data),
-          onError: (error, stack) => logger.e('Post stream error', error, stack),
+          onError: (error, stack) => _handleStreamError(error, stack),
         );
 
     logger.i('Started all stream subscriptions with server-side filtering');
@@ -218,8 +225,100 @@ class SupabaseStreamService {
     });
   }
 
+  /// Stream 에러 처리
+  Future<void> _handleStreamError(Object error, StackTrace stack) async {
+    logger.e('Stream error occurred', error, stack);
+
+    // 네트워크 에러 타입 판단
+    final errorType = NetworkErrorHandler.getErrorType(error);
+
+    // 연결 에러인지 확인
+    final isConnectionError = error.toString().contains('1006') ||
+        error.toString().contains('channelError') ||
+        error.toString().contains('RealtimeClose') ||
+        error.toString().contains('timedOut') ||
+        error.toString().contains('RealtimeSubscribeException') ||
+        errorType == NetworkErrorType.noConnection ||
+        errorType == NetworkErrorType.timeout;
+
+    if (isConnectionError) {
+      logger.w('Connection error detected, attempting reconnection...');
+      await _attemptReconnection();
+    }
+  }
+
+  /// 재연결 시도
+  Future<void> _attemptReconnection() async {
+    if (_isReconnecting) {
+      logger.d('Reconnection already in progress');
+      return;
+    }
+
+    _isReconnecting = true;
+    _reconnectAttempts++;
+
+    if (_reconnectAttempts > _maxReconnectAttempts) {
+      logger.e(
+          'Max reconnection attempts ($_maxReconnectAttempts) reached. Stopping reconnection.');
+      _isReconnecting = false;
+      _reconnectAttempts = 0;
+      return;
+    }
+
+    // Exponential backoff
+    final delaySeconds =
+        _baseReconnectDelaySeconds * (1 << (_reconnectAttempts - 1));
+    logger.i(
+        'Reconnection attempt $_reconnectAttempts/$_maxReconnectAttempts in ${delaySeconds}s...');
+
+    _reconnectTimer?.cancel();
+    _reconnectTimer = Timer(Duration(seconds: delaySeconds), () async {
+      try {
+        // JWT 토큰 리프레시
+        await _refreshAuthToken();
+
+        // 기존 구독 취소
+        await stopListening();
+
+        // 재구독
+        await startListening();
+
+        // 성공 시 재연결 상태 초기화
+        _reconnectAttempts = 0;
+        _isReconnecting = false;
+        logger.i('✅ Reconnection successful');
+      } catch (e, stack) {
+        logger.e('Reconnection failed', e, stack);
+        _isReconnecting = false;
+
+        // 재시도
+        await _attemptReconnection();
+      }
+    });
+  }
+
+  /// JWT 토큰 리프레시
+  Future<void> _refreshAuthToken() async {
+    try {
+      logger.i('Refreshing JWT token...');
+
+      final refreshResult = await _supabase.auth.refreshSession();
+
+      if (refreshResult.session != null) {
+        logger.i('✅ JWT token refreshed successfully');
+        _supabase.realtime.setAuth(refreshResult.session!.accessToken);
+      } else {
+        logger.e('❌ Failed to refresh JWT token: session is null');
+      }
+    } catch (e, stack) {
+      logger.e('❌ JWT token refresh error', e, stack);
+      rethrow;
+    }
+  }
+
   /// 서비스 정리
   void dispose() {
+    _reconnectTimer?.cancel();
     stopListening();
     logger.i('SupabaseStreamService disposed');
   }

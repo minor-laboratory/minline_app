@@ -185,7 +185,9 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
       targetId: _post!.remoteID,
     );
 
-    if (hasExisting && mounted) {
+    if (!mounted) return;
+
+    if (hasExisting) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('feedback.error_already_submitted'.tr())),
       );
@@ -193,8 +195,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     }
 
     // 피드백 페이지로 이동
-    // ignore: use_build_context_synchronously
-    await context.push<bool>(
+    context.push<bool>(
       '/feedback/post/${_post!.remoteID}',
     );
   }
