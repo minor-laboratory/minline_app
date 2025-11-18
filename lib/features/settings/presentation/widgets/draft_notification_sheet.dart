@@ -81,7 +81,7 @@ class _DraftNotificationSheetState
           (picked.hour == _endTime.hour && picked.minute >= _endTime.minute)) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('시작 시간은 종료 시간보다 빨라야 합니다'),
+            content: Text('settings.start_time_must_be_earlier'.tr()),
           ),
         );
         return;
@@ -104,7 +104,7 @@ class _DraftNotificationSheetState
           (picked.hour == _startTime.hour && picked.minute <= _startTime.minute)) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('종료 시간은 시작 시간보다 늦어야 합니다'),
+            content: Text('settings.end_time_must_be_later'.tr()),
           ),
         );
         return;

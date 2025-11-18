@@ -500,7 +500,7 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
                       currentUser?.email ?? 'unknown_email'.tr(),
                       style: theme.textTheme.bodyLarge,
                     ),
-                    SizedBox(height: 2),
+                    SizedBox(height: common.Spacing.xs),
                     Text(
                       'settings.${providerType}_login'.tr(),
                       style: theme.textTheme.bodySmall?.copyWith(

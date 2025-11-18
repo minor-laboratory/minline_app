@@ -365,7 +365,9 @@ class _DraftCardState extends ConsumerState<DraftCard> {
                           children: [
                             Text(
                               fragment.content,
-                              style: Theme.of(context).textTheme.bodySmall,
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.mutedForeground,
+                              ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),

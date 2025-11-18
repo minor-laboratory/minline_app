@@ -332,10 +332,10 @@ class _DailyReminderSheetState extends ConsumerState<DailyReminderSheet> {
                   await LocalNotificationService().showTestNotification();
                   if (!mounted) return;
                   messenger.showSnackBar(
-                    SnackBar(content: Text('테스트 알림 전송됨')),
+                    SnackBar(content: Text('settings.test_notification_sent'.tr())),
                   );
                 },
-                child: Text('테스트 알림 보내기'),
+                child: Text('settings.send_test_notification'.tr()),
               ),
             ),
         ],

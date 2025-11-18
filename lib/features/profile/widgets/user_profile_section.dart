@@ -204,7 +204,7 @@ class UserProfileSection extends ConsumerWidget {
                     ),
                     error: (_, __) => Text('0', style: theme.textTheme.headlineMedium),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: common.Spacing.xs),
                   Text(
                     'timeline.fragments'.tr(),
                     style: theme.textTheme.labelSmall?.copyWith(
@@ -259,7 +259,7 @@ class UserProfileSection extends ConsumerWidget {
                     ),
                     error: (_, __) => Text('0', style: theme.textTheme.headlineMedium),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: common.Spacing.xs),
                   Text(
                     'drafts.title'.tr(),
                     style: theme.textTheme.labelSmall?.copyWith(
@@ -314,7 +314,7 @@ class UserProfileSection extends ConsumerWidget {
                     ),
                     error: (_, __) => Text('0', style: theme.textTheme.headlineMedium),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: common.Spacing.xs),
                   Text(
                     'posts.title'.tr(),
                     style: theme.textTheme.labelSmall?.copyWith(

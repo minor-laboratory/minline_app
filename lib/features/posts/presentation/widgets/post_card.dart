@@ -100,7 +100,7 @@ class _PostCardState extends ConsumerState<PostCard> {
                   ),
                   SizedBox(width: common.Spacing.sm),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: common.Spacing.xs + 2, vertical: 2),
+                    padding: EdgeInsets.symmetric(horizontal: common.Spacing.sm, vertical: common.Spacing.xs),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.muted,
                       borderRadius: BorderRadius.circular(common.Spacing.xs),
