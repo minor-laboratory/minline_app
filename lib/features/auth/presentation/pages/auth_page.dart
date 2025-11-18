@@ -386,7 +386,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
         const SizedBox(height: common.Spacing.xl),
 
         // Submit Button
-        _buildSubmitButton(),
+        _buildSubmitButton(theme),
         const SizedBox(height: common.Spacing.md),
 
         // Mode Toggle
@@ -622,17 +622,17 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     );
   }
 
-  Widget _buildSubmitButton() {
+  Widget _buildSubmitButton(ShadThemeData theme) {
     return ShadButton(
       onPressed: (_isLoading || !_isFormValid) ? null : _handleEmailAuth,
       size: ShadButtonSize.lg,
       child: _isLoading
-          ? const SizedBox(
+          ? SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: Colors.white,
+                color: theme.colorScheme.primaryForeground,
               ),
             )
           : Text(_isSignUpMode ? 'auth.sign_up'.tr() : 'auth.login'.tr()),

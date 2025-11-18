@@ -330,7 +330,7 @@ class _ShareInputPageState extends ConsumerState<ShareInputPage> {
   /// Bottom Sheet 스타일 콘텐츠 (ShareActivity용)
   Widget _buildBottomSheetContent(ShadThemeData theme) {
     return Scaffold(
-      backgroundColor: Colors.black.withAlpha(128), // 반투명 배경
+      backgroundColor: theme.colorScheme.background.withValues(alpha: 0.5), // 반투명 배경
       body: Align(
         alignment: Alignment.bottomCenter,
         child: Container(

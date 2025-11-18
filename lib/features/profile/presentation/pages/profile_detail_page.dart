@@ -335,13 +335,13 @@ class _ProfileDetailPageState extends ConsumerState<ProfileDetailPage> {
                       ),
                       child: IconButton(
                         icon: _isImageUploading
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 20,
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
+                                    theme.colorScheme.primaryForeground,
                                   ),
                                 ),
                               )
