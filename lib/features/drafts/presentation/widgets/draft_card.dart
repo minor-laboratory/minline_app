@@ -6,6 +6,7 @@ import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/database/database_service.dart';
+import '../../../../core/services/analytics_service.dart';
 import '../../../../core/services/feedback_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../models/draft.dart';
@@ -145,6 +146,9 @@ class _DraftCardState extends ConsumerState<DraftCard> {
           await isar.drafts.put(draft);
         }
       });
+
+      // Analytics 로그
+      await AnalyticsService.logDraftDeleted(widget.draft.remoteID);
 
       widget.onUpdate?.call();
     } catch (e) {

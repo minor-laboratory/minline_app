@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/database/database_service.dart';
+import '../../../core/services/analytics_service.dart';
 import '../../../core/services/sync/sync_metadata_service.dart';
 import '../../../core/utils/logger.dart';
 import '../../../core/utils/network_error_handler.dart';
@@ -38,6 +39,8 @@ class AuthRepository {
       if (response.user != null) {
         logger.i('Login successful for user: ${response.user!.id}');
         await _reinitializeDatabase();
+        await AnalyticsService.logLogin('email');
+        await AnalyticsService.setUserId(response.user!.id);
       }
       return response;
     } catch (e, stackTrace) {
@@ -65,6 +68,8 @@ class AuthRepository {
       if (response.user != null) {
         logger.i('Sign up successful for user: ${response.user!.id}');
         await _createUserProfile(response.user!.id, email, name);
+        await AnalyticsService.logSignUp('email');
+        await AnalyticsService.setUserId(response.user!.id);
       }
 
       return response;
@@ -87,6 +92,8 @@ class AuthRepository {
       if (currentUser != null) {
         logger.i('Google login successful for user: ${currentUser!.id}');
         await _reinitializeDatabase();
+        await AnalyticsService.logLogin('google');
+        await AnalyticsService.setUserId(currentUser!.id);
       }
 
       return AuthResponse(user: currentUser);
@@ -109,6 +116,8 @@ class AuthRepository {
       if (currentUser != null) {
         logger.i('Apple login successful for user: ${currentUser!.id}');
         await _reinitializeDatabase();
+        await AnalyticsService.logLogin('apple');
+        await AnalyticsService.setUserId(currentUser!.id);
       }
 
       return AuthResponse(user: currentUser);
@@ -137,6 +146,10 @@ class AuthRepository {
       // 4. 동기화 메타데이터 초기화
       await SyncMetadataService.resetAllSyncMetadata();
       logger.i('Sync metadata cleared');
+
+      // 5. Analytics 로그아웃 기록
+      await AnalyticsService.logLogout();
+      await AnalyticsService.setUserId(null);
 
       logger.i('Sign out completed successfully');
     } catch (e) {

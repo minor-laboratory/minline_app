@@ -12,6 +12,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/database/database_service.dart';
+import '../../../../core/services/analytics_service.dart';
 import '../../../../core/services/feedback_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
@@ -98,6 +99,9 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
         final isar = DatabaseService.instance.isar;
         _post!.deleted = true;
         await isar.writeTxn(() => isar.posts.put(_post!));
+
+        // Analytics 로그
+        await AnalyticsService.logPostDeleted(_post!.remoteID);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

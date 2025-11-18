@@ -3,6 +3,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
 
+import '../../../core/services/analytics_service.dart';
+
 part 'settings_provider.g.dart';
 
 /// SharedPreferences Provider
@@ -36,6 +38,9 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
 
     final prefs = await ref.read(sharedPreferencesProvider.future);
     await prefs.setString(_key, mode.toString());
+
+    // Analytics 로그
+    await AnalyticsService.logThemeChanged(mode.toString().split('.').last);
   }
 }
 
@@ -84,6 +89,9 @@ class LocaleNotifier extends _$LocaleNotifier {
     } else {
       await prefs.remove(_key);
     }
+
+    // Analytics 로그
+    await AnalyticsService.logLanguageChanged(locale?.languageCode ?? 'system');
   }
 }
 
@@ -131,6 +139,12 @@ class AutoFocusInputNotifier extends _$AutoFocusInputNotifier {
 
     final prefs = await ref.read(sharedPreferencesProvider.future);
     await prefs.setBool(_key, enabled);
+
+    // Analytics 로그
+    await AnalyticsService.logEvent(
+      name: 'auto_focus_input_changed',
+      parameters: {'enabled': enabled},
+    );
   }
 }
 

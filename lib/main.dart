@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -34,11 +35,14 @@ void main() async {
   // Isar Database 초기화 (로컬 데이터베이스)
   await DatabaseService.instance.init();
 
-  // Firebase 초기화 (FCM, Crashlytics 사용)
+  // Firebase 초기화 (FCM, Crashlytics, Analytics 사용)
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   logger.i('Firebase initialized successfully');
+
+  // Firebase Analytics 초기화
+  FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
 
   // Crashlytics 초기화 (릴리즈 빌드에서 에러 추적)
   if (kReleaseMode) {

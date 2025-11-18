@@ -13,6 +13,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/database/database_service.dart';
 import '../../../../core/providers/shared_media_provider.dart';
+import '../../../../core/services/analytics_service.dart';
 import '../../../../core/services/media/media_service.dart';
 import '../../../../core/services/share_activity_service.dart';
 import '../../../../core/utils/app_icons.dart';
@@ -284,6 +285,12 @@ class _ShareInputPageState extends ConsumerState<ShareInputPage> {
       await isar.writeTxn(() async {
         await isar.fragments.put(fragment);
       });
+
+      // Analytics 로그
+      await AnalyticsService.logShareReceived(
+        contentType: _contentController.text.isNotEmpty ? 'text' : 'media',
+        hasImage: mediaUrls.isNotEmpty,
+      );
 
       // 공유 데이터 초기화
       ref.read(sharedMediaProvider.notifier).clear();

@@ -11,6 +11,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/database/database_service.dart';
+import '../../../../core/services/analytics_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../models/draft.dart';
@@ -86,6 +87,12 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
         await isar.fragments.put(widget.fragment);
       });
 
+      // Analytics 로그
+      await AnalyticsService.logFragmentEdited(
+        fragmentId: widget.fragment.remoteID,
+        contentLength: widget.fragment.content.length,
+      );
+
       setState(() => _isEditing = false);
       widget.onUpdate?.call();
     } catch (e, stack) {
@@ -107,6 +114,9 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
         widget.fragment.refreshAt = DateTime.now().toLocal();
         await isar.fragments.put(widget.fragment);
       });
+
+      // Analytics 로그
+      await AnalyticsService.logFragmentDeleted(widget.fragment.remoteID);
 
       widget.onUpdate?.call();
     } catch (e, stack) {

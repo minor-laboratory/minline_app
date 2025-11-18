@@ -10,6 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/database/database_service.dart';
+import '../../../../core/services/analytics_service.dart';
 import '../../../../core/services/media/media_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
@@ -216,6 +217,13 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
       await isar.writeTxn(() async {
         await isar.fragments.put(fragment);
       });
+
+      // Analytics 로그
+      await AnalyticsService.logFragmentAdded(
+        fragmentId: fragmentId,
+        hasImage: mediaUrls.isNotEmpty,
+        contentLength: fragment.content.length,
+      );
 
       // 입력 초기화
       if (!mounted) return;

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../router/app_router.dart' as router;
 import '../utils/logger.dart';
+import 'analytics_service.dart';
 import 'device_info_service.dart';
 import 'local_notification_service.dart';
 
@@ -126,8 +127,17 @@ class FcmService {
 
     // payload로 data 전달 (draft_id 등)
     String? payload;
+    String? notificationType;
     if (message.data.containsKey('draft_id')) {
       payload = 'draft:${message.data['draft_id']}';
+      notificationType = 'draft_created';
+    }
+
+    // Analytics 로그
+    if (notificationType != null) {
+      await AnalyticsService.logNotificationReceived(
+        notificationType: notificationType,
+      );
     }
 
     // 즉시 표시 (서버에서 방해금지 시간 이미 체크됨)
@@ -147,6 +157,11 @@ class FcmService {
     final draftId = message.data['draft_id'];
     if (draftId != null) {
       logger.i('[FCM] Navigate to draft detail: $draftId');
+
+      // Analytics 로그
+      AnalyticsService.logNotificationOpened(
+        notificationType: 'draft_created',
+      );
 
       // GoRouter를 사용하여 네비게이션
       final context = router.navigatorKey.currentContext;
