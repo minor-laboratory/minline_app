@@ -181,6 +181,7 @@
     "draft_notifications_description": "AI가 초안을 생성하면 알림",
     "draft_completion_notification": "초안 생성 완료 알림",
     "draft_completion_description": "AI가 새로운 초안을 생성하면 푸시 알림",
+    "draft_notification_time_range": "알림 허용 시간대",
     "post_notification": "게시글 알림",
     "post_notification_description": "게시글 관련 알림 수신",
     "select_time": "시간 선택",
@@ -217,7 +218,11 @@
     "weekday_4": "목",
     "weekday_5": "금",
     "weekday_6": "토",
-    "weekday_7": "일"
+    "weekday_7": "일",
+    "test_notification_sent": "테스트 알림 전송됨",
+    "send_test_notification": "테스트 알림 보내기",
+    "start_time_must_be_earlier": "시작 시간은 종료 시간보다 빨라야 합니다",
+    "end_time_must_be_later": "종료 시간은 시작 시간보다 늦어야 합니다"
   },
   "theme": {
     "mode": "테마 모드",

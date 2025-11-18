@@ -181,6 +181,7 @@
     "draft_notifications_description": "Notify when AI creates a draft",
     "draft_completion_notification": "Draft Creation Notification",
     "draft_completion_description": "Receive push notification when AI creates a new draft",
+    "draft_notification_time_range": "Allowed notification hours",
     "post_notification": "Post Notification",
     "post_notification_description": "Receive post-related notifications",
     "select_time": "Select Time",
@@ -217,7 +218,11 @@
     "weekday_4": "Thu",
     "weekday_5": "Fri",
     "weekday_6": "Sat",
-    "weekday_7": "Sun"
+    "weekday_7": "Sun",
+    "test_notification_sent": "Test notification sent",
+    "send_test_notification": "Send test notification",
+    "start_time_must_be_earlier": "Start time must be earlier than end time",
+    "end_time_must_be_later": "End time must be later than start time"
   },
   "theme": {
     "mode": "Theme Mode",
@@ -293,6 +298,7 @@
     "terms_of_service": "Terms of Service",
     "and": "and",
     "privacy_policy": "Privacy Policy",
+    "agree_to_terms": "agree to the terms",
     "login_success": "Logged in successfully",
     "signup_success": "Signed up successfully",
     "reset_password": "Reset Password",
@@ -467,6 +473,13 @@
       "poor_writing": "Poor writing quality",
       "wrong_tone": "Wrong tone",
       "too_short": "Too short"
+    }
+  },
+  "notification": {
+    "draft_created": {
+      "title": "New draft created",
+      "single": "1 new draft has been created",
+      "multiple": "{} new drafts have been created"
     }
   }
 }
