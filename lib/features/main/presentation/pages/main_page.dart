@@ -84,7 +84,7 @@ class _MainPageState extends ConsumerState<MainPage>
         } else {
           // fab 모드: 모달 표시
           logger.i('MainPage: FAB mode, showing fragment input modal');
-          _showFragmentInputModal();
+          showFragmentInputModal(context);
         }
       } else {
         // 다른 탭으로 이동
@@ -245,11 +245,6 @@ class _MainPageState extends ConsumerState<MainPage>
     });
   }
 
-  /// Fragment 입력 모달 표시 (notification 탭 시)
-  void _showFragmentInputModal() {
-    showFragmentInputModal(context);
-  }
-
   // Draft: 분석 실행
   Future<void> _handleAnalyzeNow() async {
     if (_isAnalyzing) return;
@@ -354,7 +349,7 @@ class _MainPageState extends ConsumerState<MainPage>
       // fab 모드일 때 FAB 표시 (모든 탭)
       floatingActionButton: inputMode == 'fab'
           ? FloatingActionButton(
-              onPressed: _showFragmentInputModal,
+              onPressed: () => showFragmentInputModal(context),
               child: Icon(AppIcons.add),
             )
           : null,

@@ -279,13 +279,8 @@ class LocalNotificationService {
       logger.i(
         '[LocalNotification] Showing fragment input modal (not on MainPage)',
       );
-      _showFragmentInputModal(context);
+      showFragmentInputModal(context);
     }
-  }
-
-  /// Fragment 입력 모달 표시 (notification 탭 시)
-  void _showFragmentInputModal(BuildContext context) {
-    showFragmentInputModal(context);
   }
 
   /// Drafts 페이지로 이동
