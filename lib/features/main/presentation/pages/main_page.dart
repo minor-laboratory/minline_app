@@ -75,6 +75,8 @@ class _MainPageState extends ConsumerState<MainPage>
         final inputModeAsync = await ref.read(fragmentInputModeProvider.future);
         final inputMode = inputModeAsync;
 
+        if (!mounted) return;
+
         if (inputMode == 'inline') {
           // inline 모드: 입력창 포커스
           if (_timelineFocusTrigger != null) {
