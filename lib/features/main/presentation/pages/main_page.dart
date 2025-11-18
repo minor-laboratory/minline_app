@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
+import '../../../../shared/widgets/keyboard_animation_builder.dart';
 import '../../../../shared/widgets/user_avatar_button.dart';
 import '../../../drafts/presentation/widgets/drafts_view.dart';
 import '../../../drafts/providers/drafts_provider.dart';
@@ -32,7 +33,8 @@ class MainPage extends ConsumerStatefulWidget {
   ConsumerState<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver {
+class _MainPageState extends ConsumerState<MainPage>
+    with WidgetsBindingObserver {
   late final PageController _pageController;
   late int _currentPageIndex;
 
@@ -60,7 +62,7 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
     WidgetsBinding.instance.addObserver(this);
 
     // Notification에서 탭 변경 요청 시 사용할 callback 설정
-    MainPage.onTabChangeRequested = (index) {
+    MainPage.onTabChangeRequested = (index) async {
       logger.d('[MainPage] Callback called: index=$index, mounted=$mounted');
       if (!mounted || index < 0 || index > 2) {
         logger.w('[MainPage] Early return: mounted=$mounted, index=$index');
@@ -69,20 +71,19 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
 
       // index 0 (타임라인) 요청 시
       if (index == 0) {
-        if (_currentPageIndex == 0) {
-          // 이미 타임라인 탭이면
+        // 입력 방식 확인
+        final inputModeAsync = await ref.read(fragmentInputModeProvider.future);
+        final inputMode = inputModeAsync;
+
+        if (inputMode == 'inline') {
+          // inline 모드: 입력창 포커스
           if (_timelineFocusTrigger != null) {
-            // Timeline 모드 (입력창 있음) → 포커스
-            logger.i('MainPage: Timeline mode, focusing input');
+            logger.i('MainPage: Inline mode, focusing input');
             _timelineFocusTrigger!.call();
-          } else {
-            // Calendar 모드 (입력창 없음) → 모달 표시
-            logger.i('MainPage: Calendar mode, showing fragment input modal');
-            _showFragmentInputModal();
           }
         } else {
-          // 다른 탭이면 → Fragment 입력 모달 표시
-          logger.i('MainPage: On different tab, showing fragment input modal');
+          // fab 모드: 모달 표시
+          logger.i('MainPage: FAB mode, showing fragment input modal');
           _showFragmentInputModal();
         }
       } else {
@@ -101,7 +102,10 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
       if (widget.initialTab == null) {
         final savedIndex = await ref.read(lastTabIndexProvider.future);
 
-        if (mounted && savedIndex != _currentPageIndex && savedIndex >= 0 && savedIndex <= 2) {
+        if (mounted &&
+            savedIndex != _currentPageIndex &&
+            savedIndex >= 0 &&
+            savedIndex <= 2) {
           setState(() {
             _currentPageIndex = savedIndex;
           });
@@ -118,8 +122,11 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
   @override
   void didUpdateWidget(MainPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.initialTab != widget.initialTab && widget.initialTab != null) {
-      logger.i('MainPage tab changed: ${oldWidget.initialTab} -> ${widget.initialTab}');
+    if (oldWidget.initialTab != widget.initialTab &&
+        widget.initialTab != null) {
+      logger.i(
+        'MainPage tab changed: ${oldWidget.initialTab} -> ${widget.initialTab}',
+      );
       setState(() {
         _currentPageIndex = widget.initialTab!;
       });
@@ -149,7 +156,9 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
 
   /// 앱 포그라운드 진입 시 처리
   void _handleAppResumed() async {
-    logger.d('[MainPage] _handleAppResumed - pageIndex: $_currentPageIndex, searchMode: $_isSearchMode');
+    logger.d(
+      '[MainPage] _handleAppResumed - pageIndex: $_currentPageIndex, searchMode: $_isSearchMode',
+    );
 
     // 타임라인 탭이 아니면 무시
     if (_currentPageIndex != 0) {
@@ -166,7 +175,9 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
     // 설정 확인 (비동기 - Provider 로드 완료까지 대기)
     try {
       final enabled = await ref.read(autoFocusInputProvider.future);
-      logger.d('[MainPage] Auto-focus enabled: $enabled, trigger: ${_timelineFocusTrigger != null}');
+      logger.d(
+        '[MainPage] Auto-focus enabled: $enabled, trigger: ${_timelineFocusTrigger != null}',
+      );
 
       if (enabled && _timelineFocusTrigger != null) {
         logger.d('[MainPage] Triggering focus');
@@ -247,10 +258,8 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
         decoration: BoxDecoration(
-          color: theme.colorScheme.background,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(16),
-          ),
+          color: theme.colorScheme.muted,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -261,15 +270,12 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: theme.colorScheme.muted,
+                color: theme.colorScheme.mutedForeground,
                 borderRadius: BorderRadius.circular(common.BorderRadii.xs),
               ),
             ),
             // Fragment 입력바
-            const FragmentInputBar(
-              autoFocus: true,
-              dismissOnSave: true,
-            ),
+            const FragmentInputBar(autoFocus: true, dismissOnSave: true),
           ],
         ),
       ),
@@ -334,25 +340,56 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
 
   @override
   Widget build(BuildContext context) {
+    final inputModeAsync = ref.watch(fragmentInputModeProvider);
+    final inputMode = inputModeAsync.asData?.value ?? 'inline';
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: _isSearchMode ? _buildSearchAppBar() : _buildDefaultAppBar(),
-      body: PageView(
-        controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(),
-        onPageChanged: _onPageChanged,
+      body: Stack(
         children: [
-          TimelineView(
-            viewMode: _viewMode,
-            onEnterSearchMode: _enterSearchMode,
-            onRegisterFocusTrigger: (trigger) {
-              _timelineFocusTrigger = trigger;
-            },
+          // 페이지 뷰
+          PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            onPageChanged: _onPageChanged,
+            children: [
+              TimelineView(
+                viewMode: _viewMode,
+                onEnterSearchMode: _enterSearchMode,
+              ),
+              DraftsView(analyzeMessage: _analyzeMessage),
+              const PostsView(),
+            ],
           ),
-          DraftsView(analyzeMessage: _analyzeMessage),
-          const PostsView(),
+          // inline 모드일 때 하단 입력창 표시 (모든 탭)
+          if (inputMode == 'inline')
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: KeyboardAnimationBuilder(
+                builder: (context, keyboardHeight) {
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: keyboardHeight),
+                    child: FragmentInputBar(
+                      onRegisterFocusTrigger: (trigger) {
+                        _timelineFocusTrigger = trigger;
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
         ],
       ),
+      // fab 모드일 때 FAB 표시 (모든 탭)
+      floatingActionButton: inputMode == 'fab'
+          ? FloatingActionButton(
+              onPressed: _showFragmentInputModal,
+              child: Icon(AppIcons.add),
+            )
+          : null,
     );
   }
 
@@ -412,7 +449,9 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
       centerTitle: true,
       actions: const [
         Padding(
-          padding: EdgeInsets.only(right: common.Spacing.sm + common.Spacing.xs),
+          padding: EdgeInsets.only(
+            right: common.Spacing.sm + common.Spacing.xs,
+          ),
           child: Center(child: UserAvatarButton()),
         ),
       ],
@@ -456,15 +495,21 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
                   child: Row(
                     children: filter.selectedTags.map((tag) {
                       return Padding(
-                        padding: const EdgeInsets.only(right: common.Spacing.xs),
+                        padding: const EdgeInsets.only(
+                          right: common.Spacing.xs,
+                        ),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: common.Spacing.sm - common.Spacing.xs,
                             vertical: common.Spacing.xs / 2,
                           ),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(common.BorderRadii.full),
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.1,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              common.BorderRadii.full,
+                            ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,

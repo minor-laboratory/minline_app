@@ -171,3 +171,33 @@ class LastTabIndexNotifier extends _$LastTabIndexNotifier {
     await prefs.setInt(_key, index);
   }
 }
+
+/// Fragment 입력 방식 Provider
+@riverpod
+class FragmentInputModeNotifier extends _$FragmentInputModeNotifier {
+  static const String _key = 'fragment_input_mode';
+
+  @override
+  Future<String> build() async {
+    final prefs = await ref.watch(sharedPreferencesProvider.future);
+    return prefs.getString(_key) ?? 'inline'; // 기본값: inline (하단 고정 입력창)
+  }
+
+  Future<void> setInputMode(String mode) async {
+    // 'inline' 또는 'fab'만 허용
+    if (mode != 'inline' && mode != 'fab') {
+      return;
+    }
+
+    state = AsyncValue.data(mode);
+
+    final prefs = await ref.read(sharedPreferencesProvider.future);
+    await prefs.setString(_key, mode);
+
+    // Analytics 로그
+    await AnalyticsService.logEvent(
+      name: 'fragment_input_mode_changed',
+      parameters: {'mode': mode},
+    );
+  }
+}

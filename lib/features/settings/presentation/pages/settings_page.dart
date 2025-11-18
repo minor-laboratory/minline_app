@@ -337,6 +337,32 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             },
           ),
 
+          Consumer(
+            builder: (context, ref, child) {
+              final inputModeAsync = ref.watch(fragmentInputModeProvider);
+
+              return inputModeAsync.when(
+                data: (mode) => ListTile(
+                  leading: Icon(AppIcons.edit),
+                  title: Text('settings.fragment_input_mode'.tr()),
+                  subtitle: Text(_getInputModeLabel(mode)),
+                  trailing: Icon(AppIcons.chevronRight, size: 20),
+                  onTap: () => _showInputModeSettings(mode),
+                ),
+                loading: () => ListTile(
+                  leading: Icon(AppIcons.edit),
+                  title: Text('settings.fragment_input_mode'.tr()),
+                  trailing: Icon(AppIcons.chevronRight, size: 20),
+                ),
+                error: (_, __) => ListTile(
+                  leading: Icon(AppIcons.edit),
+                  title: Text('settings.fragment_input_mode'.tr()),
+                  trailing: Icon(AppIcons.chevronRight, size: 20),
+                ),
+              );
+            },
+          ),
+
           ShadSeparator.horizontal(
             margin: const EdgeInsets.symmetric(horizontal: common.Spacing.md),
           ),
@@ -456,5 +482,61 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       default:
         return locale.languageCode;
     }
+  }
+
+  String _getInputModeLabel(String mode) {
+    switch (mode) {
+      case 'inline':
+        return 'settings.input_mode_inline'.tr();
+      case 'fab':
+        return 'settings.input_mode_fab'.tr();
+      default:
+        return 'settings.input_mode_inline'.tr();
+    }
+  }
+
+  void _showInputModeSettings(String currentMode) {
+    final theme = ShadTheme.of(context);
+
+    StandardBottomSheet.show(
+      context: context,
+      title: 'settings.fragment_input_mode'.tr(),
+      content: Consumer(
+        builder: (context, ref, child) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(AppIcons.edit),
+                title: Text('settings.input_mode_inline'.tr()),
+                subtitle: Text('settings.input_mode_inline_description'.tr()),
+                trailing: currentMode == 'inline'
+                    ? Icon(AppIcons.check, color: theme.colorScheme.primary)
+                    : null,
+                onTap: () {
+                  ref.read(fragmentInputModeProvider.notifier).setInputMode('inline');
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: common.Spacing.sm),
+              ListTile(
+                leading: Icon(AppIcons.add),
+                title: Text('settings.input_mode_fab'.tr()),
+                subtitle: Text('settings.input_mode_fab_description'.tr()),
+                trailing: currentMode == 'fab'
+                    ? Icon(AppIcons.check, color: theme.colorScheme.primary)
+                    : null,
+                onTap: () {
+                  ref.read(fragmentInputModeProvider.notifier).setInputMode('fab');
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      ),
+      isDraggable: true,
+      isDismissible: true,
+    );
   }
 }

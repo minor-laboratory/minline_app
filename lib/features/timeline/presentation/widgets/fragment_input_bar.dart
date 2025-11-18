@@ -55,7 +55,9 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
         logger.d('[FragmentInputBar] Focus trigger called, requesting focus');
         _focusNode.requestFocus();
       } else {
-        logger.d('[FragmentInputBar] Focus trigger called but widget not mounted');
+        logger.d(
+          '[FragmentInputBar] Focus trigger called but widget not mounted',
+        );
       }
     });
     logger.d('[FragmentInputBar] initState - callback registered');
@@ -290,7 +292,9 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
       decoration: BoxDecoration(
         color: theme.colorScheme.muted,
         border: Border(
-          top: BorderSide(color: theme.colorScheme.border.withValues(alpha: 0.2)),
+          top: BorderSide(
+            color: theme.colorScheme.border.withValues(alpha: 0.2),
+          ),
         ),
       ),
       child: Column(
