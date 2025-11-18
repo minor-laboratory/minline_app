@@ -57,17 +57,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         await authRepo.signOut();
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('settings.logout'.tr())),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('settings.logout'.tr())));
           // 타임라인으로 이동 (로컬 퍼스트: 로그아웃 후에도 사용 가능)
           context.go('/');
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('common.error'.tr())),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('common.error'.tr())));
         }
       }
     }
@@ -96,21 +96,26 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 data: (themeMode) => colorThemeAsync.when(
                   data: (colorTheme) => backgroundColorAsync.when(
                     data: (backgroundOption) {
-                      final shadLightTheme = common.MinorLabShadTheme.lightTheme(
-                        paletteId: colorTheme,
-                        backgroundOption: backgroundOption,
-                      );
+                      final shadLightTheme =
+                          common.MinorLabShadTheme.lightTheme(
+                            paletteId: colorTheme,
+                            backgroundOption: backgroundOption,
+                          );
                       final shadDarkTheme = common.MinorLabShadTheme.darkTheme(
                         paletteId: colorTheme,
                         backgroundOption: backgroundOption,
                       );
 
-                      final brightness = MediaQuery.of(context).platformBrightness;
+                      final brightness = MediaQuery.of(
+                        context,
+                      ).platformBrightness;
                       final currentShadTheme = themeMode == ThemeMode.dark
                           ? shadDarkTheme
                           : themeMode == ThemeMode.light
-                              ? shadLightTheme
-                              : (brightness == Brightness.dark ? shadDarkTheme : shadLightTheme);
+                          ? shadLightTheme
+                          : (brightness == Brightness.dark
+                                ? shadDarkTheme
+                                : shadLightTheme);
 
                       final cardColor = currentShadTheme.colorScheme.card;
 
@@ -168,21 +173,26 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 data: (themeMode) => colorThemeAsync.when(
                   data: (colorTheme) => backgroundColorAsync.when(
                     data: (backgroundOption) {
-                      final shadLightTheme = common.MinorLabShadTheme.lightTheme(
-                        paletteId: colorTheme,
-                        backgroundOption: backgroundOption,
-                      );
+                      final shadLightTheme =
+                          common.MinorLabShadTheme.lightTheme(
+                            paletteId: colorTheme,
+                            backgroundOption: backgroundOption,
+                          );
                       final shadDarkTheme = common.MinorLabShadTheme.darkTheme(
                         paletteId: colorTheme,
                         backgroundOption: backgroundOption,
                       );
 
-                      final brightness = MediaQuery.of(context).platformBrightness;
+                      final brightness = MediaQuery.of(
+                        context,
+                      ).platformBrightness;
                       final currentShadTheme = themeMode == ThemeMode.dark
                           ? shadDarkTheme
                           : themeMode == ThemeMode.light
-                              ? shadLightTheme
-                              : (brightness == Brightness.dark ? shadDarkTheme : shadLightTheme);
+                          ? shadLightTheme
+                          : (brightness == Brightness.dark
+                                ? shadDarkTheme
+                                : shadLightTheme);
 
                       final cardColor = currentShadTheme.colorScheme.card;
 
@@ -191,10 +201,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         child: const ThemeSettingsSheet(),
                       );
                     },
-                    loading: () => const Center(child: CircularProgressIndicator()),
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
                     error: (_, __) => Center(child: Text('common.error'.tr())),
                   ),
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (_, __) => Center(child: Text('common.error'.tr())),
                 ),
                 loading: () => const Center(child: CircularProgressIndicator()),
@@ -223,9 +235,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final isLoggedIn = user != null && !(user.isAnonymous);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('settings.title'.tr()),
-      ),
+      appBar: AppBar(title: Text('settings.title'.tr())),
       body: ListView(
         children: [
           // 프로필 섹션
@@ -308,30 +318,28 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   trailing: ShadSwitch(
                     value: enabled,
                     onChanged: (value) {
-                      ref.read(autoFocusInputProvider.notifier).setAutoFocusInput(value);
+                      ref
+                          .read(autoFocusInputProvider.notifier)
+                          .setAutoFocusInput(value);
                     },
                   ),
                   onTap: () {
-                    ref.read(autoFocusInputProvider.notifier).setAutoFocusInput(!enabled);
+                    ref
+                        .read(autoFocusInputProvider.notifier)
+                        .setAutoFocusInput(!enabled);
                   },
                 ),
                 loading: () => ListTile(
                   leading: Icon(AppIcons.edit),
                   title: Text('settings.auto_focus_input'.tr()),
                   subtitle: Text('settings.auto_focus_input_description'.tr()),
-                  trailing: ShadSwitch(
-                    value: false,
-                    onChanged: null,
-                  ),
+                  trailing: ShadSwitch(value: false, onChanged: null),
                 ),
                 error: (_, __) => ListTile(
                   leading: Icon(AppIcons.edit),
                   title: Text('settings.auto_focus_input'.tr()),
                   subtitle: Text('settings.auto_focus_input_description'.tr()),
-                  trailing: ShadSwitch(
-                    value: false,
-                    onChanged: null,
-                  ),
+                  trailing: ShadSwitch(value: false, onChanged: null),
                 ),
               );
             },
@@ -420,11 +428,16 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 return Column(
                   children: [
                     const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: common.Spacing.md),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: common.Spacing.md,
+                      ),
                       child: ShadSeparator.horizontal(),
                     ),
                     ListTile(
-                      leading: Icon(AppIcons.logout, color: theme.colorScheme.destructive),
+                      leading: Icon(
+                        AppIcons.logout,
+                        color: theme.colorScheme.destructive,
+                      ),
                       title: Text(
                         'settings.logout'.tr(),
                         style: theme.textTheme.large.copyWith(
@@ -455,9 +468,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       ),
       child: Text(
         title,
-        style: theme.textTheme.small.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
+        style: theme.textTheme.small.copyWith(fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -514,7 +525,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     ? Icon(AppIcons.check, color: theme.colorScheme.primary)
                     : null,
                 onTap: () {
-                  ref.read(fragmentInputModeProvider.notifier).setInputMode('inline');
+                  ref
+                      .read(fragmentInputModeProvider.notifier)
+                      .setInputMode('inline');
                   Navigator.pop(context);
                 },
               ),
@@ -527,7 +540,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     ? Icon(AppIcons.check, color: theme.colorScheme.primary)
                     : null,
                 onTap: () {
-                  ref.read(fragmentInputModeProvider.notifier).setInputMode('fab');
+                  ref
+                      .read(fragmentInputModeProvider.notifier)
+                      .setInputMode('fab');
                   Navigator.pop(context);
                 },
               ),

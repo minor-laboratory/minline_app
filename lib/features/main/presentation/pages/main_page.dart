@@ -247,39 +247,7 @@ class _MainPageState extends ConsumerState<MainPage>
 
   /// Fragment 입력 모달 표시 (notification 탭 시)
   void _showFragmentInputModal() {
-    final theme = ShadTheme.of(context);
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.muted,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 상단 핸들
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: common.Spacing.sm),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.mutedForeground,
-                borderRadius: BorderRadius.circular(common.BorderRadii.xs),
-              ),
-            ),
-            // Fragment 입력바
-            const FragmentInputBar(autoFocus: true, dismissOnSave: true),
-          ],
-        ),
-      ),
-    );
+    showFragmentInputModal(context);
   }
 
   // Draft: 분석 실행

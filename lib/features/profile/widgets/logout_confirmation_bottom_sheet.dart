@@ -6,6 +6,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../core/services/local_change_tracker.dart';
 import '../../../core/utils/app_icons.dart';
+import '../../../shared/widgets/responsive_modal_sheet.dart';
 
 /// 로그아웃 확인 Bottom Sheet (미동기화 항목 표시)
 class LogoutConfirmationSheet extends ConsumerStatefulWidget {
@@ -54,165 +55,170 @@ class _LogoutConfirmationSheetState
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
+    final materialTheme = Theme.of(context);
     final totalUnsynced = _unsyncedFragments + _unsyncedDrafts + _unsyncedPosts;
 
-    return ShadSheet(
-      title: Text('auth.logout'.tr()),
-      description: _isChecking
-          ? Text('sync.checking'.tr())
-          : totalUnsynced > 0
-              ? Text('auth.logout_unsynced_warning'.tr())
-              : Text('auth.logout_confirm'.tr()),
-      child: Padding(
-        padding: const EdgeInsets.all(common.Spacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Content
-            if (_isChecking)
-              const Center(
-                child: CircularProgressIndicator(),
-              )
-            else ...[
-              if (totalUnsynced > 0) ...[
-                // 경고 메시지
-                Container(
-                  padding: const EdgeInsets.all(common.Spacing.md),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.errorContainer,
-                    borderRadius: BorderRadius.circular(common.Spacing.sm),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        AppIcons.warning,
-                        color: theme.colorScheme.onErrorContainer,
-                        size: 20,
-                      ),
-                      const SizedBox(width: common.Spacing.sm),
-                      Expanded(
-                        child: Text(
-                          'sync.unsynced_items_exist'.tr(),
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onErrorContainer,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: common.Spacing.lg),
+    return Padding(
+      padding: const EdgeInsets.all(common.Spacing.lg),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 설명 메시지
+          Text(
+            _isChecking
+                ? 'sync.checking'.tr()
+                : totalUnsynced > 0
+                    ? 'auth.logout_unsynced_warning'.tr()
+                    : 'auth.logout_confirm'.tr(),
+            style: materialTheme.textTheme.bodyMedium,
+          ),
+          const SizedBox(height: common.Spacing.lg),
 
-                // 미동기화 항목 목록
-                if (_unsyncedFragments > 0)
-                  _buildUnsyncedItem(
-                    theme,
-                    icon: AppIcons.sparkles,
-                    label: 'timeline.fragments'.tr(),
-                    count: _unsyncedFragments,
-                  ),
-                if (_unsyncedDrafts > 0)
-                  _buildUnsyncedItem(
-                    theme,
-                    icon: AppIcons.drafts,
-                    label: 'drafts.title'.tr(),
-                    count: _unsyncedDrafts,
-                  ),
-                if (_unsyncedPosts > 0)
-                  _buildUnsyncedItem(
-                    theme,
-                    icon: AppIcons.posts,
-                    label: 'posts.title'.tr(),
-                    count: _unsyncedPosts,
-                  ),
-                const SizedBox(height: common.Spacing.lg),
-
-                // 데이터 손실 경고
-                Container(
-                  padding: const EdgeInsets.all(common.Spacing.md),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(common.Spacing.sm),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        AppIcons.info,
-                        color: theme.colorScheme.onPrimaryContainer,
-                        size: 20,
-                      ),
-                      const SizedBox(width: common.Spacing.sm),
-                      Expanded(
-                        child: Text(
-                          'auth.logout_data_loss_warning'.tr(),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onPrimaryContainer,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+          // Content
+          if (_isChecking)
+            const Center(
+              child: CircularProgressIndicator(),
+            )
+          else ...[
+            if (totalUnsynced > 0) ...[
+              // 경고 메시지
+              Container(
+                padding: const EdgeInsets.all(common.Spacing.md),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.errorContainer,
+                  borderRadius: BorderRadius.circular(common.BorderRadii.md),
                 ),
-              ] else ...[
-                // 모든 데이터 동기화됨
-                Container(
-                  padding: const EdgeInsets.all(common.Spacing.md),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.secondaryContainer,
-                    borderRadius: BorderRadius.circular(common.Spacing.sm),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        AppIcons.checkCircle,
-                        color: theme.colorScheme.onSecondaryContainer,
-                        size: 20,
-                      ),
-                      const SizedBox(width: common.Spacing.sm),
-                      Text(
-                        'sync.all_data_synced'.tr(),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSecondaryContainer,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-
-            const SizedBox(height: common.Spacing.xxl),
-
-            // 버튼
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ShadButton.ghost(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: Text('common.cancel'.tr()),
-                ),
-                const SizedBox(width: common.Spacing.md),
-                if (!_isChecking)
-                  ShadButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    backgroundColor: totalUnsynced > 0
-                        ? theme.colorScheme.error
-                        : null,
-                    foregroundColor: totalUnsynced > 0
-                        ? theme.colorScheme.onError
-                        : null,
-                    child: Text(
-                      totalUnsynced > 0
-                          ? 'auth.logout_anyway'.tr()
-                          : 'auth.logout'.tr(),
+                child: Row(
+                  children: [
+                    Icon(
+                      AppIcons.warning,
+                      color: theme.colorScheme.onErrorContainer,
+                      size: 20,
                     ),
-                  ),
-              ],
-            ),
+                    const SizedBox(width: common.Spacing.sm),
+                    Expanded(
+                      child: Text(
+                        'sync.unsynced_items_exist'.tr(),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onErrorContainer,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: common.Spacing.lg),
+
+              // 미동기화 항목 목록
+              if (_unsyncedFragments > 0)
+                _buildUnsyncedItem(
+                  theme,
+                  icon: AppIcons.sparkles,
+                  label: 'timeline.fragments'.tr(),
+                  count: _unsyncedFragments,
+                ),
+              if (_unsyncedDrafts > 0)
+                _buildUnsyncedItem(
+                  theme,
+                  icon: AppIcons.drafts,
+                  label: 'drafts.title'.tr(),
+                  count: _unsyncedDrafts,
+                ),
+              if (_unsyncedPosts > 0)
+                _buildUnsyncedItem(
+                  theme,
+                  icon: AppIcons.posts,
+                  label: 'posts.title'.tr(),
+                  count: _unsyncedPosts,
+                ),
+              const SizedBox(height: common.Spacing.lg),
+
+              // 데이터 손실 경고
+              Container(
+                padding: const EdgeInsets.all(common.Spacing.md),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(common.BorderRadii.md),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      AppIcons.info,
+                      color: theme.colorScheme.onPrimaryContainer,
+                      size: 20,
+                    ),
+                    const SizedBox(width: common.Spacing.sm),
+                    Expanded(
+                      child: Text(
+                        'auth.logout_data_loss_warning'.tr(),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ] else ...[
+              // 모든 데이터 동기화됨
+              Container(
+                padding: const EdgeInsets.all(common.Spacing.md),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.secondaryContainer,
+                  borderRadius: BorderRadius.circular(common.BorderRadii.md),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      AppIcons.checkCircle,
+                      color: theme.colorScheme.onSecondaryContainer,
+                      size: 20,
+                    ),
+                    const SizedBox(width: common.Spacing.sm),
+                    Text(
+                      'sync.all_data_synced'.tr(),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSecondaryContainer,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
-        ),
+
+          const SizedBox(height: common.Spacing.xxl),
+
+          // 버튼
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ShadButton.outline(
+                onPressed: () => Navigator.pop(context, false),
+                foregroundColor: theme.colorScheme.foreground,
+                child: Text('common.cancel'.tr()),
+              ),
+              const SizedBox(width: common.Spacing.md),
+              if (!_isChecking)
+                ShadButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  backgroundColor: totalUnsynced > 0
+                      ? materialTheme.colorScheme.error
+                      : null,
+                  foregroundColor: totalUnsynced > 0
+                      ? materialTheme.colorScheme.onError
+                      : null,
+                  child: Text(
+                    totalUnsynced > 0
+                        ? 'auth.logout_anyway'.tr()
+                        : 'auth.logout'.tr(),
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -250,8 +256,22 @@ class _LogoutConfirmationSheetState
 
 /// 로그아웃 확인 Bottom Sheet 표시 헬퍼 함수
 Future<bool?> showLogoutConfirmationBottomSheet(BuildContext context) {
-  return showShadSheet<bool>(
+  final theme = ShadTheme.of(context);
+  final materialTheme = Theme.of(context);
+  final cardColor = theme.colorScheme.card;
+
+  return ResponsiveModalSheet.show<bool>(
     context: context,
-    builder: (context) => const LogoutConfirmationSheet(),
+    barrierDismissible: true,
+    enableDrag: true,
+    pages: [
+      ResponsiveModalSheet.createPage(
+        topBarTitle: 'auth.logout'.tr(),
+        topBarTitleStyle: materialTheme.textTheme.titleLarge,
+        hasTopBarLayer: true,
+        backgroundColor: cardColor,
+        child: const LogoutConfirmationSheet(),
+      ),
+    ],
   );
 }

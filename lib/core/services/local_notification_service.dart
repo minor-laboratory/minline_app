@@ -2,8 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
-import 'package:minorlab_common/minorlab_common.dart' as common;
-import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -60,7 +58,9 @@ class LocalNotificationService {
       logger.i('[LocalNotification] System Now: $systemNow');
 
       // Android 설정
-      const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidSettings = AndroidInitializationSettings(
+        '@mipmap/ic_launcher',
+      );
 
       // iOS 설정
       const iOSSettings = DarwinInitializationSettings(
@@ -122,7 +122,11 @@ class LocalNotificationService {
         }
       }
     } catch (e, stackTrace) {
-      logger.e('[LocalNotification] Failed to check app launch details', e, stackTrace);
+      logger.e(
+        '[LocalNotification] Failed to check app launch details',
+        e,
+        stackTrace,
+      );
     }
   }
 
@@ -148,17 +152,25 @@ class LocalNotificationService {
   Future<void> _logPendingNotifications() async {
     try {
       final pendingNotifications = await _plugin.pendingNotificationRequests();
-      logger.i('[LocalNotification] 📋 Pending notifications: ${pendingNotifications.length}');
+      logger.i(
+        '[LocalNotification] 📋 Pending notifications: ${pendingNotifications.length}',
+      );
 
       if (pendingNotifications.isEmpty) {
         logger.w('[LocalNotification] ⚠️ No pending notifications found!');
       } else {
         for (final notification in pendingNotifications) {
-          logger.i('[LocalNotification] - ID: ${notification.id}, Title: ${notification.title}');
+          logger.i(
+            '[LocalNotification] - ID: ${notification.id}, Title: ${notification.title}',
+          );
         }
       }
     } catch (e, stackTrace) {
-      logger.e('[LocalNotification] Failed to get pending notifications', e, stackTrace);
+      logger.e(
+        '[LocalNotification] Failed to get pending notifications',
+        e,
+        stackTrace,
+      );
     }
   }
 
@@ -186,7 +198,8 @@ class LocalNotificationService {
 
     final androidImplementation = _plugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     await androidImplementation?.createNotificationChannel(reminderChannel);
     await androidImplementation?.createNotificationChannel(draftChannel);
@@ -196,22 +209,21 @@ class LocalNotificationService {
   Future<void> _requestIOSPermissions() async {
     await _plugin
         .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
-        ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
+          IOSFlutterLocalNotificationsPlugin
+        >()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
   }
 
   /// Android 권한 요청
   Future<void> _requestAndroidPermissions() async {
     final androidImplementation = _plugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     if (androidImplementation != null) {
-      final granted = await androidImplementation.requestNotificationsPermission();
+      final granted = await androidImplementation
+          .requestNotificationsPermission();
       logger.i('[LocalNotification] Android permission granted: $granted');
     }
   }
@@ -264,51 +276,16 @@ class LocalNotificationService {
     } else {
       // 2. MainPage가 아닌 다른 화면 (설정, post 상세 등)
       //    → Fragment 입력 모달 표시
-      logger.i('[LocalNotification] Showing fragment input modal (not on MainPage)');
+      logger.i(
+        '[LocalNotification] Showing fragment input modal (not on MainPage)',
+      );
       _showFragmentInputModal(context);
     }
   }
 
   /// Fragment 입력 모달 표시 (notification 탭 시)
   void _showFragmentInputModal(BuildContext context) {
-    final theme = ShadTheme.of(context);
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.background,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(16),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 상단 핸들
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: common.Spacing.sm),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.muted,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            // Fragment 입력바
-            const FragmentInputBar(
-              autoFocus: true,
-              dismissOnSave: true,
-            ),
-          ],
-        ),
-      ),
-    );
+    showFragmentInputModal(context);
   }
 
   /// Drafts 페이지로 이동
@@ -337,7 +314,9 @@ class LocalNotificationService {
     }
 
     try {
-      logger.i('[LocalNotification] Scheduling reminders for weekdays: $weekdays at $hour:$minute');
+      logger.i(
+        '[LocalNotification] Scheduling reminders for weekdays: $weekdays at $hour:$minute',
+      );
 
       // 기존 알림 모두 취소
       await cancelDailyReminder();
@@ -345,14 +324,23 @@ class LocalNotificationService {
       // 모든 요일 선택 시: 매일 반복 (더 안정적)
       if (weekdays.length == 7) {
         final now = tz.TZDateTime.now(tz.local);
-        var scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+        var scheduledDate = tz.TZDateTime(
+          tz.local,
+          now.year,
+          now.month,
+          now.day,
+          hour,
+          minute,
+        );
 
         // 오늘 시간이 지났으면 내일
         if (scheduledDate.isBefore(now)) {
           scheduledDate = scheduledDate.add(const Duration(days: 1));
         }
 
-        logger.d('[LocalNotification] - Daily (ID: $_baseReminderId) → ${scheduledDate.toString()}');
+        logger.d(
+          '[LocalNotification] - Daily (ID: $_baseReminderId) → ${scheduledDate.toString()}',
+        );
 
         await _plugin.zonedSchedule(
           _baseReminderId,
@@ -380,9 +368,15 @@ class LocalNotificationService {
         // 특정 요일만 선택: 요일별 스케줄링
         for (final weekday in weekdays) {
           final notificationId = _baseReminderId + weekday;
-          final scheduledDate = _nextInstanceOfDayAndTime(weekday, hour, minute);
+          final scheduledDate = _nextInstanceOfDayAndTime(
+            weekday,
+            hour,
+            minute,
+          );
 
-          logger.d('[LocalNotification] - Weekday $weekday (ID: $notificationId) → ${scheduledDate.toString()}');
+          logger.d(
+            '[LocalNotification] - Weekday $weekday (ID: $notificationId) → ${scheduledDate.toString()}',
+          );
 
           await _plugin.zonedSchedule(
             notificationId,
@@ -413,12 +407,20 @@ class LocalNotificationService {
 
       // 디버깅: 예약된 알림 목록 확인
       final pendingNotifications = await _plugin.pendingNotificationRequests();
-      logger.i('[LocalNotification] Pending notifications count: ${pendingNotifications.length}');
+      logger.i(
+        '[LocalNotification] Pending notifications count: ${pendingNotifications.length}',
+      );
       for (final notification in pendingNotifications) {
-        logger.d('[LocalNotification] - ID: ${notification.id}, Title: ${notification.title}, Body: ${notification.body}');
+        logger.d(
+          '[LocalNotification] - ID: ${notification.id}, Title: ${notification.title}, Body: ${notification.body}',
+        );
       }
     } catch (e, stackTrace) {
-      logger.e('[LocalNotification] Failed to schedule daily reminder', e, stackTrace);
+      logger.e(
+        '[LocalNotification] Failed to schedule daily reminder',
+        e,
+        stackTrace,
+      );
     }
   }
 
@@ -431,7 +433,11 @@ class LocalNotificationService {
       }
       logger.i('[LocalNotification] Daily reminders cancelled');
     } catch (e, stackTrace) {
-      logger.e('[LocalNotification] Failed to cancel daily reminder', e, stackTrace);
+      logger.e(
+        '[LocalNotification] Failed to cancel daily reminder',
+        e,
+        stackTrace,
+      );
     }
   }
 
@@ -471,7 +477,11 @@ class LocalNotificationService {
 
       logger.i('[LocalNotification] Draft notification shown');
     } catch (e, stackTrace) {
-      logger.e('[LocalNotification] Failed to show draft notification', e, stackTrace);
+      logger.e(
+        '[LocalNotification] Failed to show draft notification',
+        e,
+        stackTrace,
+      );
     }
   }
 
@@ -511,7 +521,11 @@ class LocalNotificationService {
 
       logger.i('[LocalNotification] FCM notification shown');
     } catch (e, stackTrace) {
-      logger.e('[LocalNotification] Failed to show FCM notification', e, stackTrace);
+      logger.e(
+        '[LocalNotification] Failed to show FCM notification',
+        e,
+        stackTrace,
+      );
     }
   }
 
@@ -544,7 +558,8 @@ class LocalNotificationService {
     if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.android)) {
       final androidImplementation = _plugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+            AndroidFlutterLocalNotificationsPlugin
+          >();
 
       if (androidImplementation != null) {
         final enabled = await androidImplementation.areNotificationsEnabled();
@@ -560,20 +575,19 @@ class LocalNotificationService {
     if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.iOS)) {
       final result = await _plugin
           .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>()
-          ?.requestPermissions(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
+            IOSFlutterLocalNotificationsPlugin
+          >()
+          ?.requestPermissions(alert: true, badge: true, sound: true);
       return result ?? false;
     } else if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.android)) {
       final androidImplementation = _plugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+            AndroidFlutterLocalNotificationsPlugin
+          >();
 
       if (androidImplementation != null) {
-        final granted = await androidImplementation.requestNotificationsPermission();
+        final granted = await androidImplementation
+            .requestNotificationsPermission();
         return granted ?? false;
       }
     }
@@ -586,10 +600,12 @@ class LocalNotificationService {
     if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.android)) {
       final androidImplementation = _plugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+            AndroidFlutterLocalNotificationsPlugin
+          >();
 
       if (androidImplementation != null) {
-        final canSchedule = await androidImplementation.canScheduleExactNotifications();
+        final canSchedule = await androidImplementation
+            .canScheduleExactNotifications();
         return canSchedule ?? false;
       }
     }
@@ -602,7 +618,8 @@ class LocalNotificationService {
     if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.android)) {
       final androidImplementation = _plugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+            AndroidFlutterLocalNotificationsPlugin
+          >();
 
       if (androidImplementation != null) {
         await androidImplementation.requestExactAlarmsPermission();
@@ -642,7 +659,11 @@ class LocalNotificationService {
 
       logger.i('[LocalNotification] Test notification shown');
     } catch (e, stackTrace) {
-      logger.e('[LocalNotification] Failed to show test notification', e, stackTrace);
+      logger.e(
+        '[LocalNotification] Failed to show test notification',
+        e,
+        stackTrace,
+      );
     }
   }
 

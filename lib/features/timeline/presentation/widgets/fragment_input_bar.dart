@@ -15,7 +15,41 @@ import '../../../../core/services/media/media_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../models/fragment.dart';
+import '../../../../shared/widgets/responsive_modal_sheet.dart';
 import '../../../auth/widgets/login_required_bottom_sheet.dart';
+
+/// Fragment 입력 모달 표시 헬퍼 함수
+///
+/// Bottom sheet 형태로 Fragment 입력창을 표시합니다.
+/// - Card 배경색 자동 적용
+/// - 키보드에 맞춰 자동 리사이즈
+/// - 드래그로 닫기 가능
+Future<void> showFragmentInputModal(BuildContext context) {
+  final theme = ShadTheme.of(context);
+  final cardColor = theme.colorScheme.card;
+
+  return ResponsiveModalSheet.show(
+    context: context,
+    barrierDismissible: true,
+    enableDrag: true,
+    pages: [
+      ResponsiveModalSheet.createPage(
+        hasTopBarLayer: false,
+        backgroundColor: cardColor,
+        resizeToAvoidBottomInset: true,
+        child: Padding(
+          padding: EdgeInsets.only(top: common.BorderRadii.md),
+          child: const FragmentInputBar(
+            autoFocus: true,
+            dismissOnSave: true,
+            backgroundColor: Colors.transparent,
+            showTopBorder: false,
+          ),
+        ),
+      ),
+    ],
+  );
+}
 
 /// Fragment 입력바 위젯
 ///
@@ -24,12 +58,16 @@ class FragmentInputBar extends ConsumerStatefulWidget {
   final void Function(VoidCallback)? onRegisterFocusTrigger;
   final bool autoFocus;
   final bool dismissOnSave;
+  final Color? backgroundColor;
+  final bool showTopBorder;
 
   const FragmentInputBar({
     super.key,
     this.onRegisterFocusTrigger,
     this.autoFocus = false,
     this.dismissOnSave = false,
+    this.backgroundColor,
+    this.showTopBorder = true,
   });
 
   @override
@@ -282,6 +320,10 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
     final theme = ShadTheme.of(context);
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
+    // 배경색: 파라미터로 지정되면 사용, 없으면 muted 기본값
+    final effectiveBackgroundColor =
+        widget.backgroundColor ?? theme.colorScheme.muted;
+
     return Container(
       padding: EdgeInsets.only(
         left: common.Spacing.md,
@@ -290,12 +332,14 @@ class _FragmentInputBarState extends ConsumerState<FragmentInputBar> {
         bottom: bottomPadding + common.Spacing.md,
       ),
       decoration: BoxDecoration(
-        color: theme.colorScheme.muted,
-        border: Border(
-          top: BorderSide(
-            color: theme.colorScheme.border.withValues(alpha: 0.2),
-          ),
-        ),
+        color: effectiveBackgroundColor,
+        border: widget.showTopBorder
+            ? Border(
+                top: BorderSide(
+                  color: theme.colorScheme.border.withValues(alpha: 0.2),
+                ),
+              )
+            : null,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
