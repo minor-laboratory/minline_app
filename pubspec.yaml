@@ -136,6 +136,12 @@ dev_dependencies:
 
   analyzer: ^7.6.0
 
+  # 아이콘
+  flutter_launcher_icons: ^0.14.2
+
+  # 스플래시
+  flutter_native_splash: ^2.4.6
+
 flutter:
   uses-material-design: true
 
@@ -143,3 +149,18 @@ flutter:
     - assets/translations/
     - assets/images/
     - assets/icons/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon_foreground.png"
+  remove_alpha_ios: true
+  adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
+  adaptive_icon_background: "#fcc25c"
+
+flutter_native_splash:
+  color: "#fcc25c"
+  image: "assets/icons/splash_icon.png"
+  android_12:
+    color: "#fcc25c"
+    image: "assets/icons/splash_icon.png"
