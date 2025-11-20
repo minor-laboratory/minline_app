@@ -5,6 +5,7 @@ import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
+import '../../../timeline/presentation/widgets/fragment_input_bar.dart';
 import '../../providers/drafts_provider.dart';
 import 'draft_card.dart';
 
@@ -231,7 +232,12 @@ class _DraftTabContentState extends State<_DraftTabContent> {
           },
           child: ListView.separated(
             controller: _scrollController,
-            padding: const EdgeInsets.all(common.Spacing.md),
+            padding: EdgeInsets.only(
+              left: common.Spacing.md,
+              right: common.Spacing.md,
+              top: common.Spacing.md,
+              bottom: FragmentInputBar.estimatedHeight + 8, // 입력창 높이 + SafeArea + 추가 여유
+            ),
             itemCount: displayedDrafts.length + (hasMore ? 1 : 0),
             separatorBuilder: (context, index) => SizedBox(
               height: common.Spacing.sm + common.Spacing.xs,

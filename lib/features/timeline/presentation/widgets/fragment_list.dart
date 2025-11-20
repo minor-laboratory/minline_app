@@ -9,6 +9,7 @@ import '../../../../models/draft.dart';
 import '../../../drafts/providers/drafts_provider.dart';
 import '../../providers/fragments_provider.dart';
 import 'fragment_card.dart';
+import 'fragment_input_bar.dart';
 
 /// Fragment 리스트 위젯 (무한 스크롤)
 ///
@@ -96,7 +97,12 @@ class _FragmentListState extends ConsumerState<FragmentList> {
 
         return ListView.separated(
           controller: _scrollController,
-          padding: const EdgeInsets.all(common.Spacing.md),
+          padding: EdgeInsets.only(
+            left: common.Spacing.md,
+            right: common.Spacing.md,
+            top: common.Spacing.md,
+            bottom: FragmentInputBar.estimatedHeight + 8, // 입력창 높이 + SafeArea + 추가 여유
+          ),
           itemCount: displayedFragments.length + (hasMore ? 1 : 0),
           separatorBuilder: (context, index) => SizedBox(
             height: common.Spacing.sm + common.Spacing.xs,

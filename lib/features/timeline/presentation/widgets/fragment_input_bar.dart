@@ -55,6 +55,17 @@ Future<void> showFragmentInputModal(BuildContext context) {
 ///
 /// Timeline 화면 하단 고정 입력바 (채팅 앱 스타일)
 class FragmentInputBar extends ConsumerStatefulWidget {
+  /// 예상 높이 (하단 패딩 계산용)
+  ///
+  /// 기본 입력창 높이 + SafeArea 고려
+  /// - 텍스트 입력 (1줄): ~40px
+  /// - 액션 영역: 32px
+  /// - 패딩: 24px (top 12 + bottom 12)
+  /// - SafeArea (iPhone): ~34px
+  /// - 여유: 20px
+  /// 총: ~150px
+  static const double estimatedHeight = 150;
+
   final void Function(VoidCallback)? onRegisterFocusTrigger;
   final bool autoFocus;
   final bool dismissOnSave;

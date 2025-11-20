@@ -6,6 +6,7 @@ import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
+import '../../../timeline/presentation/widgets/fragment_input_bar.dart';
 import '../../providers/posts_provider.dart';
 import 'post_card.dart';
 
@@ -65,9 +66,17 @@ class _PostsViewState extends ConsumerState<PostsView>
           onRefresh: () async {
             ref.invalidate(postsStreamProvider);
           },
-          child: ListView.builder(
-            padding: const EdgeInsets.all(common.Spacing.md),
+          child: ListView.separated(
+            padding: EdgeInsets.only(
+              left: common.Spacing.md,
+              right: common.Spacing.md,
+              top: common.Spacing.md,
+              bottom: FragmentInputBar.estimatedHeight + 8, // 입력창 높이 + SafeArea + 추가 여유
+            ),
             itemCount: posts.length,
+            separatorBuilder: (context, index) => SizedBox(
+              height: common.Spacing.sm + common.Spacing.xs,
+            ),
             itemBuilder: (context, index) {
               final post = posts[index];
               return PostCard(

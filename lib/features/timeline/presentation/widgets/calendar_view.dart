@@ -7,6 +7,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../models/fragment.dart';
 import 'fragment_card.dart';
+import 'fragment_input_bar.dart';
 
 /// 캘린더 뷰 위젯
 ///
@@ -115,12 +116,55 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
     return date.year == _currentMonth.year && date.month == _currentMonth.month;
   }
 
-  /// Fragment 개수 점 표시
-  String _getFragmentDots(int count) {
-    if (count == 1) return '•';
-    if (count == 2) return '••';
-    if (count == 3) return '•••';
-    return '•••+';
+  /// Fragment 개수 아이콘 위젯 생성
+  Widget _buildFragmentCountIndicator(int count, bool isSelected, ShadThemeData theme) {
+    final color = isSelected
+        ? theme.colorScheme.primaryForeground
+        : theme.colorScheme.primary;
+
+    // 1-3개: 점 개수만큼 표시
+    if (count <= 3) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(
+          count,
+          (index) => Padding(
+            padding: EdgeInsets.only(left: index > 0 ? 2 : 0),
+            child: Container(
+              width: 5,
+              height: 5,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // 4개 이상: ••• + Plus 아이콘
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ...List.generate(
+          3,
+          (index) => Padding(
+            padding: EdgeInsets.only(left: index > 0 ? 2 : 0),
+            child: Container(
+              width: 5,
+              height: 5,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: 2),
+        Icon(AppIcons.add, size: 6, color: color),
+      ],
+    );
   }
 
   /// 이전 월로 이동
@@ -161,8 +205,9 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
     final fragmentCounts = _getFragmentCountByDate();
     final selectedFragments = _getFragmentsForSelectedDate();
 
-    return Column(
-      children: [
+    return SingleChildScrollView(
+      child: Column(
+        children: [
         // 월 선택 헤더
         Padding(
           padding: const EdgeInsets.all(common.Spacing.md),
@@ -281,13 +326,12 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
                         ),
                       ),
                       if (fragmentCount > 0)
-                        Text(
-                          _getFragmentDots(fragmentCount),
-                          style: TextStyle(
-                            fontSize: common.Spacing.sm + 2,
-                            color: isSelected
-                                ? theme.colorScheme.primaryForeground
-                                : theme.colorScheme.primary,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: _buildFragmentCountIndicator(
+                            fragmentCount,
+                            isSelected,
+                            theme,
                           ),
                         ),
                     ],
@@ -304,30 +348,33 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
         ),
 
         // 선택된 날짜의 Fragment 리스트
-        Expanded(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: common.Spacing.md),
           child: selectedFragments.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(common.Spacing.lg),
-                    child: Text(
-                      'calendar.no_fragments'.tr(),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.mutedForeground,
-                      ),
+              ? Padding(
+                  padding: const EdgeInsets.all(common.Spacing.lg),
+                  child: Text(
+                    'calendar.no_fragments'.tr(),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.mutedForeground,
                     ),
                   ),
                 )
-              : ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: common.Spacing.md,
-                  ),
-                  itemCount: selectedFragments.length,
-                  itemBuilder: (context, index) {
-                    return FragmentCard(fragment: selectedFragments[index]);
-                  },
+              : Column(
+                  children: [
+                    for (var i = 0; i < selectedFragments.length; i++) ...[
+                      FragmentCard(fragment: selectedFragments[i]),
+                      if (i < selectedFragments.length - 1)
+                        SizedBox(height: common.Spacing.sm + common.Spacing.xs),
+                    ],
+                  ],
                 ),
         ),
+        // 하단 여백 (입력창 높이 + SafeArea + 추가 여유)
+        SizedBox(height: FragmentInputBar.estimatedHeight + 8),
       ],
+      ),
     );
   }
 }

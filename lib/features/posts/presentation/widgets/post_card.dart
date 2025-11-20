@@ -38,15 +38,13 @@ class _PostCardState extends ConsumerState<PostCard> {
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
 
-    return Container(
-      margin: EdgeInsets.only(bottom: common.Spacing.sm + common.Spacing.xs),
-      child: ShadCard(
-        child: InkWell(
-          onTap: widget.onTap,
-          borderRadius: BorderRadius.circular(common.Spacing.sm + common.Spacing.xs),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+    return ShadCard(
+      child: InkWell(
+        onTap: widget.onTap,
+        borderRadius: BorderRadius.circular(common.Spacing.sm + common.Spacing.xs),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
               // 제목
               Text(
                 widget.post.title,
@@ -138,7 +136,6 @@ class _PostCardState extends ConsumerState<PostCard> {
             ],
           ),
         ),
-      ),
     );
   }
 }
