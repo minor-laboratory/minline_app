@@ -48,6 +48,11 @@ GoogleService-Info.plist
 firebase-debug.log
 .firebase/
 
+# Android signing
+key.properties
+*.jks
+*.keystore
+
 # Symbolication related
 app.*.symbols
 

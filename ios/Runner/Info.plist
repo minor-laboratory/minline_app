@@ -48,6 +48,8 @@
 		</array>
 		<key>LSSupportsOpeningDocumentsInPlace</key>
 		<true/>
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
@@ -65,7 +67,7 @@
 		<key>CFBundleSignature</key>
 		<string>????</string>
 		<key>CFBundleVersion</key>
-		<string>$(FLUTTER_BUILD_NUMBER)</string>
+		<string>1</string>
 		<key>CFBundleURLTypes</key>
 		<array>
 			<dict>
@@ -81,6 +83,8 @@
 		</array>
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
+		<key>NSCameraUsageDescription</key>
+		<string>Fragment에 사진을 첨부하기 위해 카메라 접근이 필요합니다.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>다른 앱에서 공유한 이미지를 Fragment로 저장하기 위해 사진 라이브러리 접근이 필요합니다.</string>
 		<key>NSUserActivityTypes</key>
@@ -110,5 +114,7 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>UIUserInterfaceStyle</key>
+		<string>Automatic</string>
 	</dict>
 </plist>

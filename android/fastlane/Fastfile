@@ -1,0 +1,85 @@
+# Fastfile for Android deployment
+
+default_platform(:android)
+
+platform :android do
+  desc "Deploy to internal testing track"
+  lane :internal do
+    # Flutter build 명령 사용 (pubspec.yaml 버전 자동 적용)
+    sh("cd ../.. && flutter build appbundle --release")
+
+    # Google Play 내부 테스트 트랙에 업로드 (metadata 포함)
+    # WHY: Draft 앱은 draft로만 업로드 가능, Console에서 수동 릴리스 필요
+    upload_to_play_store(
+      track: 'internal',
+      release_status: 'draft',
+      aab: '../build/app/outputs/bundle/release/app-release.aab',
+      json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH'],
+      package_name: ENV['PACKAGE_NAME'],
+      skip_upload_metadata: false,
+      skip_upload_changelogs: true,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+  end
+
+  desc "Deploy to production"
+  lane :deploy do
+    # Flutter build 명령 사용 (pubspec.yaml 버전 자동 적용)
+    sh("cd ../.. && flutter build appbundle --release")
+
+    upload_to_play_store(
+      track: 'production',
+      release_status: 'completed',
+      aab: '../build/app/outputs/bundle/release/app-release.aab',
+      json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH'],
+      package_name: ENV['PACKAGE_NAME']
+    )
+  end
+
+  desc "Update metadata only"
+  lane :metadata do
+    upload_to_play_store(
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: false,
+      skip_upload_changelogs: true,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH'],
+      package_name: ENV['PACKAGE_NAME']
+    )
+  end
+
+  desc "Update screenshots only"
+  lane :screenshots do
+    upload_to_play_store(
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH'],
+      package_name: ENV['PACKAGE_NAME']
+    )
+  end
+
+  desc "Promote latest draft release to completed on internal track"
+  lane :promote_internal do
+    # WHY: Draft 상태의 최신 릴리스를 completed로 변경
+    # 모든 skip_upload를 true로 설정하여 새 파일 업로드 없이 상태만 변경
+    upload_to_play_store(
+      track: 'internal',
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      release_status: 'completed',
+      json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH'],
+      package_name: ENV['PACKAGE_NAME']
+    )
+  end
+end

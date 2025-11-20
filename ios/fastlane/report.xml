@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="fastlane.lanes">
+    
+    
+    
+      
+      <testcase classname="fastlane.lanes" name="00: default_platform" time="0.000209">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="01: Switch to ios load_env_file lane" time="6.1e-05">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="02: increment_build_number" time="0.196996">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="03: cd ../.. &amp;&amp; flutter clean &amp;&amp; flutter pub get" time="11.554103">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="04: cd ../.. &amp;&amp; dart run build_runner build --delete-conflicting-outputs" time="28.360902">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="05: cd ../.. &amp;&amp; dart run flutter_launcher_icons" time="1.839769">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="06: cd ../.. &amp;&amp; dart run flutter_native_splash:create" time="1.90317">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="07: cd .. &amp;&amp; pod install" time="4.770252">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="08: cd ../.. &amp;&amp; flutter build ios --release --no-codesign" time="104.867727">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="09: rm -rf /Users/heyoom/Documents/Github/miniline_app/build/ios/ipa" time="0.005968">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="10: mkdir -p /Users/heyoom/Documents/Github/miniline_app/build/ios/ipa" time="0.00432">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="11: gym" time="134.070438">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="12: app_store_connect_api_key" time="0.002091">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="13: upload_to_testflight" time="366.951172">
+        
+      </testcase>
+    
+  </testsuite>
+</testsuites>
