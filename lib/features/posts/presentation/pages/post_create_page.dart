@@ -14,6 +14,7 @@ import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../models/draft.dart';
 import '../../../../models/fragment.dart';
+import '../../../../shared/widgets/standard_bottom_sheet.dart';
 
 /// Post 생성 페이지
 ///
@@ -79,6 +80,17 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
       _generatingContent = '';
       _progress = 0.0;
       _errorMessage = null;
+    });
+
+    // 미리보기 영역으로 스크롤 (부드럽게)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
     });
 
     try {
@@ -174,9 +186,9 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
       // Post 저장 (서버에서 이미 저장됨, 로컬 동기화 대기)
       await Future.delayed(const Duration(milliseconds: 500));
 
-      // 상세 페이지로 이동
+      // 상세 페이지로 이동 (현재 Create 페이지를 Detail로 교체)
       if (mounted) {
-        context.push('/posts/$postId');
+        context.pushReplacement('/posts/$postId');
       }
     } catch (e, stack) {
       logger.e('Post 생성 실패:', e, stack);
@@ -193,6 +205,15 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
         setState(() => _isGenerating = false);
       }
     }
+  }
+
+  // 미리보기 영역으로 스크롤
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -259,79 +280,12 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
         ],
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         padding: const EdgeInsets.all(common.Spacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Draft 정보
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(common.Spacing.md),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          AppIcons.fileText,
-                          size: 20,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        SizedBox(width: common.Spacing.sm),
-                        Text(
-                          'draft.title'.tr(),
-                          style: Theme.of(context).textTheme.labelLarge,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: common.Spacing.sm + common.Spacing.xs),
-                    Text(
-                      _draft!.title,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    if (_draft!.reason != null) ...[
-                      SizedBox(height: common.Spacing.sm),
-                      Text(
-                        _draft!.reason!,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: ShadTheme.of(context).colorScheme.mutedForeground,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-
-            SizedBox(height: common.Spacing.lg),
-
-            // 템플릿 선택
-            Text(
-              'post.select_template'.tr(),
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            SizedBox(height: common.Spacing.sm + common.Spacing.xs),
-
-            // 템플릿 그리드
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: MediaQuery.of(context).size.width > 600 ? 2 : 1,
-                childAspectRatio: 3.5,
-                crossAxisSpacing: common.Spacing.sm + common.Spacing.xs,
-                mainAxisSpacing: common.Spacing.sm + common.Spacing.xs,
-              ),
-              itemCount: PostTemplates.all.length,
-              itemBuilder: (context, index) {
-                final template = PostTemplates.all[index];
-                return _buildTemplateCard(template);
-              },
-            ),
-
-            SizedBox(height: common.Spacing.lg),
-
-            // 미리보기 영역
+            // 미리보기 영역 (상단으로 이동)
             Text(
               'post.preview'.tr(),
               style: Theme.of(context).textTheme.titleMedium,
@@ -375,6 +329,32 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // 로딩 상태 (생성 시작 직후, 아직 내용 없을 때)
+                      if (_isGenerating && _generatingTitle.isEmpty && _generatingContent.isEmpty) ...[
+                        Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: 32,
+                                height: 32,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                ),
+                              ),
+                              SizedBox(height: common.Spacing.md),
+                              Text(
+                                'post.generating_message'.tr(),
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: ShadTheme.of(context).colorScheme.mutedForeground,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+
                       // 제목
                       if (_generatingTitle.isNotEmpty) ...[
                         Text(
@@ -471,96 +451,136 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
                   ),
                 ),
               ),
+
+            SizedBox(height: common.Spacing.lg),
+
+            // Draft 정보
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(common.Spacing.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          AppIcons.fileText,
+                          size: 20,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        SizedBox(width: common.Spacing.sm),
+                        Text(
+                          'draft.title'.tr(),
+                          style: Theme.of(context).textTheme.labelLarge,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: common.Spacing.sm + common.Spacing.xs),
+                    Text(
+                      _draft!.title,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    if (_draft!.reason != null) ...[
+                      SizedBox(height: common.Spacing.sm),
+                      Text(
+                        _draft!.reason!,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: ShadTheme.of(context).colorScheme.mutedForeground,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+
+            SizedBox(height: common.Spacing.md),
+
+            // 템플릿 선택 버튼
+            _buildTemplateSelector(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTemplateCard(PostTemplate template) {
-    final isSelected = _selectedTemplate == template.id;
+  /// 템플릿 선택 버튼
+  Widget _buildTemplateSelector(BuildContext context) {
     final theme = ShadTheme.of(context);
+    final selectedTemplate = PostTemplates.all.firstWhere(
+      (t) => t.id == _selectedTemplate,
+    );
 
     return GestureDetector(
-      onTap: () {
-        setState(() => _selectedTemplate = template.id);
-      },
-      child: Card(
-        color: isSelected ? theme.colorScheme.accent : null,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(common.Spacing.sm + common.Spacing.xs),
-          side: isSelected
-              ? BorderSide(color: theme.colorScheme.primary, width: 2)
-              : BorderSide.none,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(common.Spacing.md),
-          child: Row(
-            children: [
-              // 아이콘
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.muted,
-                  borderRadius: BorderRadius.circular(common.Spacing.sm),
-                ),
-                child: Icon(
-                  template.icon,
-                  size: 24,
-                  color: isSelected
-                      ? theme.colorScheme.primaryForeground
-                      : theme.colorScheme.mutedForeground,
-                ),
-              ),
-              SizedBox(width: common.Spacing.md),
-              // 텍스트
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      template.nameKey.tr(),
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: isSelected
-                            ? theme.colorScheme.accentForeground
-                            : theme.colorScheme.foreground,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(height: common.Spacing.xs),
-                    Text(
-                      template.descKey.tr(),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: isSelected
-                            ? theme.colorScheme.accentForeground.withValues(
-                                alpha: 0.8,
-                              )
-                            : theme.colorScheme.mutedForeground,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              // 체크 마크
-              if (isSelected) ...[
-                SizedBox(width: common.Spacing.sm),
-                Icon(
-                  AppIcons.checkCircle,
-                  size: 20,
-                  color: theme.colorScheme.primary,
-                ),
-              ],
-            ],
+      onTap: _showTemplateSelector,
+      child: Container(
+        padding: const EdgeInsets.all(common.Spacing.md),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.muted,
+          borderRadius: BorderRadius.circular(common.Spacing.sm),
+          border: Border.all(
+            color: theme.colorScheme.border,
+            width: 1,
           ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              selectedTemplate.icon,
+              size: 20,
+              color: theme.colorScheme.primary,
+            ),
+            SizedBox(width: common.Spacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'post.select_template'.tr(),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.mutedForeground,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    selectedTemplate.nameKey.tr(),
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              AppIcons.chevronDown,
+              size: 16,
+              color: theme.colorScheme.mutedForeground,
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  /// 템플릿 선택 Bottom Sheet 표시
+  Future<void> _showTemplateSelector() async {
+    final result = await StandardBottomSheet.showSelection<String>(
+      context: context,
+      title: 'post.select_template'.tr(),
+      selectedValue: _selectedTemplate,
+      options: PostTemplates.all.map((template) {
+        return BottomSheetOption<String>(
+          text: template.nameKey.tr(),
+          subtitle: template.descKey.tr(),
+          value: template.id,
+          icon: template.icon,
+        );
+      }).toList(),
+    );
+
+    if (result != null && mounted) {
+      setState(() => _selectedTemplate = result);
+    }
   }
 }
 

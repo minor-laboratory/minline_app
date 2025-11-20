@@ -124,6 +124,7 @@
     "preview": "Preview",
     "preview_placeholder": "Click Generate button to create your post",
     "generating": "Generating...",
+    "generating_message": "AI is generating your post...",
     "generation_complete": "Generation complete!",
     "generation_failed": "Generation failed",
     "not_enough_fragments": "Not enough fragments (minimum 2 required)",
