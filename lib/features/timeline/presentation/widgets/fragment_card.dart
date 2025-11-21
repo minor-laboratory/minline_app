@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -424,21 +425,23 @@ class _FragmentCardState extends ConsumerState<FragmentCard> {
                             ],
                           ),
                         ),
-                        PopupMenuItem(
-                          value: 'generate',
-                          enabled: !_isGeneratingEmbedding,
-                          child: Row(
-                            children: [
-                              Icon(AppIcons.sparkles, size: 16),
-                              const SizedBox(width: common.Spacing.sm),
-                              Text(
-                                _isGeneratingEmbedding
-                                    ? 'common.generating'.tr()
-                                    : 'common.generate'.tr(),
-                              ),
-                            ],
+                        // 생성 버튼 (debug mode만)
+                        if (kDebugMode)
+                          PopupMenuItem(
+                            value: 'generate',
+                            enabled: !_isGeneratingEmbedding,
+                            child: Row(
+                              children: [
+                                Icon(AppIcons.sparkles, size: 16),
+                                const SizedBox(width: common.Spacing.sm),
+                                Text(
+                                  _isGeneratingEmbedding
+                                      ? 'common.generating'.tr()
+                                      : 'common.generate'.tr(),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
                         const PopupMenuDivider(),
                         PopupMenuItem(
                           value: 'delete',

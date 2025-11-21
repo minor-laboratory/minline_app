@@ -50,7 +50,7 @@
     "similarity": "Similarity",
     "toggle_snaps_show": "Show snaps",
     "toggle_snaps_hide": "Hide snaps",
-    "accept_action": "Create post",
+    "accept_action": "Accept",
     "reject_action": "Reject",
     "reaccept_action": "Re-accept",
     "create_post": "Create post",
@@ -482,5 +482,11 @@
       "single": "1 new draft has been created",
       "multiple": "{} new drafts have been created"
     }
+  },
+  "limit": {
+    "free_posts_count": "{current}/{max} used this month",
+    "free_limit_exceeded": "Free limit exceeded",
+    "upgrade_to_premium": "Upgrade to Premium for unlimited posts",
+    "reset_at": "Resets on {date}"
   }
 }

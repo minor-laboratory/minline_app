@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -602,8 +603,8 @@ class _MainPageState extends ConsumerState<MainPage>
       );
     }
 
-    // Drafts: 분석 아이콘
-    if (_currentPageIndex == 1) {
+    // Drafts: 분석 아이콘 (debug mode만)
+    if (_currentPageIndex == 1 && kDebugMode) {
       return Center(
         child: ShadIconButton.ghost(
           icon: _isAnalyzing

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -255,8 +256,8 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                   }
                 },
                 itemBuilder: (context) => [
-                  // 재생성 (draftId가 있는 경우에만)
-                  if (_post?.draftId != null)
+                  // 재생성 (draftId가 있는 경우에만, debug mode만)
+                  if (_post?.draftId != null && kDebugMode)
                     PopupMenuItem(
                       value: 'regenerate',
                       child: Row(

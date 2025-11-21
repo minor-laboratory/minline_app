@@ -50,7 +50,7 @@
     "similarity": "유사도",
     "toggle_snaps_show": "스냅 목록 보기",
     "toggle_snaps_hide": "스냅 목록 숨기기",
-    "accept_action": "글로 만들기",
+    "accept_action": "수락",
     "reject_action": "거부",
     "reaccept_action": "다시 수락",
     "create_post": "글 만들기",
@@ -482,5 +482,11 @@
       "single": "새로운 초안 1개가 생성되었습니다",
       "multiple": "새로운 초안 {}개가 생성되었습니다"
     }
+  },
+  "limit": {
+    "free_posts_count": "이번 달 {current}/{max}개 사용",
+    "free_limit_exceeded": "무료 한도 초과",
+    "upgrade_to_premium": "프리미엄으로 업그레이드하여 무제한 생성",
+    "reset_at": "다음 리셋: {date}"
   }
 }

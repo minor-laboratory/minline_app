@@ -1,13 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
 
 import '../../../../core/utils/app_icons.dart';
+import '../../../subscription/providers/subscription_provider.dart';
 
 /// Draft 카드 액션 버튼 위젯 (웹 버전과 동일한 구조)
-class DraftCardActions extends StatelessWidget {
+class DraftCardActions extends ConsumerWidget {
   final String status;
   final bool isLoading;
   final bool hasSubmittedFeedback;
@@ -30,8 +32,9 @@ class DraftCardActions extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = ShadTheme.of(context);
+    final subscriptionAsync = ref.watch(subscriptionProvider);
 
     if (status == 'pending') {
       return Row(
@@ -138,12 +141,19 @@ class DraftCardActions extends StatelessWidget {
         ],
       );
     } else if (status == 'accepted') {
+      // 무료 한도 체크
+      final isLimitExceeded = subscriptionAsync.when(
+        data: (subscription) => subscription.isFreeLimitExceeded,
+        loading: () => false,
+        error: (_, __) => false,
+      );
+
       return Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           // Create Post 버튼 (왼쪽)
           ShadButton(
-            onPressed: isLoading
+            onPressed: isLoading || isLimitExceeded
                 ? null
                 : () => context.push('/posts/create/$draftRemoteID'),
             size: ShadButtonSize.sm,
@@ -152,7 +162,11 @@ class DraftCardActions extends StatelessWidget {
               children: [
                 Icon(AppIcons.fileText, size: 16),
                 const SizedBox(width: common.Spacing.xs + 2),
-                Text('draft.create_post'.tr()),
+                Text(
+                  isLimitExceeded
+                      ? 'limit.free_limit_exceeded'.tr()
+                      : 'draft.create_post'.tr(),
+                ),
               ],
             ),
           ),
