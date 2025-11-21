@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../core/utils/app_icons.dart';
 import '../../providers/intro_provider.dart';
 import '../widgets/intro_slide.dart';
 import '../widgets/page_indicator.dart';
@@ -83,22 +82,19 @@ class _IntroPageState extends ConsumerState<IntroPage> {
                   IntroSlide(
                     title: 'intro.page1.title'.tr(),
                     description: 'intro.page1.description'.tr(),
-                    icon: AppIcons.fileText,
-                    iconColor: theme.colorScheme.mutedForeground,
+                    imagePath: 'assets/images/intro/intro_1.png',
                   ),
                   // 화면 2: 해결책
                   IntroSlide(
                     title: 'intro.page2.title'.tr(),
                     description: 'intro.page2.description'.tr(),
-                    icon: AppIcons.edit,
-                    iconColor: theme.colorScheme.primary,
+                    imagePath: 'assets/images/intro/intro_2.png',
                   ),
                   // 화면 3: 결과
                   IntroSlide(
                     title: 'intro.page3.title'.tr(),
                     description: 'intro.page3.description'.tr(),
-                    icon: AppIcons.sparkles,
-                    iconColor: const Color(0xFFFFB800),
+                    imagePath: 'assets/images/intro/intro_3.png',
                   ),
                 ],
               ),

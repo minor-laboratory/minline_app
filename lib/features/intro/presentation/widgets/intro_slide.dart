@@ -72,9 +72,12 @@ class IntroSlide extends StatelessWidget {
   Widget _buildIllustration(ShadThemeData theme) {
     // 이미지가 있으면 이미지 표시
     if (imagePath != null) {
-      return Image.asset(
-        imagePath!,
-        fit: BoxFit.contain,
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Image.asset(
+          imagePath!,
+          fit: BoxFit.contain,
+        ),
       );
     }
 

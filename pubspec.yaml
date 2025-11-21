@@ -148,6 +148,7 @@ flutter:
   assets:
     - assets/translations/
     - assets/images/
+    - assets/images/intro/
     - assets/icons/
 
 flutter_launcher_icons:
