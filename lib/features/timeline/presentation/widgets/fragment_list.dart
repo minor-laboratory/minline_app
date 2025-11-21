@@ -7,6 +7,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../models/draft.dart';
 import '../../../drafts/providers/drafts_provider.dart';
+import '../../../settings/providers/settings_provider.dart';
 import '../../providers/fragments_provider.dart';
 import 'fragment_card.dart';
 import 'fragment_input_bar.dart';
@@ -166,6 +167,8 @@ class _FragmentListState extends ConsumerState<FragmentList> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final shadTheme = ShadTheme.of(context);
+    final inputMode = ref.watch(fragmentInputModeProvider).value ?? 'inline';
+    final isInlineMode = inputMode == 'inline';
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -174,7 +177,12 @@ class _FragmentListState extends ConsumerState<FragmentList> {
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: Center(
               child: Container(
-                margin: const EdgeInsets.all(common.Spacing.md),
+                margin: EdgeInsets.only(
+                  left: common.Spacing.md,
+                  right: common.Spacing.md,
+                  top: common.Spacing.md,
+                  bottom: common.Spacing.md + (isInlineMode ? FragmentInputBar.estimatedHeight : 0),
+                ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: common.Spacing.lg,
                   vertical: common.Spacing.md,

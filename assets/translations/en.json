@@ -504,8 +504,39 @@
   },
   "limit": {
     "free_posts_count": "{current}/{max} used this month",
+    "free_posts_remaining": "{remaining} free posts left",
     "free_limit_exceeded": "Free limit exceeded",
+    "free_limit_warning": "You have {remaining} free posts left this month",
     "upgrade_to_premium": "Upgrade to Premium for unlimited posts",
     "reset_at": "Resets on {date}"
+  },
+  "premium": {
+    "title": "Upgrade to Premium",
+    "subtitle": "Enjoy unlimited posts and more features",
+    "free_plan": "Free",
+    "premium_plan": "Premium",
+    "free_posts_limit": "3/month",
+    "premium_posts_limit": "Unlimited",
+    "free_analysis": "Batch processing",
+    "premium_analysis": "Real-time analysis",
+    "free_storage": "100MB",
+    "premium_storage": "10GB",
+    "feature_unlimited": "Unlimited post generation",
+    "feature_realtime": "Real-time AI analysis",
+    "feature_storage": "10GB storage",
+    "feature_priority": "Priority support",
+    "upgrade_button": "Start Premium",
+    "restore_purchase": "Restore Purchase",
+    "coming_soon": "Coming soon"
+  },
+  "help": {
+    "draft_empty_title": "AI creates drafts for you",
+    "draft_empty_desc": "As you write fragments, AI automatically groups related content and suggests drafts",
+    "draft_empty_cta": "Write fragments",
+    "post_empty_title": "Your posts appear here",
+    "post_empty_desc": "Accept a draft and AI will create a complete post for you",
+    "post_empty_cta": "Check drafts",
+    "draft_first_visit": "When you have enough fragments, AI will automatically group related content",
+    "post_first_visit": "Accept a draft and choose a template to create a complete post"
   }
 }

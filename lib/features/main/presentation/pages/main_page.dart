@@ -10,6 +10,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../shared/widgets/keyboard_animation_builder.dart';
+import '../../../../shared/widgets/post_limit_banner.dart';
+import '../../../../shared/widgets/premium_sheet.dart';
 import '../../../../shared/widgets/user_avatar_button.dart';
 import '../../../drafts/presentation/widgets/drafts_view.dart';
 import '../../../drafts/providers/drafts_provider.dart';
@@ -312,41 +314,53 @@ class _MainPageState extends ConsumerState<MainPage>
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: _isSearchMode ? _buildSearchAppBar() : _buildDefaultAppBar(),
-      body: Stack(
+      body: Column(
         children: [
-          // 페이지 뷰
-          PageView(
-            controller: _pageController,
-            physics: const NeverScrollableScrollPhysics(),
-            onPageChanged: _onPageChanged,
-            children: [
-              TimelineView(
-                viewMode: _viewMode,
-                onEnterSearchMode: _enterSearchMode,
-              ),
-              DraftsView(analyzeMessage: _analyzeMessage),
-              const PostsView(),
-            ],
-          ),
-          // inline 모드일 때 하단 입력창 표시 (모든 탭)
-          if (inputMode == 'inline')
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: KeyboardAnimationBuilder(
-                builder: (context, keyboardHeight) {
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: keyboardHeight),
-                    child: FragmentInputBar(
-                      onRegisterFocusTrigger: (trigger) {
-                        _timelineFocusTrigger = trigger;
+          // 한도 배너 (Posts 탭에서만 표시)
+          if (_currentPageIndex == 2)
+            PostLimitBanner(
+              onUpgradeTap: () => PremiumSheet.show(context),
+            ),
+
+          // 페이지 뷰 + 입력창
+          Expanded(
+            child: Stack(
+              children: [
+                PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  onPageChanged: _onPageChanged,
+                  children: [
+                    TimelineView(
+                      viewMode: _viewMode,
+                      onEnterSearchMode: _enterSearchMode,
+                    ),
+                    DraftsView(analyzeMessage: _analyzeMessage),
+                    const PostsView(),
+                  ],
+                ),
+                // inline 모드일 때 하단 입력창 표시 (모든 탭)
+                if (inputMode == 'inline')
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: KeyboardAnimationBuilder(
+                      builder: (context, keyboardHeight) {
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: keyboardHeight),
+                          child: FragmentInputBar(
+                            onRegisterFocusTrigger: (trigger) {
+                              _timelineFocusTrigger = trigger;
+                            },
+                          ),
+                        );
                       },
                     ),
-                  );
-                },
-              ),
+                  ),
+              ],
             ),
+          ),
         ],
       ),
       // fab 모드일 때 FAB 표시 (모든 탭)

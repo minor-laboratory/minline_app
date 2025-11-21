@@ -504,8 +504,39 @@
   },
   "limit": {
     "free_posts_count": "이번 달 {current}/{max}개 사용",
+    "free_posts_remaining": "남은 무료 글: {remaining}개",
     "free_limit_exceeded": "무료 한도 초과",
+    "free_limit_warning": "이번 달 무료 글 생성이 {remaining}개 남았어요",
     "upgrade_to_premium": "프리미엄으로 업그레이드하여 무제한 생성",
     "reset_at": "다음 리셋: {date}"
+  },
+  "premium": {
+    "title": "프리미엄으로 업그레이드",
+    "subtitle": "무제한 글 생성과 더 많은 기능을 즐기세요",
+    "free_plan": "무료",
+    "premium_plan": "프리미엄",
+    "free_posts_limit": "월 3개",
+    "premium_posts_limit": "무제한",
+    "free_analysis": "배치 처리",
+    "premium_analysis": "실시간 분석",
+    "free_storage": "100MB",
+    "premium_storage": "10GB",
+    "feature_unlimited": "글 무제한 생성",
+    "feature_realtime": "실시간 AI 분석",
+    "feature_storage": "10GB 스토리지",
+    "feature_priority": "우선 지원",
+    "upgrade_button": "프리미엄 시작하기",
+    "restore_purchase": "구매 복원",
+    "coming_soon": "곧 출시됩니다"
+  },
+  "help": {
+    "draft_empty_title": "AI가 초안을 만들어요",
+    "draft_empty_desc": "토막글을 쌓으면 AI가 관련된 내용을 자동으로 묶어 초안을 제안합니다",
+    "draft_empty_cta": "토막글 쓰러 가기",
+    "post_empty_title": "완성된 글이 여기에",
+    "post_empty_desc": "초안을 수락하면 AI가 완성된 글로 만들어드려요",
+    "post_empty_cta": "초안 확인하기",
+    "draft_first_visit": "토막글이 충분히 쌓이면 AI가 자동으로 관련 내용을 묶어 제안해요",
+    "post_first_visit": "초안을 수락하고 템플릿을 선택하면 AI가 완성된 글을 만들어요"
   }
 }

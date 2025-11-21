@@ -6,6 +6,7 @@ import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
+import '../../../settings/providers/settings_provider.dart';
 import '../../../timeline/presentation/widgets/fragment_input_bar.dart';
 import '../../providers/posts_provider.dart';
 import 'post_card.dart';
@@ -29,6 +30,8 @@ class _PostsViewState extends ConsumerState<PostsView>
   Widget build(BuildContext context) {
     super.build(context);
     final postsStream = ref.watch(postsStreamProvider);
+    final inputMode = ref.watch(fragmentInputModeProvider).value ?? 'inline';
+    final isInlineMode = inputMode == 'inline';
 
     return postsStream.when(
       data: (posts) {
@@ -36,25 +39,74 @@ class _PostsViewState extends ConsumerState<PostsView>
           final theme = ShadTheme.of(context);
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(common.Spacing.lg),
+              padding: EdgeInsets.only(
+                left: common.Spacing.xl,
+                right: common.Spacing.xl,
+                top: common.Spacing.xl,
+                bottom: common.Spacing.xl + (isInlineMode ? FragmentInputBar.estimatedHeight : 0),
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    AppIcons.posts,
-                    size: 64,
-                    color: theme.colorScheme.border,
+                  // 아이콘 배경
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.muted,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      AppIcons.posts,
+                      size: 40,
+                      color: theme.colorScheme.mutedForeground,
+                    ),
                   ),
-                  const SizedBox(height: common.Spacing.md),
+                  const SizedBox(height: common.Spacing.lg),
+
+                  // 제목
                   Text(
-                    'posts.empty_title'.tr(),
-                    style: theme.textTheme.h3,
+                    'help.post_empty_title'.tr(),
+                    style: theme.textTheme.h4,
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: common.Spacing.sm),
+
+                  // 설명
                   Text(
-                    'posts.empty_message'.tr(),
+                    'help.post_empty_desc'.tr(),
                     style: theme.textTheme.muted,
                     textAlign: TextAlign.center,
+                  ),
+
+                  const SizedBox(height: common.Spacing.lg),
+
+                  // CTA 힌트
+                  Container(
+                    padding: const EdgeInsets.all(common.Spacing.md),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.muted.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(common.BorderRadii.md),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          AppIcons.info,
+                          size: 16,
+                          color: theme.colorScheme.mutedForeground,
+                        ),
+                        const SizedBox(width: common.Spacing.sm),
+                        Flexible(
+                          child: Text(
+                            'help.post_first_visit'.tr(),
+                            style: theme.textTheme.small.copyWith(
+                              color: theme.colorScheme.mutedForeground,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

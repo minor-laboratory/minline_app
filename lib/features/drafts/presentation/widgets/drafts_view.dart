@@ -5,6 +5,7 @@ import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../../core/utils/app_icons.dart';
+import '../../../settings/providers/settings_provider.dart';
 import '../../../timeline/presentation/widgets/fragment_input_bar.dart';
 import '../../providers/drafts_provider.dart';
 import 'draft_card.dart';
@@ -112,7 +113,7 @@ class _DraftsViewState extends ConsumerState<DraftsView>
 }
 
 /// Draft 탭 컨텐츠 위젯 (기존 DraftsPage에서 복사)
-class _DraftTabContent extends StatefulWidget {
+class _DraftTabContent extends ConsumerStatefulWidget {
   final String status;
   final AsyncValue<List<dynamic>> draftsStream;
   final VoidCallback onRefresh;
@@ -124,10 +125,10 @@ class _DraftTabContent extends StatefulWidget {
   });
 
   @override
-  State<_DraftTabContent> createState() => _DraftTabContentState();
+  ConsumerState<_DraftTabContent> createState() => _DraftTabContentState();
 }
 
-class _DraftTabContentState extends State<_DraftTabContent> {
+class _DraftTabContentState extends ConsumerState<_DraftTabContent> {
   static const _pageSize = 20;
   final _scrollController = ScrollController();
   int _displayLimit = _pageSize;
@@ -181,6 +182,9 @@ class _DraftTabContentState extends State<_DraftTabContent> {
 
   @override
   Widget build(BuildContext context) {
+    final inputMode = ref.watch(fragmentInputModeProvider).value ?? 'inline';
+    final isInlineMode = inputMode == 'inline';
+
     return widget.draftsStream.when(
       data: (allDrafts) {
         final filteredDrafts = widget.status == 'all'
@@ -191,30 +195,79 @@ class _DraftTabContentState extends State<_DraftTabContent> {
           final theme = ShadTheme.of(context);
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(common.Spacing.lg),
+              padding: EdgeInsets.only(
+                left: common.Spacing.xl,
+                right: common.Spacing.xl,
+                top: common.Spacing.xl,
+                bottom: common.Spacing.xl + (isInlineMode ? FragmentInputBar.estimatedHeight : 0),
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    AppIcons.sparkles,
-                    size: 64,
-                    color: theme.colorScheme.border,
+                  // 아이콘 배경
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.muted,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      AppIcons.sparkles,
+                      size: 40,
+                      color: theme.colorScheme.mutedForeground,
+                    ),
                   ),
-                  SizedBox(height: common.Spacing.md),
+                  const SizedBox(height: common.Spacing.lg),
+
+                  // 제목
                   Text(
                     widget.status == 'all'
-                        ? 'draft.empty_message'.tr()
+                        ? 'help.draft_empty_title'.tr()
                         : 'draft.empty_filter'.tr(),
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: theme.textTheme.h4,
+                    textAlign: TextAlign.center,
                   ),
+
                   if (widget.status == 'all') ...[
-                    SizedBox(height: common.Spacing.sm),
+                    const SizedBox(height: common.Spacing.sm),
+
+                    // 설명
                     Text(
-                      'draft.empty_hint'.tr(),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.mutedForeground,
-                      ),
+                      'help.draft_empty_desc'.tr(),
+                      style: theme.textTheme.muted,
                       textAlign: TextAlign.center,
+                    ),
+
+                    const SizedBox(height: common.Spacing.lg),
+
+                    // CTA 힌트
+                    Container(
+                      padding: const EdgeInsets.all(common.Spacing.md),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.muted.withValues(alpha: 0.5),
+                        borderRadius:
+                            BorderRadius.circular(common.BorderRadii.md),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            AppIcons.info,
+                            size: 16,
+                            color: theme.colorScheme.mutedForeground,
+                          ),
+                          const SizedBox(width: common.Spacing.sm),
+                          Flexible(
+                            child: Text(
+                              'help.draft_first_visit'.tr(),
+                              style: theme.textTheme.small.copyWith(
+                                color: theme.colorScheme.mutedForeground,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ],
