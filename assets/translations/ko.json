@@ -1,4 +1,21 @@
 {
+  "intro": {
+    "skip": "건너뛰기",
+    "next": "다음",
+    "start": "MiniLine 시작하기",
+    "page1": {
+      "title": "생각을 기록하고 싶은데...",
+      "description": "일기는 부담스럽고\n메모는 어디 갔는지 모르겠고"
+    },
+    "page2": {
+      "title": "그냥 짧게 적기만 하면 돼요",
+      "description": "\"점심에 파스타 먹음\"\n\"친구가 추천한 식당이었는데\"\n언제 어디서든"
+    },
+    "page3": {
+      "title": "AI가 하나의 이야기로 만들어줘요",
+      "description": "시간을 넘어 자동으로 연결\n완성된 글로 조합"
+    }
+  },
   "timeline": {
     "title": "타임라인",
     "calendar": "달력",
@@ -223,7 +240,9 @@
     "test_notification_sent": "테스트 알림 전송됨",
     "send_test_notification": "테스트 알림 보내기",
     "start_time_must_be_earlier": "시작 시간은 종료 시간보다 빨라야 합니다",
-    "end_time_must_be_later": "종료 시간은 시작 시간보다 늦어야 합니다"
+    "end_time_must_be_later": "종료 시간은 시작 시간보다 늦어야 합니다",
+    "debug_show_intro": "인트로 다시 보기",
+    "debug_show_intro_description": "온보딩 화면을 다시 표시합니다 (Debug)"
   },
   "theme": {
     "mode": "테마 모드",

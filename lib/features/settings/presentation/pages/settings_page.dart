@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +13,7 @@ import '../../../../core/utils/app_icons.dart';
 import '../../../../shared/widgets/responsive_modal_sheet.dart';
 import '../../../../shared/widgets/standard_bottom_sheet.dart';
 import '../../../auth/data/auth_repository.dart';
+import '../../../intro/providers/intro_provider.dart';
 import '../../../profile/widgets/user_profile_section.dart';
 import '../../providers/settings_provider.dart';
 import '../widgets/language_settings_sheet.dart';
@@ -398,6 +400,23 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             title: Text('settings.app_version'.tr()),
             subtitle: Text(_appVersion),
           ),
+
+          // Debug 모드 전용 항목
+          if (kDebugMode) ...[
+            Builder(
+              builder: (ctx) => ListTile(
+                leading: Icon(AppIcons.sparkles),
+                title: Text('settings.debug_show_intro'.tr()),
+                subtitle: Text('settings.debug_show_intro_description'.tr()),
+                trailing: Icon(AppIcons.chevronRight, size: 20),
+                onTap: () {
+                  ref.read(introCompletedProvider.notifier).reset().then((_) {
+                    if (ctx.mounted) ctx.go('/intro');
+                  });
+                },
+              ),
+            ),
+          ],
 
           ShadSeparator.horizontal(
             margin: const EdgeInsets.symmetric(horizontal: common.Spacing.md),

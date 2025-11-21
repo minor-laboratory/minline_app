@@ -2,9 +2,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../features/auth/presentation/pages/auth_page.dart';
 import '../features/feedback/presentation/pages/feedback_page.dart';
+import '../features/intro/presentation/pages/intro_page.dart';
 import '../features/main/presentation/pages/main_page.dart';
 import '../features/posts/presentation/pages/post_create_page.dart';
 import '../features/posts/presentation/pages/post_detail_page.dart';
@@ -19,6 +21,20 @@ import '../features/timeline/presentation/pages/tag_edit_page.dart';
 /// Navigator Key for ShareHandlerService
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+/// 인트로 완료 여부 캐시 (main.dart에서 초기화)
+bool? _introCompletedCache;
+
+/// 인트로 완료 여부 초기화 (main.dart에서 호출)
+Future<void> initIntroState() async {
+  final prefs = await SharedPreferences.getInstance();
+  _introCompletedCache = prefs.getBool('intro_completed') ?? false;
+}
+
+/// 인트로 완료 처리 (IntroPage에서 호출 시 캐시 업데이트)
+void setIntroCompleted() {
+  _introCompletedCache = true;
+}
+
 /// 국가 코드 가져오기 (언어 설정 기반)
 String _getCountryCode(BuildContext context) {
   final locale = context.locale;
@@ -31,6 +47,13 @@ String _getCountryCode(BuildContext context) {
 final appRouter = GoRouter(
   navigatorKey: navigatorKey,
   initialLocation: '/',
+  redirect: (context, state) {
+    // 인트로 미완료 + 현재 인트로 페이지가 아니면 인트로로 리다이렉트
+    if (_introCompletedCache == false && state.matchedLocation != '/intro') {
+      return '/intro';
+    }
+    return null;
+  },
   routes: [
     // Main (메인 화면 - Timeline/Drafts/Posts)
     GoRoute(
@@ -51,6 +74,13 @@ final appRouter = GoRouter(
           },
         ),
       ],
+    ),
+
+    // Intro (온보딩)
+    GoRoute(
+      path: '/intro',
+      name: 'intro',
+      builder: (context, state) => const IntroPage(),
     ),
 
     // Auth

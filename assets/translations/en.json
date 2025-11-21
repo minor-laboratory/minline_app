@@ -1,4 +1,21 @@
 {
+  "intro": {
+    "skip": "Skip",
+    "next": "Next",
+    "start": "Get Started with MiniLine",
+    "page1": {
+      "title": "Want to record your thoughts...",
+      "description": "Journaling feels overwhelming\nNotes get lost everywhere"
+    },
+    "page2": {
+      "title": "Just jot down short snippets",
+      "description": "\"Had pasta for lunch\"\n\"It was a restaurant my friend recommended\"\nAnytime, anywhere"
+    },
+    "page3": {
+      "title": "AI weaves them into a story",
+      "description": "Automatically connects across time\nCrafts complete writings"
+    }
+  },
   "timeline": {
     "title": "Timeline",
     "calendar": "Calendar",
@@ -223,7 +240,9 @@
     "test_notification_sent": "Test notification sent",
     "send_test_notification": "Send test notification",
     "start_time_must_be_earlier": "Start time must be earlier than end time",
-    "end_time_must_be_later": "End time must be later than start time"
+    "end_time_must_be_later": "End time must be later than start time",
+    "debug_show_intro": "Show Intro Again",
+    "debug_show_intro_description": "Show onboarding screen again (Debug)"
   },
   "theme": {
     "mode": "Theme Mode",

@@ -71,6 +71,9 @@ void main() async {
   // 첫 번째 auth state change 이벤트까지 대기 (세션 복구 완료 신호)
   await Supabase.instance.client.auth.onAuthStateChange.first;
 
+  // 인트로 완료 여부 초기화 (라우터 redirect에서 사용)
+  await router.initIntroState();
+
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('ko'), Locale('en')],
