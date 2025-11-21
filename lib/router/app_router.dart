@@ -15,6 +15,7 @@ import '../features/profile/presentation/pages/password_change_page.dart';
 import '../features/profile/presentation/pages/profile_detail_page.dart';
 import '../features/settings/presentation/pages/notifications_page.dart';
 import '../features/settings/presentation/pages/settings_page.dart';
+import '../features/subscription/presentation/pages/subscription_page.dart';
 import '../features/share/presentation/pages/share_input_page.dart';
 import '../features/timeline/presentation/pages/tag_edit_page.dart';
 
@@ -134,6 +135,11 @@ final appRouter = GoRouter(
         GoRoute(
           path: 'notifications',
           builder: (context, state) => const NotificationsPage(),
+        ),
+        // 구독 관리
+        GoRoute(
+          path: 'subscription',
+          builder: (context, state) => const SubscriptionPage(),
         ),
         // 프로필 비밀번호 변경
         GoRoute(

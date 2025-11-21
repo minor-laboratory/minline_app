@@ -14,6 +14,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/database/database_service.dart';
 import 'core/services/fcm_service.dart';
 import 'core/services/local_notification_service.dart';
+import 'core/services/subscription_service_provider.dart';
 import 'firebase_options.dart';
 import 'core/services/share_activity_service.dart';
 import 'core/services/share_handler_provider.dart';
@@ -134,6 +135,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         await FcmService().initialize(); // FCM 초기화 (토큰 가져오기)
         ref.read(lifecycleServiceProvider).initialize();
         ref.read(shareHandlerServiceProvider).initialize();
+        await ref.read(subscriptionServiceProvider).initialize(); // RevenueCat
         logger.i('[Main] All services initialized');
       });
     }

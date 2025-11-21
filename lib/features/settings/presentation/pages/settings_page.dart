@@ -248,6 +248,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             margin: EdgeInsets.symmetric(horizontal: common.Spacing.md),
           ),
 
+          // 구독 섹션
+          _buildSectionHeader(context, 'subscription.title'.tr()),
+
+          ListTile(
+            leading: Icon(AppIcons.crown),
+            title: Text('subscription.manage_subscription'.tr()),
+            trailing: Icon(AppIcons.chevronRight, size: 20),
+            onTap: () => context.push('/settings/subscription'),
+          ),
+
+          const ShadSeparator.horizontal(
+            margin: EdgeInsets.symmetric(horizontal: common.Spacing.md),
+          ),
+
           // UX 설정 섹션
           _buildSectionHeader(context, 'settings.ux'.tr()),
 

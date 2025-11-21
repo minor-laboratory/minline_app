@@ -15,6 +15,7 @@ import '../../../../core/utils/logger.dart';
 import '../../../../models/draft.dart';
 import '../../../../models/fragment.dart';
 import '../../../../shared/widgets/standard_bottom_sheet.dart';
+import '../../../subscription/presentation/widgets/subscription_sheet.dart';
 
 /// Post 생성 페이지
 ///
@@ -193,8 +194,18 @@ class _PostCreatePageState extends ConsumerState<PostCreatePage> {
     } catch (e, stack) {
       logger.e('Post 생성 실패:', e, stack);
       if (mounted) {
+        final isFreeLimitError = e.toString().contains('free_limit_exceeded');
+        if (isFreeLimitError && mounted) {
+          // 무료 한도 초과 시 Paywall 표시
+          final subscribed = await SubscriptionSheet.show(context);
+          if (subscribed == true) {
+            // 구독 성공 시 다시 시도
+            _handleGenerate();
+            return;
+          }
+        }
         setState(() {
-          _errorMessage = e.toString().contains('free_limit_exceeded')
+          _errorMessage = isFreeLimitError
               ? 'post.free_limit_exceeded'.tr()
               : 'post.generation_failed'.tr();
           _isGenerating = false;

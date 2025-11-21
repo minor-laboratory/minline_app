@@ -98,4 +98,6 @@ class AppIcons {
   // Premium
   static const IconData crown = LucideIcons.crown;
   static const IconData zap = LucideIcons.zap;
+  static const IconData infinity = LucideIcons.infinity;
+  static const IconData database = LucideIcons.database;
 }
