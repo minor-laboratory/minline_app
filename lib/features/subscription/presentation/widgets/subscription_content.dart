@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/services/subscription_service.dart';
 import '../../../../core/services/subscription_service_provider.dart';
@@ -435,6 +436,16 @@ class _SubscriptionContentState extends ConsumerState<SubscriptionContent> {
   /// 구독 처리
   Future<void> _handleSubscribe() async {
     if (_selectedPackageId == null) return;
+
+    // 로그인 체크
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null || user.isAnonymous) {
+      if (mounted) {
+        // 로그인 화면으로 이동
+        context.push('/auth/login');
+      }
+      return;
+    }
 
     setState(() => _isLoading = true);
 

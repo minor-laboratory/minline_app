@@ -16,7 +16,7 @@ class SubscriptionService {
   static const String yearlyProductId = 'miniline_premium_yearly';
 
   /// Entitlement ID (RevenueCat에서 설정)
-  static const String premiumEntitlementId = 'premium';
+  static const String premiumEntitlementId = 'default';
 
   /// RevenueCat 초기화
   Future<void> initialize() async {
