@@ -69,7 +69,7 @@ MiniLine 앱의 RevenueCat 구독 기능 설정 방법입니다.
 - Monthly/Annual 패키지 추가
 
 **Entitlements 설정**:
-- `premium` Entitlement 생성
+- `Pro` Entitlement 생성 (중요: 정확히 "Pro"로 설정)
 - 위 상품들을 Entitlement에 연결
 
 ## 2. 환경 변수 설정
@@ -169,6 +169,8 @@ lib/
 │   └── subscription_service_provider.dart  # Riverpod Provider
 │
 ├── features/subscription/
+│   ├── providers/
+│   │   └── subscription_provider.dart      # 무료 한도 Provider (Supabase)
 │   └── presentation/
 │       ├── pages/
 │       │   └── subscription_page.dart      # 전체 화면 (설정에서)
@@ -177,9 +179,37 @@ lib/
 │           └── subscription_sheet.dart     # BottomSheet (한도 초과)
 ```
 
-## 7. 사용 방법
+**중요 개념**:
+- **subscription_service**: RevenueCat API 직접 호출 (실시간 구독 상태)
+- **subscription_provider**: Supabase DB 조회 (무료 한도 추적, 캐시됨)
 
-### 7.1 프리미엄 상태 확인
+## 7. 무료 한도 및 크로스앱 구독
+
+### 7.1 무료 한도
+
+**무료 사용자**: 월 5개 글 생성
+- `user_subscriptions.free_posts_count` 추적
+- 매월 1일 자동 리셋
+- 한도 초과 시 Paywall 표시
+
+**프리미엄 사용자**: 무제한
+- RevenueCat Entitlement `Pro` 보유
+- 한도 체크 건너뜀
+
+### 7.2 크로스앱 구독 (중요)
+
+**MinorLab 패밀리 앱은 하나의 구독을 공유합니다.**
+
+- **북랩 앱**에서 구독 → 미니라인에서도 프리미엄
+- **미니라인 앱**에서 구독 → 북랩에서도 프리미엄
+- 모든 앱이 동일한 Supabase 백엔드 사용
+- RevenueCat 웹훅이 `user_subscriptions.is_premium` 자동 동기화
+
+**참고**: [GUIDE_SUBSCRIPTION_REVENUECAT.md](../../docs/common/GUIDE_SUBSCRIPTION_REVENUECAT.md)
+
+## 8. 사용 방법
+
+### 8.1 프리미엄 상태 확인
 
 ```dart
 final isPremium = ref.watch(isPremiumProvider);
@@ -197,7 +227,7 @@ isPremium.when(
 );
 ```
 
-### 7.2 Paywall 표시
+### 8.2 Paywall 표시
 
 ```dart
 // BottomSheet로 표시 (무료 한도 초과 시)
@@ -210,7 +240,7 @@ if (subscribed == true) {
 context.push('/settings/subscription');
 ```
 
-## 8. 체크리스트
+## 9. 체크리스트
 
 ### RevenueCat 설정
 - [ ] RevenueCat 프로젝트 생성
@@ -218,7 +248,7 @@ context.push('/settings/subscription');
 - [ ] Android Google Play 연동
 - [ ] Products 생성 (monthly, yearly)
 - [ ] Offerings 설정 (default)
-- [ ] Entitlements 설정 (premium)
+- [ ] Entitlements 설정 (Pro)
 
 ### 환경 변수
 - [ ] `.env.dev`에 `REVENUECAT_API_KEY_IOS` 추가
@@ -240,7 +270,7 @@ context.push('/settings/subscription');
 - [ ] 구매 복원 테스트
 - [ ] 무료 한도 초과 시 Paywall 동작 확인
 
-## 9. 트러블슈팅
+## 10. 트러블슈팅
 
 ### "No offerings available"
 - RevenueCat에서 Offerings이 설정되었는지 확인

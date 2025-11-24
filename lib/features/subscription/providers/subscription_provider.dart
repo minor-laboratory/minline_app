@@ -17,8 +17,8 @@ class SubscriptionInfo {
     required this.freePostsResetAt,
   });
 
-  /// 무료 한도 초과 여부
-  bool get isFreeLimitExceeded => !isPremium && freePostsCount >= 3;
+  /// 무료 한도 초과 여부 (월 5개)
+  bool get isFreeLimitExceeded => !isPremium && freePostsCount >= 5;
 
   /// 다음 리셋까지 남은 일수
   int get daysUntilReset {

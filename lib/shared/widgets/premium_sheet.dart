@@ -1,8 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
+import '../../core/services/subscription_service_provider.dart';
 import '../../core/utils/app_icons.dart';
 import 'standard_bottom_sheet.dart';
 
@@ -11,8 +14,8 @@ import 'standard_bottom_sheet.dart';
 /// 무료 한도 초과 시 또는 프리미엄 기능 접근 시 표시
 /// - 무료 vs 프리미엄 비교 테이블
 /// - 프리미엄 기능 목록
-/// - 업그레이드 버튼 (인앱결제 연결 - TODO)
-class PremiumSheet extends StatelessWidget {
+/// - 업그레이드 버튼 (구독 페이지로 이동)
+class PremiumSheet extends ConsumerWidget {
   const PremiumSheet({super.key});
 
   /// 프리미엄 시트 표시
@@ -25,7 +28,7 @@ class PremiumSheet extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = ShadTheme.of(context);
 
     return SingleChildScrollView(
@@ -56,11 +59,8 @@ class PremiumSheet extends StatelessWidget {
           ShadButton(
             width: double.infinity,
             onPressed: () {
-              // TODO: 인앱결제 연결
               Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('premium.coming_soon'.tr())),
-              );
+              context.push('/subscription');
             },
             child: Text('premium.upgrade_button'.tr()),
           ),
@@ -70,12 +70,30 @@ class PremiumSheet extends StatelessWidget {
           // 구매 복원 버튼
           ShadButton.outline(
             width: double.infinity,
-            onPressed: () {
-              // TODO: 구매 복원
+            onPressed: () async {
               Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('premium.coming_soon'.tr())),
-              );
+
+              try {
+                await ref.read(subscriptionServiceProvider).restorePurchases();
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('premium.restore_success'.tr()),
+                      backgroundColor: theme.colorScheme.primary,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('premium.restore_failed'.tr()),
+                      backgroundColor: theme.colorScheme.destructive,
+                    ),
+                  );
+                }
+              }
             },
             child: Text('premium.restore_purchase'.tr()),
           ),
