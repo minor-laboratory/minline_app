@@ -220,16 +220,36 @@ class _SubscriptionContentState extends ConsumerState<SubscriptionContent> {
           SizedBox(height: common.Spacing.md),
 
           // 약관 및 개인정보처리방침 링크
-          GestureDetector(
-            onTap: () => context.push('/settings/terms'),
-            child: Text(
-              'subscription.terms_and_privacy'.tr(),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.primary,
-                decoration: TextDecoration.underline,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () => context.push('/settings/terms'),
+                child: Text(
+                  'common.terms_of_service'.tr(),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
+              Text(
+                ' | ',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.mutedForeground,
+                ),
+              ),
+              GestureDetector(
+                onTap: () => context.push('/settings/privacy'),
+                child: Text(
+                  'common.privacy_policy'.tr(),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
