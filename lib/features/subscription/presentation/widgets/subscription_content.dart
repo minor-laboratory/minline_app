@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +13,7 @@ import '../../../../core/services/subscription_service.dart';
 import '../../../../core/services/subscription_service_provider.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../../../core/utils/logger.dart';
+import '../../../../shared/widgets/standard_bottom_sheet.dart';
 
 /// 구독 UI 핵심 컨텐츠 위젯
 ///
@@ -194,9 +197,11 @@ class _SubscriptionContentState extends ConsumerState<SubscriptionContent> {
 
           SizedBox(height: common.Spacing.md),
 
-          // 안내 문구
+          // 안내 문구 (플랫폼별)
           Text(
-            'subscription.terms_notice'.tr(),
+            Platform.isIOS
+                ? 'subscription.terms_notice_ios'.tr()
+                : 'subscription.terms_notice_android'.tr(),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.mutedForeground,
             ),
@@ -433,16 +438,80 @@ class _SubscriptionContentState extends ConsumerState<SubscriptionContent> {
     );
   }
 
+  /// 로그인 필요 안내 - 북랩 패턴 (StandardBottomSheet)
+  Future<void> _showLoginRequired() async {
+    final action = await StandardBottomSheet.show(
+      context: context,
+      title: 'auth.login_required_title'.tr(),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 안내 아이콘
+          Icon(
+            AppIcons.info,
+            size: 48,
+            color: ShadTheme.of(context).colorScheme.primary,
+          ),
+          SizedBox(height: common.Spacing.md),
+
+          // 안내 메시지
+          Text(
+            'auth.login_required_message'.tr(),
+            style: ShadTheme.of(context).textTheme.bodyLarge,
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: common.Spacing.xs),
+
+          // 부가 설명
+          Text(
+            'auth.login_benefits'.tr(),
+            style: ShadTheme.of(context).textTheme.bodyMedium?.copyWith(
+              color: ShadTheme.of(context).colorScheme.mutedForeground,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+      actions: [
+        BottomSheetAction<String>(
+          text: 'common.cancel'.tr(),
+          value: 'cancel',
+          style: BottomSheetActionStyle.outlined,
+        ),
+        BottomSheetAction<String>(
+          text: 'auth.sign_in'.tr(),
+          value: 'login',
+          style: BottomSheetActionStyle.elevated,
+        ),
+      ],
+      actionLayout: BottomSheetActionLayout.horizontal,
+    );
+
+    // 로그인 선택 시 인증 페이지로 이동
+    if (action == 'login' && mounted) {
+      // 로그인 후 구독 페이지로 돌아오도록 from 파라미터 전달
+      context.push('/auth?from=/settings/subscription');
+    }
+  }
+
   /// 구독 처리
   Future<void> _handleSubscribe() async {
-    if (_selectedPackageId == null) return;
+    logger.i('Subscribe button pressed');
+
+    if (_selectedPackageId == null) {
+      logger.w('No package selected');
+      return;
+    }
 
     // 로그인 체크
     final user = Supabase.instance.client.auth.currentUser;
+    logger.i('Current user: ${user?.id}, isAnonymous: ${user?.isAnonymous}');
+
     if (user == null || user.isAnonymous) {
+      logger.i('Not logged in, showing login required sheet');
       if (mounted) {
-        // 로그인 화면으로 이동
-        context.push('/auth/login');
+        _showLoginRequired();
       }
       return;
     }

@@ -19,7 +19,10 @@ import '../../../../core/utils/logger.dart';
 /// - shadcn_ui 컴포넌트만 사용
 /// - 소셜 로그인 ↔ 이메일 탭 토글
 class AuthPage extends ConsumerStatefulWidget {
-  const AuthPage({super.key});
+  /// 로그인 후 리다이렉트할 경로 (null이면 홈으로)
+  final String? redirectTo;
+
+  const AuthPage({super.key, this.redirectTo});
 
   @override
   ConsumerState<AuthPage> createState() => _AuthPageState();
@@ -70,6 +73,27 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
   bool _isValidEmail(String email) {
     return RegExp(r'^[\w-\.+]+@([\w-]+\.)+[\w-]{2,}$').hasMatch(email);
+  }
+
+  /// 인증 성공 후 리다이렉션 (원래 페이지 또는 홈)
+  ///
+  /// - from 파라미터가 있으면 pop() (로그인 페이지 제거, 이전 페이지로 복귀)
+  /// - from 파라미터가 없으면 go('/') (홈으로 이동)
+  void _navigateAfterAuth() {
+    if (!mounted) return;
+
+    final redirectTo = widget.redirectTo;
+    logger.i('🔄 [AuthPage] 인증 후 리다이렉션: redirectTo=$redirectTo');
+
+    if (redirectTo != null && redirectTo.isNotEmpty) {
+      // from 파라미터가 있으면 이전 페이지로 복귀 (로그인 페이지 제거)
+      logger.i('🔄 [AuthPage] pop으로 이전 페이지 복귀');
+      context.pop();
+    } else {
+      // from 파라미터가 없으면 홈으로 이동
+      logger.i('🔄 [AuthPage] go로 홈 이동');
+      context.go('/');
+    }
   }
 
   void _validateForm() {
@@ -165,7 +189,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
         logger.i('✅ [AuthPage] 이메일 회원가입 성공');
         if (!mounted) return;
         _showToast('auth.signup_success'.tr(), isSuccess: true);
-        context.go('/');
+        _navigateAfterAuth();
       } else {
         await ref
             .read(common.authNotifierProvider.notifier)
@@ -177,7 +201,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
         logger.i('✅ [AuthPage] 이메일 로그인 성공');
         if (!mounted) return;
         _showToast('auth.login_success'.tr(), isSuccess: true);
-        context.go('/');
+        _navigateAfterAuth();
       }
     } catch (e, st) {
       logger.e('❌ [AuthPage] 이메일 ${_isSignUpMode ? "회원가입" : "로그인"} 실패', e, st);
@@ -200,7 +224,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       logger.i('✅ [AuthPage] Google 로그인 성공');
       if (!mounted) return;
       _showToast('auth.login_success'.tr(), isSuccess: true);
-      context.go('/');
+      _navigateAfterAuth();
     } catch (e, st) {
       logger.e('❌ [AuthPage] Google 로그인 실패', e, st);
       if (!mounted) return;
@@ -222,7 +246,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       logger.i('✅ [AuthPage] Apple 로그인 성공');
       if (!mounted) return;
       _showToast('auth.login_success'.tr(), isSuccess: true);
-      context.go('/');
+      _navigateAfterAuth();
     } catch (e, st) {
       logger.e('❌ [AuthPage] Apple 로그인 실패', e, st);
       if (!mounted) return;

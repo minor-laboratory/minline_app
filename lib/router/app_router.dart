@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/utils/logger.dart';
 import '../features/auth/presentation/pages/auth_page.dart';
 import '../features/feedback/presentation/pages/feedback_page.dart';
 import '../features/intro/presentation/pages/intro_page.dart';
@@ -88,7 +89,11 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/auth',
       name: 'auth',
-      builder: (context, state) => const AuthPage(),
+      builder: (context, state) {
+        final redirectTo = state.uri.queryParameters['from'];
+        logger.i('🔗 [AppRouter] Auth route - from parameter: $redirectTo');
+        return AuthPage(redirectTo: redirectTo);
+      },
       routes: [
         // 비밀번호 재설정
         GoRoute(
