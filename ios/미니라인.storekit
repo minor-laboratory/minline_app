@@ -1,0 +1,117 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "522F370E",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6755478595",
+    "_askToBuyEnabled" : false,
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_developerTeamID" : "A968UAC4J8",
+    "_disableDialogs" : false,
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 785660827.91242802,
+    "_locale" : "en_US",
+    "_renewalBillingIssuesEnabled" : false,
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ],
+    "_timeRate" : 0
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21840465",
+      "localizations" : [
+
+      ],
+      "name" : "Miniline Pro subscription",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "3.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "6755670250",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "무제한 글 생성, 실시간 AI 분석",
+              "displayName" : "연간 프리미엄",
+              "locale" : "ko"
+            },
+            {
+              "description" : "Unlimited posts & real-time AI",
+              "displayName" : "Annual Premium",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.minorlab.miniline.Annual",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "미니라인 Pro 연간 구독",
+          "subscriptionGroupID" : "21840465",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "3.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6755670066",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "무제한 글 생성, 실시간 AI 분석",
+              "displayName" : "월간 프리미엄",
+              "locale" : "ko"
+            },
+            {
+              "description" : "Unlimited posts & real-time AI",
+              "displayName" : "Monthly Premium",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.minorlab.miniline.Monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "미니라인 Pro 월간 구독",
+          "subscriptionGroupID" : "21840465",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

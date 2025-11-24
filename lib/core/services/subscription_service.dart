@@ -11,9 +11,9 @@ import '../utils/logger.dart';
 class SubscriptionService {
   bool _isInitialized = false;
 
-  /// 구독 상품 ID (RevenueCat에서 설정)
-  static const String monthlyProductId = 'miniline_premium_monthly';
-  static const String yearlyProductId = 'miniline_premium_yearly';
+  /// 구독 상품 ID (App Store Connect에서 설정)
+  static const String monthlyProductId = 'com.minorlab.miniline.Monthly';
+  static const String yearlyProductId = 'com.minorlab.miniline.Annual';
 
   /// Entitlement ID (RevenueCat에서 설정)
   static const String premiumEntitlementId = 'Pro';

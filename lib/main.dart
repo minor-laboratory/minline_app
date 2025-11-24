@@ -14,16 +14,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/database/database_service.dart';
 import 'core/services/fcm_service.dart';
 import 'core/services/local_notification_service.dart';
-import 'core/services/subscription_service_provider.dart';
-import 'firebase_options.dart';
 import 'core/services/share_activity_service.dart';
 import 'core/services/share_handler_provider.dart';
 import 'core/services/share_handler_service.dart';
+import 'core/services/subscription_service_provider.dart';
 import 'core/services/sync/lifecycle_service_provider.dart';
 import 'core/utils/logger.dart';
 import 'env/app_env.dart';
 import 'features/settings/providers/settings_provider.dart';
 import 'features/share/presentation/pages/share_input_page.dart';
+import 'firebase_options.dart';
 import 'router/app_router.dart' as router;
 
 void main() async {
@@ -37,9 +37,7 @@ void main() async {
   await DatabaseService.instance.init();
 
   // Firebase 초기화 (FCM, Crashlytics, Analytics 사용)
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   logger.i('Firebase initialized successfully');
 
   // Firebase Analytics 초기화
@@ -146,9 +144,8 @@ class _MyAppState extends ConsumerState<MyApp> {
     // ShareActivity 확인 중일 때 로딩 화면 표시 (빈 화면)
     if (_isCheckingShareActivity) {
       return const MaterialApp(
-        home: Scaffold(
-          body: SizedBox.shrink(),
-        ),
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(body: SizedBox.shrink()),
       );
     }
 
@@ -171,6 +168,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         appBuilder: (appContext) {
           final materialTheme = Theme.of(appContext);
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             theme: materialTheme,
             darkTheme: materialTheme,
             themeMode: ThemeMode.system,
@@ -235,6 +233,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                     theme: materialTheme,
                     darkTheme: materialTheme,
                     themeMode: themeMode,
+                    debugShowCheckedModeBanner: false,
                     routerConfig: router.appRouter,
                     localizationsDelegates: context.localizationDelegates,
                     supportedLocales: context.supportedLocales,
@@ -248,6 +247,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             );
           },
           loading: () => MaterialApp(
+            debugShowCheckedModeBanner: false,
             home: Scaffold(body: Center(child: CircularProgressIndicator())),
           ),
           error: (error, stack) {
@@ -285,6 +285,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   final materialTheme = Theme.of(appContext);
                   return MaterialApp.router(
                     title: 'MiniLine',
+                    debugShowCheckedModeBanner: false,
                     theme: materialTheme,
                     darkTheme: materialTheme,
                     themeMode: themeMode,
@@ -302,6 +303,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           },
         ),
         loading: () => MaterialApp(
+          debugShowCheckedModeBanner: false,
           home: Scaffold(body: Center(child: CircularProgressIndicator())),
         ),
         error: (error, stack) {
@@ -339,6 +341,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                 final materialTheme = Theme.of(appContext);
                 return MaterialApp.router(
                   title: 'MiniLine',
+                  debugShowCheckedModeBanner: false,
                   theme: materialTheme,
                   darkTheme: materialTheme,
                   themeMode: themeMode,
@@ -356,6 +359,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         },
       ),
       loading: () => MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: Scaffold(body: Center(child: CircularProgressIndicator())),
       ),
       error: (error, stack) {
@@ -387,6 +391,7 @@ class _MyAppState extends ConsumerState<MyApp> {
               final materialTheme = Theme.of(appContext);
               return MaterialApp.router(
                 title: 'MiniLine',
+                debugShowCheckedModeBanner: false,
                 theme: materialTheme,
                 darkTheme: materialTheme,
                 themeMode: ThemeMode.system,
