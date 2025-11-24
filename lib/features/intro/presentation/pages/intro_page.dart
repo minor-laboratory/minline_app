@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -143,7 +144,7 @@ class _IntroPageState extends ConsumerState<IntroPage> {
             totalPages: _totalPages,
           ),
 
-          const SizedBox(height: 32),
+          SizedBox(height: common.Spacing.xl),
 
           // 버튼
           SizedBox(

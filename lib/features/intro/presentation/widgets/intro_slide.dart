@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// 인트로 슬라이드 위젯
@@ -39,7 +40,7 @@ class IntroSlide extends StatelessWidget {
             flex: 4,
             child: Column(
               children: [
-                const SizedBox(height: 24),
+                SizedBox(height: common.Spacing.lg),
 
                 // 제목
                 Text(
@@ -50,7 +51,7 @@ class IntroSlide extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: common.Spacing.md),
 
                 // 설명
                 Text(

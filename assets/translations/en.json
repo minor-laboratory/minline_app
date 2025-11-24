@@ -241,6 +241,9 @@
     "send_test_notification": "Send test notification",
     "start_time_must_be_earlier": "Start time must be earlier than end time",
     "end_time_must_be_later": "End time must be later than start time",
+    "allowed_start_time": "Allowed start time",
+    "allowed_end_time": "Allowed end time",
+    "error_loading": "Failed to load settings",
     "debug_show_intro": "Show Intro Again",
     "debug_show_intro_description": "Show onboarding screen again (Debug)"
   },
@@ -292,6 +295,9 @@
     "logout": "Logout",
     "logout_description": "Local data will be deleted after logout",
     "logout_confirm": "Are you sure you want to logout?",
+    "logout_unsynced_warning": "You have unsynced data",
+    "logout_data_loss_warning": "Logging out will permanently delete unsynced data",
+    "logout_anyway": "Logout anyway",
     "currentPassword": "Current Password",
     "newPassword": "New Password",
     "password": "Password",
@@ -357,7 +363,10 @@
     "hint": "Save shared content from other apps as a Fragment"
   },
   "sync": {
-    "waiting": "Waiting to sync"
+    "waiting": "Waiting to sync",
+    "checking": "Checking sync status",
+    "all_data_synced": "All data synced",
+    "unsynced_items_exist": "Unsynced items exist"
   },
   "common": {
     "input_placeholder": "What's on your mind?",

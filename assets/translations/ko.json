@@ -241,6 +241,9 @@
     "send_test_notification": "테스트 알림 보내기",
     "start_time_must_be_earlier": "시작 시간은 종료 시간보다 빨라야 합니다",
     "end_time_must_be_later": "종료 시간은 시작 시간보다 늦어야 합니다",
+    "allowed_start_time": "허용 시작 시간",
+    "allowed_end_time": "허용 종료 시간",
+    "error_loading": "설정 로드 실패",
     "debug_show_intro": "인트로 다시 보기",
     "debug_show_intro_description": "온보딩 화면을 다시 표시합니다 (Debug)"
   },
@@ -292,6 +295,9 @@
     "logout": "로그아웃",
     "logout_description": "로그아웃하면 로컬 데이터가 삭제됩니다",
     "logout_confirm": "정말 로그아웃 하시겠습니까?",
+    "logout_unsynced_warning": "아직 동기화되지 않은 데이터가 있습니다",
+    "logout_data_loss_warning": "로그아웃하면 동기화되지 않은 데이터가 영구적으로 삭제됩니다",
+    "logout_anyway": "그래도 로그아웃",
     "currentPassword": "현재 비밀번호",
     "newPassword": "새 비밀번호",
     "password": "비밀번호",
@@ -357,7 +363,10 @@
     "hint": "다른 앱에서 공유받은 내용을 Fragment로 저장합니다"
   },
   "sync": {
-    "waiting": "동기화 대기 중"
+    "waiting": "동기화 대기 중",
+    "checking": "동기화 확인 중",
+    "all_data_synced": "모든 데이터가 동기화되었습니다",
+    "unsynced_items_exist": "동기화되지 않은 항목이 있습니다"
   },
   "common": {
     "input_placeholder": "무슨 생각을 하고 계신가요?",
