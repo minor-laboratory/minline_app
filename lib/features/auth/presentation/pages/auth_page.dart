@@ -680,7 +680,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-        style: theme.textTheme.muted,
+        style: theme.textTheme.muted.copyWith(
+          color: theme.colorScheme.mutedForeground,
+        ),
         children: [
           TextSpan(text: '${'auth.by_continuing'.tr()} '),
           TextSpan(
