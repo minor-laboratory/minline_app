@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'dart:io' show Platform;
+
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +9,7 @@ import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 import '../../../../core/utils/app_icons.dart';
@@ -231,6 +234,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
+  Future<void> _openAppleSubscriptionManagement() async {
+    final url = Uri.parse('https://apps.apple.com/account/subscriptions');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('common.error'.tr())),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
@@ -257,6 +271,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             trailing: Icon(AppIcons.chevronRight, size: 20),
             onTap: () => context.push('/settings/subscription'),
           ),
+
+          // iOS에서만 Apple 구독 관리 링크 표시
+          if (Platform.isIOS)
+            ListTile(
+              leading: Icon(AppIcons.settings),
+              title: Text('subscription.manage_apple_subscription'.tr()),
+              trailing: Icon(AppIcons.chevronRight, size: 20),
+              onTap: _openAppleSubscriptionManagement,
+            ),
 
           const ShadSeparator.horizontal(
             margin: EdgeInsets.symmetric(horizontal: common.Spacing.md),

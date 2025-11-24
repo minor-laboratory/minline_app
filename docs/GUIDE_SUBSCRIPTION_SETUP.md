@@ -2,6 +2,42 @@
 
 MiniLine 앱의 RevenueCat 구독 기능 설정 방법입니다.
 
+## 0. Apple App Store 가이드라인 필수 사항
+
+### 필수 구현 요구사항
+
+**Apple App Store Review Guidelines 3.1.2** 준수 사항:
+
+1. **구매 복원 버튼** ✅
+   - 구현 위치: `SubscriptionContent` 위젯
+   - 모든 구독 화면에 "구매 복원" 버튼 제공
+
+2. **구독 관리 링크** ✅
+   - 구현 위치: `SettingsPage`
+   - iOS에서만 "Apple 구독 관리" 링크 표시
+   - 링크: `https://apps.apple.com/account/subscriptions`
+
+3. **자동 갱신 정책 명시** ✅
+   - 구현 위치: `SubscriptionContent` 위젯
+   - "구독은 현재 기간이 끝나기 최소 24시간 전에 취소하지 않으면 자동으로 갱신됩니다" 문구 표시
+
+4. **약관 및 개인정보처리방침 링크** ✅
+   - 구현 위치: `SubscriptionContent` 위젯
+   - 구독 화면 하단에 링크 제공
+
+5. **명확한 가격 및 기간 표시** ✅
+   - 구현 위치: `SubscriptionContent` 위젯
+   - 각 패키지 카드에 가격과 기간 명시
+
+### 주의사항
+
+- 디지털 콘텐츠 판매는 반드시 In-App Purchase 사용
+- 외부 결제 링크 제공 금지 (미국 제외)
+- 구독은 최소 7일 이상 기간 제공 필요
+- 모든 기기에서 구독 콘텐츠 접근 가능해야 함
+
+**참고**: [App Store Review Guidelines](https://developer.apple.com/app-store/review/guidelines/)
+
 ## 1. RevenueCat 콘솔 설정
 
 ### 1.1 RevenueCat 프로젝트 생성

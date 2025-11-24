@@ -547,9 +547,12 @@
     "restore_not_found": "No purchases to restore",
     "purchase_failed": "Purchase failed",
     "manage_subscription": "Manage Subscription",
+    "manage_apple_subscription": "Manage Apple Subscription",
     "cancel_anytime": "Cancel anytime",
-    "terms_notice": "Payment will be charged to your Apple/Google account upon confirmation",
+    "terms_notice": "Payment will be charged to your Apple/Google account upon confirmation and renews automatically",
     "auto_renewal": "Auto-renewal",
+    "auto_renewal_notice": "Subscription automatically renews unless cancelled at least 24 hours before the end of current period",
+    "terms_and_privacy": "Terms of Service and Privacy Policy",
     "expires_at": "Expires: {date}",
     "features_title": "Premium Features",
     "best_value": "Best Value"

@@ -108,11 +108,11 @@ class BackgroundColorNotifier extends _$BackgroundColorNotifier {
     if (optionString != null) {
       return common.BackgroundColorOption.values.firstWhere(
         (option) => option.toString() == optionString,
-        orElse: () => common.BackgroundColorOption.defaultColor,
+        orElse: () => common.BackgroundColorOption.neutral,
       );
     }
 
-    return common.BackgroundColorOption.defaultColor;
+    return common.BackgroundColorOption.neutral;
   }
 
   Future<void> setBackgroundOption(common.BackgroundColorOption option) async {

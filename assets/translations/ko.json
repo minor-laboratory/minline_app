@@ -547,9 +547,12 @@
     "restore_not_found": "복원할 구매가 없습니다",
     "purchase_failed": "구매에 실패했습니다",
     "manage_subscription": "구독 관리",
+    "manage_apple_subscription": "Apple 구독 관리",
     "cancel_anytime": "언제든지 취소 가능",
-    "terms_notice": "결제는 확인 시 Apple/Google 계정으로 청구됩니다",
+    "terms_notice": "결제는 확인 시 Apple/Google 계정으로 청구되며, 자동으로 갱신됩니다",
     "auto_renewal": "자동 갱신",
+    "auto_renewal_notice": "구독은 현재 기간이 끝나기 최소 24시간 전에 취소하지 않으면 자동으로 갱신됩니다",
+    "terms_and_privacy": "이용약관 및 개인정보처리방침",
     "expires_at": "만료일: {date}",
     "features_title": "프리미엄 기능",
     "best_value": "최고의 가치"

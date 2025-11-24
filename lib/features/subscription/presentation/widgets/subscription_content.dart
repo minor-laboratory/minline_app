@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:minorlab_common/minorlab_common.dart' as common;
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -202,11 +203,33 @@ class _SubscriptionContentState extends ConsumerState<SubscriptionContent> {
           ),
           SizedBox(height: common.Spacing.xs),
           Text(
+            'subscription.auto_renewal_notice'.tr(),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.mutedForeground,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: common.Spacing.xs),
+          Text(
             'subscription.cancel_anytime'.tr(),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.mutedForeground,
             ),
             textAlign: TextAlign.center,
+          ),
+          SizedBox(height: common.Spacing.md),
+
+          // 약관 및 개인정보처리방침 링크
+          GestureDetector(
+            onTap: () => context.push('/settings/terms'),
+            child: Text(
+              'subscription.terms_and_privacy'.tr(),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.primary,
+                decoration: TextDecoration.underline,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
         ],
       ),
@@ -219,7 +242,6 @@ class _SubscriptionContentState extends ConsumerState<SubscriptionContent> {
       ('premium.feature_unlimited'.tr(), AppIcons.infinity),
       ('premium.feature_realtime'.tr(), AppIcons.zap),
       ('premium.feature_storage'.tr(), AppIcons.database),
-      ('premium.feature_priority'.tr(), AppIcons.star),
     ];
 
     return Container(
