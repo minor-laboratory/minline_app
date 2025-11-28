@@ -341,17 +341,25 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     );
   }
 
-  PreferredSizeWidget? _buildAppBar() {
-    // 이전 페이지가 있는 경우만 AppBar 표시
-    if (Navigator.of(context).canPop()) {
-      return AppBar(
-        leading: IconButton(
-          icon: Icon(AppIcons.arrowBack),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      );
-    }
-    return null;
+  PreferredSizeWidget _buildAppBar() {
+    final canPop = Navigator.of(context).canPop();
+
+    return AppBar(
+      leading: canPop
+          ? IconButton(
+              icon: Icon(AppIcons.arrowBack),
+              onPressed: () => Navigator.of(context).pop(),
+            )
+          : null,
+      actions: [
+        // 뒤로갈 곳이 없을 때만 "나중에" 버튼 표시
+        if (!canPop)
+          TextButton(
+            onPressed: () => context.go('/'),
+            child: Text('auth.skip'.tr()),
+          ),
+      ],
+    );
   }
 
   void _clearEmailForm() {
